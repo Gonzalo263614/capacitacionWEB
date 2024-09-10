@@ -28,11 +28,14 @@ app.get('/', (req, res) => {
     res.send('SERVIDOR CORRIENDO');
 });
 
-// Ruta para obtener la lista de maestros
-app.get('/maestros', (req, res) => {
-    connection.query('SELECT nombre, telefono FROM maestros', (err, results) => {
+// Ruta para obtener los datos de la tabla usuarios
+app.get('/usuarios', (req, res) => {
+    const query = 'SELECT * FROM usuarios';
+    connection.query(query, (err, results) => {
         if (err) {
-            return res.status(500).send('Error fetching data');
+            console.error('Error fetching users:', err);
+            res.status(500).json({ error: 'Error fetching users' });
+            return;
         }
         res.json(results);
     });
