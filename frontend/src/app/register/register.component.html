@@ -1,0 +1,44 @@
+<form (ngSubmit)="register()">
+  <div>
+    <label for="email">Email:</label>
+    <input type="email" id="email" [(ngModel)]="email" name="email" required>
+  </div>
+  <div>
+    <label for="password">Password:</label>
+    <input type="password" id="password" [(ngModel)]="password" name="password" required>
+  </div>
+  <div>
+    <label for="nombre">Nombre:</label>
+    <input type="text" id="nombre" [(ngModel)]="nombre" name="nombre" required>
+  </div>
+  <div>
+    <label for="apellidopaterno">Apellido Paterno:</label>
+    <input type="text" id="apellidopaterno" [(ngModel)]="apellidopaterno" name="apellidopaterno">
+  </div>
+  <div>
+    <label for="apellidomaterno">Apellido Materno:</label>
+    <input type="text" id="apellidomaterno" [(ngModel)]="apellidomaterno" name="apellidomaterno">
+  </div>
+  <div>
+    <label for="rol">Rol:</label>
+    <select id="rol" [(ngModel)]="rol" name="rol" required>
+      <option value="administrador">Administrador</option>
+      <option value="jefe">Jefe</option>
+      <option value="maestro">Maestro</option>
+      <option value="instructor">Instructor</option>
+    </select>
+  </div>
+  <div>
+    <label for="curp">CURP:</label>
+    <input type="text" id="curp" [(ngModel)]="curp" name="curp">
+  </div>
+  <div>
+    <label for="rfc">RFC:</label>
+    <input type="text" id="rfc" [(ngModel)]="rfc" name="rfc">
+  </div>
+  <div>
+    <label for="maxestudios">Máximo de Estudios:</label>
+    <input type="text" id="maxestudios" [(ngModel)]="maxestudios" name="maxestudios">
+  </div>
+  <button type="submit">Register</button>
+</form>
