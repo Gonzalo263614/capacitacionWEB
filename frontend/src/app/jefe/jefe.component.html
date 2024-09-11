@@ -3,3 +3,13 @@
 <h1>Bienvenido, Jefe</h1>
 <p>Aquí puedes proponer tus cursos.</p>
 <!-- Añadir más contenido según sea necesario -->
+<h2>Proponer un nuevo curso</h2>
+<form (ngSubmit)="proponerCurso()">
+  <label for="nombreCurso">Nombre del curso:</label>
+  <input type="text" id="nombreCurso" [(ngModel)]="nombreCurso" name="nombreCurso" required>
+
+  <label for="cupo">Cupo:</label>
+  <input type="number" id="cupo" [(ngModel)]="cupo" name="cupo" required>
+
+  <button type="submit">Proponer curso</button>
+</form>

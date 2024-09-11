@@ -135,3 +135,44 @@ const PORT = 3000;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
+
+// Ruta para que el jefe proponga un curso
+app.post('/proponer-curso', (req, res) => {
+    const { nombre_curso, cupo } = req.body;
+    const query = 'INSERT INTO cursos_propuestos (nombre_curso, cupo) VALUES (?, ?)';
+    connection.query(query, [nombre_curso, cupo], (err, results) => {
+        if (err) {
+            console.error('Error proposing course:', err);
+            return res.status(500).json({ error: 'Error proposing course' });
+        }
+        res.status(201).json({ message: 'Course proposed successfully' });
+    });
+});
+
+// Ruta para que el admin acepte o rechace un curso
+app.put('/actualizar-curso/:id', (req, res) => {
+    const { id } = req.params;
+    const { estado } = req.body; // 'aceptado' o 'rechazado'
+    const query = 'UPDATE cursos_propuestos SET estado = ? WHERE id = ?';
+    connection.query(query, [estado, id], (err, results) => {
+        if (err) {
+            console.error('Error updating course status:', err);
+            return res.status(500).json({ error: 'Error updating course status' });
+        }
+        res.status(200).json({ message: `Course ${estado}` });
+    });
+});
+// Ruta para obtener los cursos propuestos
+app.get('/cursos-propuestos', (req, res) => {
+    const query = 'SELECT * FROM cursos_propuestos';
+    connection.query(query, (err, results) => {
+        if (err) {
+            console.error('Error fetching proposed courses:', err);
+            return res.status(500).json({ error: 'Error fetching proposed courses' });
+        }
+        res.json(results);
+    });
+});
+
+
+
