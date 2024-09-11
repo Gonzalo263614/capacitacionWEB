@@ -6,6 +6,8 @@ import { AdminComponent } from './admin/admin.component';
 import { RegisterComponent } from './register/register.component';
 import { InstructorComponent } from './instructor/instructor.component';
 import { JefeComponent } from './jefe/jefe.component';
+import { ProfileComponent } from './profile/profile.component'; // Importa el componente de perfil
+import { AuthGuard } from './auth.guard'; // Importa el AuthGuard
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -14,6 +16,7 @@ const routes: Routes = [
   { path: 'register', component: RegisterComponent },
   { path: 'instructor', component: InstructorComponent },
   { path: 'jefe', component: JefeComponent },
+  { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },
   { path: '', redirectTo: '/login', pathMatch: 'full' },
 ];
 

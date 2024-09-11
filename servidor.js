@@ -108,7 +108,28 @@ app.post('/login', (req, res) => {
         });
     });
 });
+// Ruta para obtener el perfil del usuario
+app.get('/profile', (req, res) => {
+    const token = req.headers.authorization?.split(' ')[1]; // Obtener el token del header
+    if (!token) return res.status(401).json({ error: 'No token provided' });
 
+    jwt.verify(token, secretKey, (err, decoded) => {
+        if (err) return res.status(401).json({ error: 'Invalid token' });
+
+        const userId = decoded.id;
+        const query = 'SELECT * FROM usuarios WHERE id = ?';
+        connection.query(query, [userId], (err, results) => {
+            if (err) {
+                console.error('Error fetching user profile:', err);
+                return res.status(500).json({ error: 'Error fetching user profile' });
+            }
+            if (results.length === 0) {
+                return res.status(404).json({ error: 'User not found' });
+            }
+            res.json(results[0]);
+        });
+    });
+});
 // Iniciar el servidor en el puerto 3000
 const PORT = 3000;
 app.listen(PORT, () => {

@@ -12,6 +12,8 @@ import { AppRoutingModule } from './app-routing.module';
 import { RegisterComponent } from './register/register.component';
 import { InstructorComponent } from './instructor/instructor.component';
 import { JefeComponent } from './jefe/jefe.component';
+import { NavbarComponent } from './navbar/navbar.component';
+import { ProfileComponent } from './profile/profile.component';
 
 @NgModule({
   declarations: [
@@ -21,7 +23,9 @@ import { JefeComponent } from './jefe/jefe.component';
     AdminComponent,
     RegisterComponent,
     InstructorComponent,
-    JefeComponent
+    JefeComponent,
+    NavbarComponent,
+    ProfileComponent
   ],
   imports: [
     BrowserModule,
