@@ -10,6 +10,7 @@ import { HttpClient } from '@angular/common/http';
 export class RegisterComponent {
   email: string = '';
   password: string = '';
+  confirmPassword: string = '';
   nombre: string = '';
   apellidopaterno: string = '';
   apellidomaterno: string = '';
@@ -23,6 +24,12 @@ export class RegisterComponent {
   constructor(private http: HttpClient, private router: Router) { }
 
   register() {
+    if (this.password !== this.confirmPassword) {
+      console.error('Passwords do not match');
+      // Aquí puedes mostrar un mensaje de error al usuario
+      return;
+    }
+
     const user = {
       email: this.email,
       password: this.password,
