@@ -2,53 +2,61 @@
 <!-- Contenido específico para el componente -->
 <h1>Bienvenido, Jefe</h1>
 <p>Aquí puedes proponer tus cursos.</p>
-<!-- Añadir más contenido según sea necesario -->
-<h2>Proponer un nuevo curso</h2>
-<form (ngSubmit)="proponerCurso()">
-  <label>Nombre del Curso</label>
-  <input [(ngModel)]="nombreCurso" name="nombreCurso" required>
 
-  <label>Asignaturas Requeridas</label>
-  <textarea [(ngModel)]="asignaturasRequeridas" name="asignaturasRequeridas"></textarea>
+<!-- Botón para abrir el formulario -->
+<button (click)="mostrarFormulario = !mostrarFormulario" class="btn-toggle-form">
+  {{ mostrarFormulario ? 'Cerrar Formulario' : 'Proponer un nuevo curso' }}
+</button>
 
-  <label>Contenidos Requeridos</label>
-  <textarea [(ngModel)]="contenidosRequeridos" name="contenidosRequeridos"></textarea>
+<!-- Formulario con visibilidad controlada -->
+<div *ngIf="mostrarFormulario" class="form-container">
+  <h2>Proponer un nuevo curso</h2>
+  <form (ngSubmit)="proponerCurso()">
+    <label>Nombre del Curso</label>
+    <input [(ngModel)]="nombreCurso" name="nombreCurso" required>
 
-  <label>Número de Docentes</label>
-  <input type="number" [(ngModel)]="numeroDocentes" name="numeroDocentes">
+    <label>Asignaturas Requeridas</label>
+    <textarea [(ngModel)]="asignaturasRequeridas" name="asignaturasRequeridas"></textarea>
 
-  <label>Tipo de Asignatura</label>
-  <select [(ngModel)]="tipoAsignatura" name="tipoAsignatura">
-    <option value="carrera generica">Carrera Genérica</option>
-    <option value="modulo especialidad">Módulo de Especialidad</option>
-  </select>
+    <label>Contenidos Requeridos</label>
+    <textarea [(ngModel)]="contenidosRequeridos" name="contenidosRequeridos"></textarea>
 
-  <label>Actividad/Evento</label>
-  <input [(ngModel)]="actividadEvento" name="actividadEvento">
+    <label>Número de Docentes</label>
+    <input type="number" [(ngModel)]="numeroDocentes" name="numeroDocentes">
 
-  <label>Objetivo</label>
-  <textarea [(ngModel)]="objetivo" name="objetivo"></textarea>
+    <label>Tipo de Asignatura</label>
+    <select [(ngModel)]="tipoAsignatura" name="tipoAsignatura">
+      <option value="carrera generica">Carrera Genérica</option>
+      <option value="modulo especialidad">Módulo de Especialidad</option>
+    </select>
 
-  <label>Carreras Atendidas</label>
-  <textarea [(ngModel)]="carrerasAtendidas" name="carrerasAtendidas"></textarea>
+    <label>Actividad/Evento</label>
+    <input [(ngModel)]="actividadEvento" name="actividadEvento">
 
-  <label>Período</label>
-  <input [(ngModel)]="periodo" name="periodo">
+    <label>Objetivo</label>
+    <textarea [(ngModel)]="objetivo" name="objetivo"></textarea>
 
-  <label>Facilitadores Propuestos</label>
-  <textarea [(ngModel)]="facilitadoresPropuestos" name="facilitadoresPropuestos"></textarea>
+    <label>Carreras Atendidas</label>
+    <textarea [(ngModel)]="carrerasAtendidas" name="carrerasAtendidas"></textarea>
 
-  <label>Turno</label>
-  <select [(ngModel)]="turno" name="turno">
-    <option value="M">Mañana</option>
-    <option value="V">Tarde</option>
-  </select>
+    <label>Período</label>
+    <input [(ngModel)]="periodo" name="periodo">
 
-  <label>Fecha de Inicio</label>
-  <input type="date" [(ngModel)]="fechaInicio" name="fechaInicio">
+    <label>Facilitadores Propuestos</label>
+    <textarea [(ngModel)]="facilitadoresPropuestos" name="facilitadoresPropuestos"></textarea>
 
-  <label>Fecha de Fin</label>
-  <input type="date" [(ngModel)]="fechaFin" name="fechaFin">
+    <label>Turno</label>
+    <select [(ngModel)]="turno" name="turno">
+      <option value="M">Mañana</option>
+      <option value="V">Tarde</option>
+    </select>
 
-  <button type="submit">Proponer Curso</button>
-</form>
+    <label>Fecha de Inicio</label>
+    <input type="date" [(ngModel)]="fechaInicio" name="fechaInicio">
+
+    <label>Fecha de Fin</label>
+    <input type="date" [(ngModel)]="fechaFin" name="fechaFin">
+
+    <button type="submit" class="btn-submit">Proponer Curso</button>
+  </form>
+</div>

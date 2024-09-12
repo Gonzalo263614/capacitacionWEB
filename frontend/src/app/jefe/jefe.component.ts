@@ -7,6 +7,7 @@ import { HttpClient } from '@angular/common/http';
   styleUrls: ['./jefe.component.css']
 })
 export class JefeComponent {
+  mostrarFormulario = false;
   nombreCurso = '';
   asignaturasRequeridas = '';
   contenidosRequeridos = '';
@@ -43,6 +44,7 @@ export class JefeComponent {
     this.http.post('http://localhost:3000/proponer-curso', curso)
       .subscribe(response => {
         console.log('Curso propuesto:', response);
+        this.mostrarFormulario = false;  // Cerrar el formulario al enviar los datos
       }, error => {
         console.error('Error al proponer el curso:', error);
       });
