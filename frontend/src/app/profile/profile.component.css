@@ -1,9 +1,44 @@
-/* Agrega estilos básicos para la página de perfil */
-h1 {
-    color: #333;
+/* Title styles */
+.profile-title {
+  text-align: center;
+  font-size: 28px;
+  font-weight: bold;
+  color: #333;
+  margin-top: 20px;
+  font-family: 'Arial', sans-serif;
+}
+
+/* Profile card container */
+.profile-card {
+  width: 400px;
+  margin: 20px auto;
+  padding: 20px;
+  border-radius: 10px;
+  background-color: #f9f9f9;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  font-family: 'Arial', sans-serif;
+}
+
+/* Styling for profile information */
+.profile-card p {
+  font-size: 16px;
+  margin: 10px 0;
+  color: #333;
+}
+
+.profile-card strong {
+  font-weight: bold;
+  color: #007bff;
+}
+
+/* Responsiveness */
+@media (max-width: 500px) {
+  .profile-card {
+    width: 100%;
+    padding: 15px;
   }
-  
-  div {
-    padding: 20px;
+
+  .profile-card p {
+    font-size: 14px;
   }
-  
+}

@@ -1,12 +1,15 @@
-<form (ngSubmit)="login()">
-  <div>
+<h2 class="form-title">Formación y Actualización Profesional Docente</h2>
+<form (ngSubmit)="login()" class="login-form">
+  <div class="form-group">
     <label for="email">Email:</label>
     <input type="email" id="email" [(ngModel)]="email" name="email" required>
   </div>
-  <div>
+  <div class="form-group">
     <label for="password">Password:</label>
     <input type="password" id="password" [(ngModel)]="password" name="password" required>
   </div>
-  <button type="submit">Login</button>
-  <button type="button" (click)="goToRegister()">Register</button>
+  <div class="button-group">
+    <button type="submit" class="btn">Login</button>
+    <button type="button" class="btn btn-secondary" (click)="goToRegister()">Register</button>
+  </div>
 </form>

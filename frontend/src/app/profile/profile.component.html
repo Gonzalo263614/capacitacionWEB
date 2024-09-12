@@ -1,9 +1,10 @@
-<h1>Perfil</h1>
-<div *ngIf="user">
+<app-navbar></app-navbar>
+<h1 class="profile-title">Perfil</h1>
+<div *ngIf="user" class="profile-card">
   <p><strong>Nombre:</strong> {{ user.nombre }}</p>
-  <p><strong>Apellido Paterno:</strong> {{ user.nombre }}</p>
-  <p><strong>Apellido Materno:</strong> {{ user.apellidopaterno }}</p>
-  <p><strong>Email:</strong> {{ user.apellidomaterno }}</p>
+  <p><strong>Apellido Paterno:</strong> {{ user.apellidopaterno }}</p>
+  <p><strong>Apellido Materno:</strong> {{ user.apellidomaterno }}</p>
+  <p><strong>Email:</strong> {{ user.email }}</p>
   <p><strong>Rol:</strong> {{ user.rol }}</p>
   <p><strong>CURP:</strong> {{ user.curp }}</p>
   <p><strong>RFC:</strong> {{ user.rfc }}</p>
