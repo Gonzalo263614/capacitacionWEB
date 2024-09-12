@@ -1,12 +1,29 @@
 <app-navbar></app-navbar>
-<!-- Contenido específico para el componente -->
+
 <h1>Bienvenido, Administrador</h1>
 <p>Gestiona los usuarios, capacitaciones y más.</p>
-<!-- Añadir más contenido según sea necesario -->
+
 <h2>Cursos Propuestos</h2>
 <ul>
   <li *ngFor="let curso of cursos">
-    {{ curso.nombre_curso }} - Cupo: {{ curso.cupo }} - Estado: {{ curso.estado }}
+    <p><strong>Nombre del Curso:</strong> {{ curso.nombre_curso }}</p>
+    <p><strong>Cupo:</strong> {{ curso.cupo }}</p>
+    <p><strong>Nombre del Instructor:</strong> {{ curso.nombre_instructor }}</p>
+    <p><strong>Asignaturas de Formación:</strong> {{ curso.asignaturas_formacion }}</p>
+    <p><strong>Contenidos Temáticos:</strong> {{ curso.contenidos_tematicos }}</p>
+    <p><strong>Número de Docentes:</strong> {{ curso.numero_docentes }}</p>
+    <p><strong>Tipo de Asignatura:</strong> {{ curso.tipo_asignatura }}</p>
+    <p><strong>Actividad Evento:</strong> {{ curso.actividad_evento }}</p>
+    <p><strong>Objetivo:</strong> {{ curso.objetivo }}</p>
+    <p><strong>Carreras Atendidas:</strong> {{ curso.carreras_atendidas }}</p>
+    <p><strong>Periodo de Formación:</strong> {{ curso.periodo_formacion }}</p>
+    <p><strong>Fecha de Actividad:</strong> {{ curso.fecha_actividad | date }}</p>
+    <p><strong>Facilitadores:</strong> {{ curso.facilitadores }}</p>
+    <p><strong>Carrera Genérica:</strong> {{ curso.carrera_generica }}</p>
+    <p><strong>Módulo de Especialidad:</strong> {{ curso.modulo_especialidad }}</p>
+    <p><strong>Fecha de Inicio:</strong> {{ curso.fecha_inicio | date }}</p>
+    <p><strong>Turno:</strong> {{ curso.turno }}</p>
+
     <button *ngIf="curso.estado === 'pendiente'" (click)="actualizarEstado(curso.id, 'aceptado')">Aceptar</button>
     <button *ngIf="curso.estado === 'pendiente'" (click)="actualizarEstado(curso.id, 'rechazado')">Rechazar</button>
   </li>

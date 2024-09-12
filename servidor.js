@@ -108,6 +108,7 @@ app.post('/login', (req, res) => {
         });
     });
 });
+
 // Ruta para obtener el perfil del usuario
 app.get('/profile', (req, res) => {
     const token = req.headers.authorization?.split(' ')[1]; // Obtener el token del header
@@ -130,24 +131,47 @@ app.get('/profile', (req, res) => {
         });
     });
 });
-// Iniciar el servidor en el puerto 3000
-const PORT = 3000;
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-});
 
-// Ruta para que el jefe proponga un curso
+// Ruta para proponer un curso
 app.post('/proponer-curso', (req, res) => {
-    const { nombre_curso, cupo } = req.body;
-    const query = 'INSERT INTO cursos_propuestos (nombre_curso, cupo) VALUES (?, ?)';
-    connection.query(query, [nombre_curso, cupo], (err, results) => {
+    const {
+        nombre_curso,
+        asignaturas_requeridas,
+        contenidos_requeridos,
+        numero_docentes,
+        tipo_asignatura,
+        actividad_evento,
+        objetivo,
+        carreras_atendidas,
+        periodo,
+        facilitadores_propuestos,
+        turno,
+        fecha_inicio,
+        fecha_fin
+    } = req.body;
+
+    const sql = `
+      INSERT INTO cursos_propuestos (
+        nombre_curso, asignaturas_requeridas, contenidos_requeridos, numero_docentes,
+        tipo_asignatura, actividad_evento, objetivo, carreras_atendidas, periodo,
+        facilitadores_propuestos, turno, fecha_inicio, fecha_fin
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    connection.query(sql, [
+        nombre_curso, asignaturas_requeridas, contenidos_requeridos, numero_docentes,
+        tipo_asignatura, actividad_evento, objetivo, carreras_atendidas, periodo,
+        facilitadores_propuestos, turno, fecha_inicio, fecha_fin
+    ], (err, result) => {
         if (err) {
             console.error('Error proposing course:', err);
             return res.status(500).json({ error: 'Error proposing course' });
         }
-        res.status(201).json({ message: 'Course proposed successfully' });
+        // Asegúrate de enviar una respuesta JSON correcta
+        res.status(200).json({ message: 'Course proposed successfully' });
     });
 });
+
 
 // Ruta para que el admin acepte o rechace un curso
 app.put('/actualizar-curso/:id', (req, res) => {
@@ -162,6 +186,7 @@ app.put('/actualizar-curso/:id', (req, res) => {
         res.status(200).json({ message: `Course ${estado}` });
     });
 });
+
 // Ruta para obtener los cursos propuestos
 app.get('/cursos-propuestos', (req, res) => {
     const query = 'SELECT * FROM cursos_propuestos';
@@ -174,5 +199,8 @@ app.get('/cursos-propuestos', (req, res) => {
     });
 });
 
-
-
+// Iniciar el servidor en el puerto 3000
+const PORT = 3000;
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+});

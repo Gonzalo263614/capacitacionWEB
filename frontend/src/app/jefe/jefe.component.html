@@ -5,11 +5,50 @@
 <!-- Añadir más contenido según sea necesario -->
 <h2>Proponer un nuevo curso</h2>
 <form (ngSubmit)="proponerCurso()">
-  <label for="nombreCurso">Nombre del curso:</label>
-  <input type="text" id="nombreCurso" [(ngModel)]="nombreCurso" name="nombreCurso" required>
+  <label>Nombre del Curso</label>
+  <input [(ngModel)]="nombreCurso" name="nombreCurso" required>
 
-  <label for="cupo">Cupo:</label>
-  <input type="number" id="cupo" [(ngModel)]="cupo" name="cupo" required>
+  <label>Asignaturas Requeridas</label>
+  <textarea [(ngModel)]="asignaturasRequeridas" name="asignaturasRequeridas"></textarea>
 
-  <button type="submit">Proponer curso</button>
+  <label>Contenidos Requeridos</label>
+  <textarea [(ngModel)]="contenidosRequeridos" name="contenidosRequeridos"></textarea>
+
+  <label>Número de Docentes</label>
+  <input type="number" [(ngModel)]="numeroDocentes" name="numeroDocentes">
+
+  <label>Tipo de Asignatura</label>
+  <select [(ngModel)]="tipoAsignatura" name="tipoAsignatura">
+    <option value="carrera generica">Carrera Genérica</option>
+    <option value="modulo especialidad">Módulo de Especialidad</option>
+  </select>
+
+  <label>Actividad/Evento</label>
+  <input [(ngModel)]="actividadEvento" name="actividadEvento">
+
+  <label>Objetivo</label>
+  <textarea [(ngModel)]="objetivo" name="objetivo"></textarea>
+
+  <label>Carreras Atendidas</label>
+  <textarea [(ngModel)]="carrerasAtendidas" name="carrerasAtendidas"></textarea>
+
+  <label>Período</label>
+  <input [(ngModel)]="periodo" name="periodo">
+
+  <label>Facilitadores Propuestos</label>
+  <textarea [(ngModel)]="facilitadoresPropuestos" name="facilitadoresPropuestos"></textarea>
+
+  <label>Turno</label>
+  <select [(ngModel)]="turno" name="turno">
+    <option value="M">Mañana</option>
+    <option value="V">Tarde</option>
+  </select>
+
+  <label>Fecha de Inicio</label>
+  <input type="date" [(ngModel)]="fechaInicio" name="fechaInicio">
+
+  <label>Fecha de Fin</label>
+  <input type="date" [(ngModel)]="fechaFin" name="fechaFin">
+
+  <button type="submit">Proponer Curso</button>
 </form>

@@ -1,11 +1,12 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+
 @Component({
   selector: 'app-admin',
   templateUrl: './admin.component.html',
-  styleUrl: './admin.component.css'
+  styleUrls: ['./admin.component.css']
 })
-export class AdminComponent {
+export class AdminComponent implements OnInit {
   cursos: any[] = [];
 
   constructor(private http: HttpClient) {}
@@ -17,11 +18,13 @@ export class AdminComponent {
   obtenerCursos() {
     this.http.get('http://localhost:3000/cursos-propuestos')
       .subscribe((data: any) => {
-        this.cursos = data;
+        this.cursos = data.filter((curso: any) => curso.estado === 'pendiente');
       }, error => {
         console.error('Error al obtener los cursos:', error);
       });
   }
+  
+
 
   actualizarEstado(id: number, estado: string) {
     this.http.put(`http://localhost:3000/actualizar-curso/${id}`, { estado })
