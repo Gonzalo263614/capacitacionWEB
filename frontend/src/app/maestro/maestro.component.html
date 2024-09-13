@@ -1,5 +1,37 @@
+<!-- maestro.component.html -->
 <app-navbar></app-navbar>
-<!-- Contenido específico para el componente -->
+
 <h1>Bienvenido, Maestro</h1>
-<p>Aquí puedes ver tus capacitaciones y realizar otras acciones.</p>
-<!-- Añadir más contenido según sea necesario -->
+<p>Aquí puedes ver los cursos disponibles y inscribirte en ellos.</p>
+
+<ul>
+  <li *ngFor="let curso of cursos">
+    <p><strong>Nombre del Curso:</strong> {{ curso.nombre_curso }}</p>
+    <p><strong>Fecha de Inicio:</strong> {{ curso.fecha_inicio | date }}</p>
+    <button (click)="toggleDetails(curso.id)">
+      {{ curso.mostrarDetalles ? 'Ocultar' : 'Ver Más' }}
+    </button>
+    
+    <div *ngIf="curso.mostrarDetalles">
+      <p><strong>Asignaturas de Formación:</strong> {{ curso.asignaturas_requeridas }}</p>
+      <p><strong>Contenidos Temáticos:</strong> {{ curso.contenidos_requeridos }}</p>
+      <p><strong>Número de Docentes:</strong> {{ curso.numero_docentes }}</p>
+      <p><strong>Tipo de Asignatura:</strong> {{ curso.tipo_asignatura }}</p>
+      <p><strong>Actividad/Event:</strong> {{ curso.actividad_evento }}</p>
+      <p><strong>Objetivo:</strong> {{ curso.objetivo }}</p>
+      <p><strong>Carreras Atendidas:</strong> {{ curso.carreras_atendidas }}</p>
+      <p><strong>Período:</strong> {{ curso.periodo }}</p>
+      <p><strong>Facilitadores Propuestos:</strong> {{ curso.facilitadores_propuestos }}</p>
+      <p><strong>Turno:</strong> {{ curso.turno }}</p>
+      <p><strong>Fecha de Fin:</strong> {{ curso.fecha_fin | date }}</p>
+      <p><strong>Justificación:</strong> {{ curso.justificacion }}</p>
+      <p><strong>Número de Horas:</strong> {{ curso.numero_horas }}</p>
+      <p><strong>Horario:</strong> {{ curso.horario }}</p>
+      <p><strong>Lugar:</strong> {{ curso.lugar }}</p>
+      <p><strong>Requisitos:</strong> {{ curso.requisitos }}</p>
+      <p><strong>Tipo de Curso:</strong> {{ curso.tipo_curso }}</p>
+      
+      <button (click)="inscribir(curso.id)">Inscribirse</button>
+    </div>
+  </li>
+</ul>

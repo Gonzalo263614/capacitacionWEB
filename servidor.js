@@ -207,6 +207,32 @@ app.get('/cursos-propuestos', (req, res) => {
         res.json(results);
     });
 });
+// Ruta para obtener los cursos aceptados
+app.get('/cursos', (req, res) => {
+    const query = 'SELECT * FROM cursos_propuestos WHERE estado = "aceptado"';
+    connection.query(query, (err, results) => {
+        if (err) {
+            console.error('Error fetching courses:', err);
+            return res.status(500).json({ error: 'Error fetching courses' });
+        }
+        res.json(results);
+    });
+});
+// Ruta para obtener detalles de un curso específico
+app.get('/cursos/:id', (req, res) => {
+    const { id } = req.params;
+    const query = 'SELECT * FROM cursos_propuestos WHERE id = ?';
+    connection.query(query, [id], (err, results) => {
+        if (err) {
+            console.error('Error fetching course details:', err);
+            return res.status(500).json({ error: 'Error fetching course details' });
+        }
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'Course not found' });
+        }
+        res.json(results[0]);
+    });
+});
 
 // Iniciar el servidor en el puerto 3000
 const PORT = 3000;

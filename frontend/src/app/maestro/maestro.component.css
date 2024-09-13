@@ -1,0 +1,11 @@
+.mensaje {
+    color: green;
+    /* Color verde para éxito */
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.mensaje.error {
+    color: red;
+    /* Color rojo para error */
+}
