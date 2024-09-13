@@ -1,14 +1,11 @@
 <app-navbar></app-navbar>
-<!-- Contenido específico para el componente -->
 <h1>Bienvenido, Jefe</h1>
 <p>Aquí puedes proponer tus cursos.</p>
 
-<!-- Botón para abrir el formulario -->
 <button (click)="mostrarFormulario = !mostrarFormulario" class="btn-toggle-form">
   {{ mostrarFormulario ? 'Cerrar Formulario' : 'Proponer un nuevo curso' }}
 </button>
 
-<!-- Formulario con visibilidad controlada -->
 <div *ngIf="mostrarFormulario" class="form-container">
   <h2>Proponer un nuevo curso</h2>
   <form (ngSubmit)="proponerCurso()">
@@ -56,6 +53,29 @@
 
     <label>Fecha de Fin</label>
     <input type="date" [(ngModel)]="fechaFin" name="fechaFin">
+
+    <!-- Nuevos campos -->
+    <label>Justificación</label>
+    <textarea [(ngModel)]="justificacion" name="justificacion"></textarea>
+
+    <label>Número de Horas</label>
+    <input type="number" [(ngModel)]="numeroHoras" name="numeroHoras">
+
+    <label>Horario</label>
+    <input [(ngModel)]="horario" name="horario">
+
+    <label>Lugar</label>
+    <input [(ngModel)]="lugar" name="lugar">
+
+    <label>Requisitos</label>
+    <textarea [(ngModel)]="requisitos" name="requisitos"></textarea>
+
+    <label>Tipo de Curso</label>
+    <select [(ngModel)]="tipoCurso" name="tipoCurso">
+      <option value="Formación Docente">Formación Docente</option>
+      <option value="Actualización Profesional">Actualización Profesional</option>
+      <option value="Superación Personal">Superación Personal</option>
+    </select>
 
     <button type="submit" class="btn-submit">Proponer Curso</button>
   </form>

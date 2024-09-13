@@ -11,14 +11,22 @@
     <p><strong>Contenidos Temáticos:</strong> {{ curso.contenidos_requeridos }}</p>
     <p><strong>Número de Docentes:</strong> {{ curso.numero_docentes }}</p>
     <p><strong>Tipo de Asignatura:</strong> {{ curso.tipo_asignatura }}</p>
-    <p><strong>Actividad Evento:</strong> {{ curso.actividad_evento }}</p>
+    <p><strong>Actividad/Event:</strong> {{ curso.actividad_evento }}</p>
     <p><strong>Objetivo:</strong> {{ curso.objetivo }}</p>
     <p><strong>Carreras Atendidas:</strong> {{ curso.carreras_atendidas }}</p>
-    <p><strong>Periodo de Formación:</strong> {{ curso.periodo }}</p>
-    <p><strong>Facilitadores:</strong> {{ curso.facilitadores_propuestos }}</p>
+    <p><strong>Período:</strong> {{ curso.periodo }}</p>
+    <p><strong>Facilitadores Propuestos:</strong> {{ curso.facilitadores_propuestos }}</p>
+    <p><strong>Turno:</strong> {{ curso.turno }}</p>
     <p><strong>Fecha de Inicio:</strong> {{ curso.fecha_inicio | date }}</p>
     <p><strong>Fecha de Fin:</strong> {{ curso.fecha_fin | date }}</p>
-    <p><strong>Turno:</strong> {{ curso.turno }}</p>
+    
+    <!-- Nuevos campos -->
+    <p><strong>Justificación:</strong> {{ curso.justificacion }}</p>
+    <p><strong>Número de Horas:</strong> {{ curso.numero_horas }}</p>
+    <p><strong>Horario:</strong> {{ curso.horario }}</p>
+    <p><strong>Lugar:</strong> {{ curso.lugar }}</p>
+    <p><strong>Requisitos:</strong> {{ curso.requisitos }}</p>
+    <p><strong>Tipo de Curso:</strong> {{ curso.tipo_curso }}</p>
 
     <button *ngIf="curso.estado === 'pendiente'" (click)="actualizarEstado(curso.id, 'aceptado')">Aceptar</button>
     <button *ngIf="curso.estado === 'pendiente'" (click)="actualizarEstado(curso.id, 'rechazado')">Rechazar</button>

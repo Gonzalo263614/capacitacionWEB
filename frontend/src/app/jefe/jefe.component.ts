@@ -21,6 +21,12 @@ export class JefeComponent {
   turno = '';
   fechaInicio = '';
   fechaFin = '';
+  justificacion = '';
+  numeroHoras = 0;
+  horario = '';
+  lugar = '';
+  requisitos = '';
+  tipoCurso = '';
 
   constructor(private http: HttpClient) {}
 
@@ -38,7 +44,13 @@ export class JefeComponent {
       facilitadores_propuestos: this.facilitadoresPropuestos,
       turno: this.turno,
       fecha_inicio: this.fechaInicio,
-      fecha_fin: this.fechaFin
+      fecha_fin: this.fechaFin,
+      justificacion: this.justificacion,
+      numero_horas: this.numeroHoras,
+      horario: this.horario,
+      lugar: this.lugar,
+      requisitos: this.requisitos,
+      tipo_curso: this.tipoCurso
     };
 
     this.http.post('http://localhost:3000/proponer-curso', curso)

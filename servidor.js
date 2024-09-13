@@ -147,21 +147,29 @@ app.post('/proponer-curso', (req, res) => {
         facilitadores_propuestos,
         turno,
         fecha_inicio,
-        fecha_fin
+        fecha_fin,
+        justificacion,         // Nuevo campo
+        numero_horas,          // Nuevo campo
+        horario,               // Nuevo campo
+        lugar,                 // Nuevo campo
+        requisitos,            // Nuevo campo
+        tipo_curso             // Nuevo campo
     } = req.body;
 
     const sql = `
       INSERT INTO cursos_propuestos (
         nombre_curso, asignaturas_requeridas, contenidos_requeridos, numero_docentes,
         tipo_asignatura, actividad_evento, objetivo, carreras_atendidas, periodo,
-        facilitadores_propuestos, turno, fecha_inicio, fecha_fin
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        facilitadores_propuestos, turno, fecha_inicio, fecha_fin,
+        justificacion, numero_horas, horario, lugar, requisitos, tipo_curso
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     connection.query(sql, [
         nombre_curso, asignaturas_requeridas, contenidos_requeridos, numero_docentes,
         tipo_asignatura, actividad_evento, objetivo, carreras_atendidas, periodo,
-        facilitadores_propuestos, turno, fecha_inicio, fecha_fin
+        facilitadores_propuestos, turno, fecha_inicio, fecha_fin,
+        justificacion, numero_horas, horario, lugar, requisitos, tipo_curso
     ], (err, result) => {
         if (err) {
             console.error('Error proposing course:', err);
@@ -171,6 +179,7 @@ app.post('/proponer-curso', (req, res) => {
         res.status(200).json({ message: 'Course proposed successfully' });
     });
 });
+
 
 
 // Ruta para que el admin acepte o rechace un curso
