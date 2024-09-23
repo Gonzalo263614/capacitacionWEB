@@ -20,12 +20,23 @@ export class MaestroComponent implements OnInit {
       .subscribe((data: any) => {
         this.cursos = data.map((curso: any) => ({
           ...curso,
-          mostrarDetalles: false // Inicialmente ocultar detalles
+          mostrarDetalles: false, // Inicialmente ocultar detalles
+          inscrito: false // Inicializar la propiedad de inscripción
         }));
+  
+        // Verificar si el usuario ya está inscrito en cada curso
+        this.cursos.forEach(curso => {
+          this.http.get(`http://localhost:3000/inscripciones/${curso.id}`, {
+            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+          }).subscribe((res: any) => {
+            curso.inscrito = res.inscrito; // Actualizar la propiedad inscrito
+          });
+        });
       }, error => {
         console.error('Error al obtener los cursos:', error);
       });
   }
+  
 
   toggleDetails(cursoId: number) {
     const curso = this.cursos.find(c => c.id === cursoId);

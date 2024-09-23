@@ -31,7 +31,15 @@
       <p><strong>Requisitos:</strong> {{ curso.requisitos }}</p>
       <p><strong>Tipo de Curso:</strong> {{ curso.tipo_curso }}</p>
       
-      <button (click)="inscribir(curso.id)">Inscribirse</button>
+      <div *ngFor="let curso of cursos">
+        <h3>{{ curso.nombre_curso }}</h3>
+        <button (click)="inscribir(curso.id)" [disabled]="curso.inscrito">Inscribirse</button>
+        <span *ngIf="curso.inscrito">Inscrito</span>
+        <button (click)="toggleDetails(curso.id)">Detalles</button>
+        <div *ngIf="curso.mostrarDetalles">
+          <!-- Mostrar detalles del curso aquí -->
+        </div>
+      </div>      
     </div>
   </li>
 </ul>

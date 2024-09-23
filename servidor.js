@@ -255,6 +255,27 @@ app.post('/inscribir/:id', (req, res) => {
     });
 });
 
+// Ruta para verificar si un usuario está inscrito en un curso
+app.get('/inscripciones/:cursoId', (req, res) => {
+    const token = req.headers.authorization?.split(' ')[1]; // Obtener el token del header
+    if (!token) return res.status(401).json({ error: 'No token provided' });
+
+    jwt.verify(token, secretKey, (err, decoded) => {
+        if (err) return res.status(401).json({ error: 'Invalid token' });
+
+        const userId = decoded.id;
+        const { cursoId } = req.params;
+
+        const query = 'SELECT * FROM inscripciones WHERE usuario_id = ? AND curso_id = ?';
+        connection.query(query, [userId, cursoId], (err, results) => {
+            if (err) {
+                console.error('Error checking enrollment:', err);
+                return res.status(500).json({ error: 'Error checking enrollment' });
+            }
+            res.json({ inscrito: results.length > 0 });
+        });
+    });
+});
 
 // Iniciar el servidor en el puerto 3000
 const PORT = 3000;
