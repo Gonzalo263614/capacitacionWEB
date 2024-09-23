@@ -19,14 +19,20 @@ export class LoginComponent {
     this.http.post<{ token: string, rol: string }>('http://localhost:3000/login', loginData)
       .subscribe({
         next: (response) => {
+          // Guardar el token en localStorage
           localStorage.setItem('token', response.token);
+
+          // Guardar el rol del usuario en localStorage
+          localStorage.setItem('userRole', response.rol);
+          
+          // Navegar según el rol del usuario
           if (response.rol === 'maestro') {
             this.router.navigate(['/maestro']);
           } else if (response.rol === 'administrador') {
             this.router.navigate(['/admin']);
-          }else if (response.rol === 'instructor') {
+          } else if (response.rol === 'instructor') {
             this.router.navigate(['/instructor']);
-          }else if (response.rol === 'jefe') {
+          } else if (response.rol === 'jefe') {
             this.router.navigate(['/jefe']);
           }
         },
@@ -35,6 +41,7 @@ export class LoginComponent {
         }
       });
   }
+
   goToRegister() {
     this.router.navigate(['/register']); // Redirige a la página de registro
   }

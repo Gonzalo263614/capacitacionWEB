@@ -9,12 +9,20 @@ import { filter } from 'rxjs/operators';
 })
 export class NavbarComponent {
   isProfilePage: boolean;
+  userRole: string | null; // Se mantiene como string | null
 
   constructor(private router: Router) {
-    // Inicializar el estado basado en la URL actual
     this.isProfilePage = this.router.url === '/profile';
+    
+    // Obtener el rol del usuario desde localStorage
+    const storedRole = localStorage.getItem('userRole');
+    
+  
+    // Si el valor no es null, lo convertimos a minúsculas; si es null, lo dejamos como null
+    this.userRole = storedRole ? storedRole.toLowerCase() : null; 
 
-    // Suscribirse a los eventos de navegación para actualizar el estado
+    console.log('Rol del usuario:', this.userRole); // Verificar el rol en la consola
+
     this.router.events.pipe(filter(() => this.router.url === '/profile')).subscribe(() => {
       this.isProfilePage = true;
     });
@@ -24,19 +32,39 @@ export class NavbarComponent {
   }
 
   toggleProfile(event: MouseEvent) {
-    event.preventDefault(); // Evita la acción predeterminada del enlace
+    event.preventDefault();
 
     if (this.isProfilePage) {
-      // Si estás en la página de perfil, simplemente regresa a otra vista
-      this.router.navigate(['/']); // Regresa a la página principal o a una página específica
+      // Regresa a la vista dependiendo del rol del usuario
+      this.navigateToRolePage();
     } else {
-      // Si no estás en la página de perfil, navega al perfil
       this.router.navigate(['/profile']);
+    }
+  }
+
+  navigateToRolePage() {
+    switch (this.userRole) {
+      case 'administrador':
+        this.router.navigate(['/admin']);
+        break;
+      case 'maestro':
+        this.router.navigate(['/maestro']);
+        break;
+      case 'jefe':
+        this.router.navigate(['/jefe']);
+        break;
+      case 'instructor':
+        this.router.navigate(['/instructor']);
+        break;
+      default:
+        console.log('Rol no encontrado, redirigiendo a la página principal.');
+        this.router.navigate(['/']); // Redirigir a la página principal si el rol no es válido
+        break;
     }
   }
 
   logout() {
     // Implementa aquí tu lógica de cierre de sesión
-    this.router.navigate(['/']);
+    this.router.navigate(['/login']);
   }
 }
