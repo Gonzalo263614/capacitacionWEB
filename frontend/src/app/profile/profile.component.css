@@ -1,44 +1,44 @@
 /* Title styles */
 .profile-title {
   text-align: center;
-  font-size: 28px;
-  font-weight: bold;
-  color: #333;
+  font-size: 32px; /* Aumentar el tamaño del título */
+  font-weight: 600; /* Cambiar a un peso seminegro */
+  color: #2c3e50; /* Color más oscuro */
   margin-top: 20px;
-  font-family: 'Arial', sans-serif;
+  font-family: 'Helvetica Neue', Arial, sans-serif; /* Fuente más moderna */
 }
 
 /* Profile card container */
 .profile-card {
-  width: 400px;
+  max-width: 450px; /* Limitar ancho máximo */
   margin: 20px auto;
-  padding: 20px;
+  padding: 25px; /* Aumentar padding */
   border-radius: 10px;
-  background-color: #f9f9f9;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background-color: #ffffff; /* Color de fondo blanco */
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Sombra más pronunciada */
   font-family: 'Arial', sans-serif;
 }
 
 /* Styling for profile information */
 .profile-card p {
-  font-size: 16px;
+  font-size: 18px; /* Aumentar tamaño de texto */
   margin: 10px 0;
-  color: #333;
+  color: #333; /* Color del texto */
 }
 
 .profile-card strong {
   font-weight: bold;
-  color: #007bff;
+  color: #007bff; /* Color azul para las etiquetas */
 }
 
 /* Responsiveness */
 @media (max-width: 500px) {
   .profile-card {
-    width: 100%;
-    padding: 15px;
+    width: 90%; /* Ajustar el ancho en móviles */
+    padding: 20px;
   }
 
   .profile-card p {
-    font-size: 14px;
+    font-size: 16px; /* Ajustar tamaño de texto en móviles */
   }
 }

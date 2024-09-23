@@ -1,29 +1,39 @@
-<form (ngSubmit)="register()">
-  <div>
+<h2 class="form-title">Formación y Actualización Profesional Docente</h2>
+<img src="TecNM.png" alt="Logo de la Institución" class="logo"> <!-- Ajusta la ruta según tu estructura -->
+<form (ngSubmit)="register()" class="register-form">
+  <h2 class="form-title2">Registro de Usuario</h2>
+  
+  <div class="form-group">
     <label for="email">Email:</label>
     <input type="email" id="email" [(ngModel)]="email" name="email" required>
   </div>
-  <div>
+
+  <div class="form-group">
     <label for="password">Password:</label>
     <input type="password" id="password" [(ngModel)]="password" name="password" required>
   </div>
-  <div>
+
+  <div class="form-group">
     <label for="confirmPassword">Confirm Password:</label>
     <input type="password" id="confirmPassword" [(ngModel)]="confirmPassword" name="confirmPassword" required>
   </div>
-  <div>
+
+  <div class="form-group">
     <label for="nombre">Nombre:</label>
     <input type="text" id="nombre" [(ngModel)]="nombre" name="nombre" required>
   </div>
-  <div>
+
+  <div class="form-group">
     <label for="apellidopaterno">Apellido Paterno:</label>
     <input type="text" id="apellidopaterno" [(ngModel)]="apellidopaterno" name="apellidopaterno">
   </div>
-  <div>
+
+  <div class="form-group">
     <label for="apellidomaterno">Apellido Materno:</label>
     <input type="text" id="apellidomaterno" [(ngModel)]="apellidomaterno" name="apellidomaterno">
   </div>
-  <div>
+
+  <div class="form-group">
     <label for="rol">Rol:</label>
     <select id="rol" [(ngModel)]="rol" name="rol" required>
       <option value="administrador">Administrador</option>
@@ -32,17 +42,21 @@
       <option value="instructor">Instructor</option>
     </select>
   </div>
-  <div>
+
+  <div class="form-group">
     <label for="curp">CURP:</label>
     <input type="text" id="curp" [(ngModel)]="curp" name="curp">
   </div>
-  <div>
+
+  <div class="form-group">
     <label for="rfc">RFC:</label>
     <input type="text" id="rfc" [(ngModel)]="rfc" name="rfc">
   </div>
-  <div>
+
+  <div class="form-group">
     <label for="maxestudios">Máximo de Estudios:</label>
     <input type="text" id="maxestudios" [(ngModel)]="maxestudios" name="maxestudios">
   </div>
-  <button type="submit">Register</button>
+
+  <button type="submit" class="btn">Registrar</button>
 </form>

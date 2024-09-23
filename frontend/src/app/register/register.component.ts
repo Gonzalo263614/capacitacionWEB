@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-register',
@@ -45,7 +46,18 @@ export class RegisterComponent {
     this.http.post(this.apiUrl, user).subscribe(
       response => {
         console.log('User registered successfully', response);
-        this.router.navigate(['/login']); // Redirige al login después del registro
+        // Mostrar el alert
+        Swal.fire({
+          icon: 'success',
+          title: 'Éxito',
+          text: 'Usuario registrado exitosamente.',
+          confirmButtonText: 'Aceptar',
+          background: '#f0f0f0', // Cambia el color de fondo
+          color: '#333', // Cambia el color del texto
+          confirmButtonColor: '#007bff' // Cambia el color del botón
+        }).then(() => {
+          this.router.navigate(['/login']); // Redirige al login después de cerrar el alert
+        });
       },
       error => {
         console.error('Error registering user', error);

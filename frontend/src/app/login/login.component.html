@@ -1,4 +1,5 @@
 <h2 class="form-title">Formación y Actualización Profesional Docente</h2>
+<img src="TecNM.png" alt="Logo de la Institución" class="logo"> <!-- Ajusta la ruta según tu estructura -->
 <form (ngSubmit)="login()" class="login-form">
   <div class="form-group">
     <label for="email">Email:</label>
@@ -9,7 +10,7 @@
     <input type="password" id="password" [(ngModel)]="password" name="password" required>
   </div>
   <div class="button-group">
-    <button type="submit" class="btn">Login</button>
+    <button type="submit" class="btn btn-primary">Login</button>
     <button type="button" class="btn btn-secondary" (click)="goToRegister()">Register</button>
   </div>
 </form>

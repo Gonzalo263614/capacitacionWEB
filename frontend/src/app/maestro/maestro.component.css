@@ -9,3 +9,23 @@
     color: red;
     /* Color rojo para error */
 }
+.form-title {
+    text-align: center;
+    font-size: 28px; /* Aumentar tamaño */
+    font-weight: 700; /* Hacerlo más grueso */
+    color: rgb(0, 0, 0); /* Cambiar color a blanco */
+    margin-bottom: 25px;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    /*background: linear-gradient(90deg, #2980b9, #6dd5ed); /* Degradado */
+    background: linear-gradient(90deg, #eff1f5, #ccc8c8); /* Degradado */
+    padding: 20px; /* Espaciado alrededor del texto */
+    border-radius: 8px; /* Bordes redondeados */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Sombra */
+    transition: transform 0.3s ease;
+}
+.logo {
+    display: block;
+    margin: 0 auto 20px; /* Centrar y agregar margen inferior */
+    width: 120px; /* Ajusta el tamaño del logo aquí */
+    height: auto; /* Mantener proporciones del logo */
+}

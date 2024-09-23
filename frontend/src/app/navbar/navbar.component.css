@@ -1,9 +1,10 @@
 /* Estilos para la barra de navegación */
 nav {
-  background-color: #333;
+  background-color: #093f63; /* Color de fondo */
   color: #fff;
-  padding: 10px;
-  border-bottom: 2px solid #444;
+  padding: 15px 20px;
+  border-bottom: 2px solid #34495e;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 ul {
@@ -15,27 +16,32 @@ ul {
 }
 
 li {
-  margin-right: 20px;
+  margin: 0 15px; /* Espaciado entre elementos */
 }
 
 a {
-  color: #fff;
+  color: #ecf0f1; /* Color de texto claro */
   text-decoration: none;
-  padding: 10px 15px;
+  padding: 10px 20px; /* Espaciado interno */
   display: block;
   border-radius: 5px;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  font-weight: bold; /* Texto en negrita */
+  font-size: 16px; /* Tamaño de fuente más grande */
+  letter-spacing: 1px; /* Espaciado entre letras */
 }
 
 a:hover {
-  background-color: #555;
+  background-color: #1d7ddd; /* Fondo al pasar el ratón */
+  transform: translateY(-2px); /* Efecto de elevación */
 }
 
 a.active {
-  background-color: #007bff;
+  background-color: #007bff; /* Color activo */
   color: #fff;
+  text-decoration: underline; /* Subrayar el texto activo */
 }
 
 a.active:hover {
-  background-color: #0056b3;
+  background-color: #0056b3; /* Color al pasar el ratón sobre el activo */
 }
