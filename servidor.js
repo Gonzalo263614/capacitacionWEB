@@ -233,6 +233,28 @@ app.get('/cursos/:id', (req, res) => {
         res.json(results[0]);
     });
 });
+// Ruta para inscribir a un maestro en un curso
+app.post('/inscribir/:id', (req, res) => {
+    const { id } = req.params;
+    const token = req.headers.authorization?.split(' ')[1]; // Obtener el token del header
+    if (!token) return res.status(401).json({ error: 'No token provided' });
+
+    jwt.verify(token, secretKey, (err, decoded) => {
+        if (err) return res.status(401).json({ error: 'Invalid token' });
+
+        const userId = decoded.id; // Obtener el ID del usuario del token
+
+        const query = 'INSERT INTO inscripciones (usuario_id, curso_id) VALUES (?, ?)';
+        connection.query(query, [userId, id], (err, result) => {
+            if (err) {
+                console.error('Error inscribing in course:', err);
+                return res.status(500).json({ error: 'Error inscribing in course' });
+            }
+            res.status(200).json({ message: 'Inscription successful' });
+        });
+    });
+});
+
 
 // Iniciar el servidor en el puerto 3000
 const PORT = 3000;

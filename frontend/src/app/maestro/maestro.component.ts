@@ -1,4 +1,3 @@
-// maestro.component.ts
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
@@ -10,7 +9,7 @@ import { HttpClient } from '@angular/common/http';
 export class MaestroComponent implements OnInit {
   cursos: any[] = [];
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   ngOnInit(): void {
     this.obtenerCursos();
@@ -36,6 +35,20 @@ export class MaestroComponent implements OnInit {
   }
 
   inscribir(cursoId: number) {
+    const token = localStorage.getItem('token'); // Obtener el token del localStorage
+    this.http.post(`http://localhost:3000/inscribir/${cursoId}`, {}, {
+      headers: {
+        Authorization: `Bearer ${token}` // Enviar el token en el header
+      }
+    }).subscribe(
+      (response: any) => {
+        console.log('Inscripción exitosa:', response);
+        alert('Te has inscrito con éxito en el curso');
+      },
+      error => {
+        console.error('Error al inscribirse en el curso:', error);
+        alert('Hubo un error al intentar inscribirte. Por favor, intenta nuevamente.');
+      }
+    );
   }
-  
 }
