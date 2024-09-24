@@ -1,6 +1,6 @@
 <app-navbar></app-navbar>
 <h2 class="form-title">Formación y Actualización Profesional Docente</h2>
-<img src="TecNM.png" alt="Logo de la Institución" class="logo"> <!-- Ajusta la ruta según tu estructura -->
+<img src="TecNM.png" alt="Logo de la Institución" class="logo">
 
 <h1>Bienvenido, Jefe</h1>
 <p>Aquí puedes proponer tus cursos.</p>
@@ -12,6 +12,7 @@
 <div *ngIf="mostrarFormulario" class="form-container">
   <h2>Proponer un nuevo curso</h2>
   <form (ngSubmit)="proponerCurso()">
+    <!-- Datos del curso -->
     <label>Nombre del Curso</label>
     <input [(ngModel)]="nombreCurso" name="nombreCurso" required>
 
@@ -41,9 +42,6 @@
 
     <label>Período</label>
     <input [(ngModel)]="periodo" name="periodo">
-
-    <label>Facilitadores Propuestos</label>
-    <textarea [(ngModel)]="facilitadoresPropuestos" name="facilitadoresPropuestos"></textarea>
 
     <label>Turno</label>
     <select [(ngModel)]="turno" name="turno">
@@ -79,6 +77,33 @@
       <option value="Actualización Profesional">Actualización Profesional</option>
       <option value="Superación Personal">Superación Personal</option>
     </select>
+
+    <!-- Datos del instructor -->
+    <h3>Datos del Instructor</h3>
+    <label>Nombre del Instructor</label>
+    <input [(ngModel)]="nombreInstructor" name="nombreInstructor">
+
+    <label>Apellido Paterno del Instructor</label>
+    <input [(ngModel)]="apellidopaternoInstructor" name="apellidopaternoInstructor">
+
+    <label>Apellido Materno del Instructor</label>
+    <input [(ngModel)]="apellidomaternoInstructor" name="apellidomaternoInstructor">
+
+    <label>CURP del Instructor</label>
+    <input [(ngModel)]="curpInstructor" name="curpInstructor">
+
+    <label>RFC del Instructor</label>
+    <input [(ngModel)]="rfcInstructor" name="rfcInstructor">
+
+    <label>Máximo Nivel de Estudios del Instructor</label>
+    <input [(ngModel)]="maxestudiosInstructor" name="maxestudiosInstructor">
+
+    <label>Email del Instructor</label>
+    <input [(ngModel)]="emailInstructor" name="emailInstructor">
+
+    <!-- Contraseña generada automáticamente -->
+    <label>Contraseña del Instructor (Generada Automáticamente)</label>
+    <input [(ngModel)]="passwordInstructor" name="passwordInstructor" readonly>
 
     <button type="submit" class="btn-submit">Proponer Curso</button>
   </form>

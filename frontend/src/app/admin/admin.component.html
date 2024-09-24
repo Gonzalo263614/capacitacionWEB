@@ -15,7 +15,7 @@
     <p><strong>Objetivo:</strong> {{ curso.objetivo }}</p>
     <p><strong>Carreras Atendidas:</strong> {{ curso.carreras_atendidas }}</p>
     <p><strong>Período:</strong> {{ curso.periodo }}</p>
-    <p><strong>Facilitadores Propuestos:</strong> {{ curso.facilitadores_propuestos }}</p>
+
     <p><strong>Turno:</strong> {{ curso.turno }}</p>
     <p><strong>Fecha de Inicio:</strong> {{ curso.fecha_inicio | date }}</p>
     <p><strong>Fecha de Fin:</strong> {{ curso.fecha_fin | date }}</p>
@@ -27,6 +27,13 @@
     <p><strong>Lugar:</strong> {{ curso.lugar }}</p>
     <p><strong>Requisitos:</strong> {{ curso.requisitos }}</p>
     <p><strong>Tipo de Curso:</strong> {{ curso.tipo_curso }}</p>
+
+    <!-- Información del Instructor -->
+    <p><strong>Nombre del Instructor:</strong> {{ curso.nombre_instructor }} {{ curso.apellidopaterno_instructor }} {{ curso.apellidomaterno_instructor }}</p>
+    <p><strong>CURP del Instructor:</strong> {{ curso.curp_instructor }}</p>
+    <p><strong>RFC del Instructor:</strong> {{ curso.rfc_instructor }}</p>
+    <p><strong>Máximo de Estudios del Instructor:</strong> {{ curso.maxestudios_instructor }}</p>
+    <p><strong>Email del Instructor:</strong> {{ curso.email_instructor }}</p>    
 
     <button *ngIf="curso.estado === 'pendiente'" (click)="actualizarEstado(curso.id, 'aceptado')">Aceptar</button>
     <button *ngIf="curso.estado === 'pendiente'" (click)="actualizarEstado(curso.id, 'rechazado')">Rechazar</button>

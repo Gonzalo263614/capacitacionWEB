@@ -8,6 +8,8 @@ import { HttpClient } from '@angular/common/http';
 })
 export class JefeComponent {
   mostrarFormulario = false;
+
+  // Datos del curso
   nombreCurso = '';
   asignaturasRequeridas = '';
   contenidosRequeridos = '';
@@ -27,6 +29,18 @@ export class JefeComponent {
   lugar = '';
   requisitos = '';
   tipoCurso = '';
+
+  // Datos del instructor
+  nombreInstructor = '';
+  apellidopaternoInstructor = '';
+  apellidomaternoInstructor = '';
+  curpInstructor = '';
+  rfcInstructor = '';
+  maxestudiosInstructor = '';
+  emailInstructor = '';
+  
+  // Contraseña generada automáticamente
+  passwordInstructor = 'contraseña1234';  // Contraseña predeterminada
 
   constructor(private http: HttpClient) {}
 
@@ -50,9 +64,20 @@ export class JefeComponent {
       horario: this.horario,
       lugar: this.lugar,
       requisitos: this.requisitos,
-      tipo_curso: this.tipoCurso
+      tipo_curso: this.tipoCurso,
+
+      // Datos del instructor
+      nombre_instructor: this.nombreInstructor,
+      apellidopaterno_instructor: this.apellidopaternoInstructor,
+      apellidomaterno_instructor: this.apellidomaternoInstructor,
+      curp_instructor: this.curpInstructor,
+      rfc_instructor: this.rfcInstructor,
+      maxestudios_instructor: this.maxestudiosInstructor,
+      email_instructor: this.emailInstructor,
+      password_instructor: this.passwordInstructor // Contraseña fija
     };
 
+    // Enviar los datos del curso al backend
     this.http.post('http://localhost:3000/proponer-curso', curso)
       .subscribe(response => {
         console.log('Curso propuesto:', response);

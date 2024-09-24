@@ -135,51 +135,29 @@ app.get('/profile', (req, res) => {
 // Ruta para proponer un curso
 app.post('/proponer-curso', (req, res) => {
     const {
-        nombre_curso,
-        asignaturas_requeridas,
-        contenidos_requeridos,
-        numero_docentes,
-        tipo_asignatura,
-        actividad_evento,
-        objetivo,
-        carreras_atendidas,
-        periodo,
-        facilitadores_propuestos,
-        turno,
-        fecha_inicio,
-        fecha_fin,
-        justificacion,         // Nuevo campo
-        numero_horas,          // Nuevo campo
-        horario,               // Nuevo campo
-        lugar,                 // Nuevo campo
-        requisitos,            // Nuevo campo
-        tipo_curso             // Nuevo campo
+        nombre_curso, asignaturas_requeridas, contenidos_requeridos, numero_docentes, tipo_asignatura, actividad_evento,
+        objetivo, carreras_atendidas, periodo, turno, fecha_inicio, fecha_fin, justificacion,
+        numero_horas, horario, lugar, requisitos, tipo_curso, nombre_instructor, apellidopaterno_instructor, apellidomaterno_instructor,
+        curp_instructor, rfc_instructor, maxestudios_instructor, email_instructor, password_instructor
     } = req.body;
 
-    const sql = `
-      INSERT INTO cursos_propuestos (
-        nombre_curso, asignaturas_requeridas, contenidos_requeridos, numero_docentes,
-        tipo_asignatura, actividad_evento, objetivo, carreras_atendidas, periodo,
-        facilitadores_propuestos, turno, fecha_inicio, fecha_fin,
-        justificacion, numero_horas, horario, lugar, requisitos, tipo_curso
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `;
+    const query = `INSERT INTO cursos_propuestos (nombre_curso, asignaturas_requeridas, contenidos_requeridos, numero_docentes, tipo_asignatura,
+      actividad_evento, objetivo, carreras_atendidas, periodo, turno, fecha_inicio, fecha_fin, justificacion,
+      numero_horas, horario, lugar, requisitos, tipo_curso, nombre_instructor, apellidopaterno_instructor, apellidomaterno_instructor,
+      curp_instructor, rfc_instructor, maxestudios_instructor, email_instructor, password_instructor)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
-    connection.query(sql, [
-        nombre_curso, asignaturas_requeridas, contenidos_requeridos, numero_docentes,
-        tipo_asignatura, actividad_evento, objetivo, carreras_atendidas, periodo,
-        facilitadores_propuestos, turno, fecha_inicio, fecha_fin,
-        justificacion, numero_horas, horario, lugar, requisitos, tipo_curso
-    ], (err, result) => {
+    connection.query(query, [nombre_curso, asignaturas_requeridas, contenidos_requeridos, numero_docentes, tipo_asignatura,
+        actividad_evento, objetivo, carreras_atendidas, periodo, turno, fecha_inicio, fecha_fin, justificacion,
+        numero_horas, horario, lugar, requisitos, tipo_curso, nombre_instructor, apellidopaterno_instructor, apellidomaterno_instructor,
+        curp_instructor, rfc_instructor, maxestudios_instructor, email_instructor, password_instructor], (err, results) => {
         if (err) {
-            console.error('Error proposing course:', err);
-            return res.status(500).json({ error: 'Error proposing course' });
+            console.error('Error al proponer el curso:', err);
+            return res.status(500).json({ error: 'Error al proponer el curso' });
         }
-        // Asegúrate de enviar una respuesta JSON correcta
-        res.status(200).json({ message: 'Course proposed successfully' });
+        res.status(201).json({ message: 'Curso propuesto exitosamente' });
     });
 });
-
 
 
 // Ruta para que el admin acepte o rechace un curso

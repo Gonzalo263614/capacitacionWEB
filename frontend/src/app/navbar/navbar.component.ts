@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, Inject, PLATFORM_ID } from '@angular/core';
 import { Router } from '@angular/router';
+import { isPlatformBrowser } from '@angular/common';
 import { filter } from 'rxjs/operators';
 
 @Component({
@@ -9,19 +10,19 @@ import { filter } from 'rxjs/operators';
 })
 export class NavbarComponent {
   isProfilePage: boolean;
-  userRole: string | null; // Se mantiene como string | null
+  userRole: string | null;
 
-  constructor(private router: Router) {
+  constructor(private router: Router, @Inject(PLATFORM_ID) private platformId: Object) {
     this.isProfilePage = this.router.url === '/profile';
-    
-    // Obtener el rol del usuario desde localStorage
-    const storedRole = localStorage.getItem('userRole');
-    
-  
-    // Si el valor no es null, lo convertimos a minúsculas; si es null, lo dejamos como null
-    this.userRole = storedRole ? storedRole.toLowerCase() : null; 
 
-    console.log('Rol del usuario:', this.userRole); // Verificar el rol en la consola
+    // Solo acceder a localStorage si estamos en el navegador
+    if (isPlatformBrowser(this.platformId)) {
+      const storedRole = localStorage.getItem('userRole');
+      this.userRole = storedRole ? storedRole.toLowerCase() : null;
+      console.log('Rol del usuario:', this.userRole);
+    } else {
+      this.userRole = null; // Si no estamos en el navegador
+    }
 
     this.router.events.pipe(filter(() => this.router.url === '/profile')).subscribe(() => {
       this.isProfilePage = true;
@@ -35,7 +36,6 @@ export class NavbarComponent {
     event.preventDefault();
 
     if (this.isProfilePage) {
-      // Regresa a la vista dependiendo del rol del usuario
       this.navigateToRolePage();
     } else {
       this.router.navigate(['/profile']);
@@ -58,7 +58,7 @@ export class NavbarComponent {
         break;
       default:
         console.log('Rol no encontrado, redirigiendo a la página principal.');
-        this.router.navigate(['/']); // Redirigir a la página principal si el rol no es válido
+        this.router.navigate(['/']);
         break;
     }
   }
