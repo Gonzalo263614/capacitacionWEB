@@ -55,6 +55,7 @@ export class MaestroComponent implements OnInit {
       (response: any) => {
         console.log('Inscripción exitosa:', response);
         alert('Te has inscrito con éxito en el curso');
+        this.obtenerCursos();
       },
       error => {
         console.error('Error al inscribirse en el curso:', error);
