@@ -213,8 +213,9 @@ app.get('/cursos/:id', (req, res) => {
 });
 // Ruta para inscribir a un maestro en un curso
 app.post('/inscribir/:id', (req, res) => {
-    const { id } = req.params;
+    const { id } = req.params;  // ID del curso
     const token = req.headers.authorization?.split(' ')[1]; // Obtener el token del header
+    
     if (!token) return res.status(401).json({ error: 'No token provided' });
 
     jwt.verify(token, secretKey, (err, decoded) => {
@@ -222,16 +223,53 @@ app.post('/inscribir/:id', (req, res) => {
 
         const userId = decoded.id; // Obtener el ID del usuario del token
 
-        const query = 'INSERT INTO inscripciones (usuario_id, curso_id) VALUES (?, ?)';
-        connection.query(query, [userId, id], (err, result) => {
+        // Verificar el cupo del curso
+        const cupoQuery = `
+            SELECT cupo_actual, numero_docentes 
+            FROM cursos_propuestos 
+            WHERE id = ?
+        `;
+
+        connection.query(cupoQuery, [id], (err, result) => {
             if (err) {
-                console.error('Error inscribing in course:', err);
-                return res.status(500).json({ error: 'Error inscribing in course' });
+                console.error('Error querying course capacity:', err);
+                return res.status(500).json({ error: 'Error querying course capacity' });
             }
-            res.status(200).json({ message: 'Inscription successful' });
+
+            const { cupo_actual, numero_docentes } = result[0];
+
+            // Verificar si hay cupo
+            if (cupo_actual >= numero_docentes) {
+                return res.status(400).json({ error: 'Cupo lleno, no se puede inscribir' });
+            }
+
+            // Si hay cupo, insertar la inscripción
+            const inscripcionQuery = 'INSERT INTO inscripciones (usuario_id, curso_id) VALUES (?, ?)';
+            connection.query(inscripcionQuery, [userId, id], (err, result) => {
+                if (err) {
+                    console.error('Error inscribing in course:', err);
+                    return res.status(500).json({ error: 'Error inscribing in course' });
+                }
+
+                // Actualizar el cupo en la tabla cursos_propuestos
+                const actualizarCupoQuery = `
+                    UPDATE cursos_propuestos 
+                    SET cupo_actual = cupo_actual + 1 
+                    WHERE id = ?
+                `;
+                connection.query(actualizarCupoQuery, [id], (err, result) => {
+                    if (err) {
+                        console.error('Error updating course capacity:', err);
+                        return res.status(500).json({ error: 'Error updating course capacity' });
+                    }
+
+                    res.status(200).json({ message: 'Inscripción exitosa' });
+                });
+            });
         });
     });
 });
+
 
 // Ruta para verificar si un usuario está inscrito en un curso
 app.get('/inscripciones/:cursoId', (req, res) => {
