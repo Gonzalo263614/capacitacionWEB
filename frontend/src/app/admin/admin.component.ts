@@ -8,6 +8,7 @@ import { HttpClient } from '@angular/common/http';
 })
 export class AdminComponent implements OnInit {
   cursos: any[] = [];
+  mostrarCursos: boolean = false; // Variable para controlar si se muestran los cursos
 
   constructor(private http: HttpClient) {}
 
@@ -23,20 +24,20 @@ export class AdminComponent implements OnInit {
         console.error('Error al obtener los cursos:', error);
       });
   }
+
   actualizarEstado(id: number, estado: string) {
     this.http.put(`http://localhost:3000/actualizar-curso/${id}`, { estado })
       .subscribe(response => {
         console.log(`Curso ${estado}:`, response);
         if (estado === 'aceptado') {
-          // Llama a la función para registrar al instructor
           this.registrarInstructor(id);
         }
-        this.obtenerCursos(); // Actualiza la lista después de aceptar/rechazar
+        this.obtenerCursos(); 
       }, error => {
         console.error('Error al actualizar el curso:', error);
       });
   }
-  
+
   registrarInstructor(cursoId: number) {
     this.http.get(`http://localhost:3000/cursos/${cursoId}`)
       .subscribe((curso: any) => {
@@ -49,9 +50,9 @@ export class AdminComponent implements OnInit {
           rfc: curso.rfc_instructor,
           maxestudios: curso.maxestudios_instructor,
           email: curso.email_instructor,
-          password: curso.password_instructor, // Asegúrate de manejar las contraseñas adecuadamente
+          password: curso.password_instructor,
         };
-  
+
         this.http.post('http://localhost:3000/register', instructorData)
           .subscribe(response => {
             console.log('Instructor registrado:', response);
@@ -61,5 +62,10 @@ export class AdminComponent implements OnInit {
       }, error => {
         console.error('Error al obtener datos del curso:', error);
       });
-  }  
+  }
+
+  // Función para alternar la visibilidad de los cursos
+  toggleCursos() {
+    this.mostrarCursos = !this.mostrarCursos;
+  }
 }

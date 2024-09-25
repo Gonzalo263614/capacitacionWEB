@@ -1,46 +1,48 @@
-<!-- maestro.component.html -->
 <app-navbar></app-navbar>
-<h2 class="form-title">Formación y Actualización Profesional Docente</h2>
-<img src="TecNM.png" alt="Logo de la Institución" class="logo"> <!-- Ajusta la ruta según tu estructura -->
-<h1>Bienvenido, Maestro</h1>
-<p>Aquí puedes ver los cursos disponibles y inscribirte en ellos.</p>
 
-<ul>
-  <li *ngFor="let curso of cursos">
-    <p><strong>Nombre del Curso:</strong> {{ curso.nombre_curso }}</p>
-    <p><strong>Fecha de Inicio:</strong> {{ curso.fecha_inicio | date }}</p>
-    <button (click)="toggleDetails(curso.id)">
-      {{ curso.mostrarDetalles ? 'Ocultar' : 'Ver Más' }}
-    </button>
-    
-    <div *ngIf="curso.mostrarDetalles">
-      <p><strong>Asignaturas de Formación:</strong> {{ curso.asignaturas_requeridas }}</p>
-      <p><strong>Contenidos Temáticos:</strong> {{ curso.contenidos_requeridos }}</p>
-      <p><strong>Número de Docentes:</strong> {{ curso.numero_docentes }}</p>
-      <p><strong>Tipo de Asignatura:</strong> {{ curso.tipo_asignatura }}</p>
-      <p><strong>Actividad/Event:</strong> {{ curso.actividad_evento }}</p>
-      <p><strong>Objetivo:</strong> {{ curso.objetivo }}</p>
-      <p><strong>Carreras Atendidas:</strong> {{ curso.carreras_atendidas }}</p>
-      <p><strong>Período:</strong> {{ curso.periodo }}</p>
-      <p><strong>Facilitadores Propuestos:</strong> {{ curso.facilitadores_propuestos }}</p>
-      <p><strong>Turno:</strong> {{ curso.turno }}</p>
-      <p><strong>Fecha de Fin:</strong> {{ curso.fecha_fin | date }}</p>
-      <p><strong>Justificación:</strong> {{ curso.justificacion }}</p>
-      <p><strong>Número de Horas:</strong> {{ curso.numero_horas }}</p>
-      <p><strong>Horario:</strong> {{ curso.horario }}</p>
-      <p><strong>Lugar:</strong> {{ curso.lugar }}</p>
-      <p><strong>Requisitos:</strong> {{ curso.requisitos }}</p>
-      <p><strong>Tipo de Curso:</strong> {{ curso.tipo_curso }}</p>
-      
-      <div *ngFor="let curso of cursos">
-        <h3>{{ curso.nombre_curso }}</h3>
-        <button (click)="inscribir(curso.id)" [disabled]="curso.inscrito">Inscribirse</button>
-        <span *ngIf="curso.inscrito">Inscrito</span>
-        <button (click)="toggleDetails(curso.id)">Detalles</button>
-        <div *ngIf="curso.mostrarDetalles">
-          <!-- Mostrar detalles del curso aquí -->
-        </div>
-      </div>      
-    </div>
-  </li>
-</ul>
+<div class="container">
+  <h2 class="form-title">Formación y Actualización Profesional Docente</h2>
+  <img src="TecNM.png" alt="Logo de la Institución" class="logo"> <!-- Ajusta la ruta según tu estructura -->
+  <h1 class="welcome-title">Bienvenido, Maestro</h1>
+  <p class="intro-text">Aquí puedes ver los cursos disponibles y inscribirte en ellos.</p>
+
+  <ul class="course-list">
+    <li class="course-item" *ngFor="let curso of cursos">
+      <p><strong>Nombre del Curso:</strong> {{ curso.nombre_curso }}</p>
+      <p><strong>Fecha de Inicio:</strong> {{ curso.fecha_inicio | date }}</p>
+      <button class="btn-details" (click)="toggleDetails(curso.id)">
+        {{ curso.mostrarDetalles ? 'Ocultar' : 'Ver Más' }}
+      </button>
+
+      <div *ngIf="curso.mostrarDetalles" class="course-details">
+        <!-- Detalles adicionales del curso -->
+        <p><strong>Asignaturas de Formación:</strong> {{ curso.asignaturas_requeridas }}</p>
+        <p><strong>Contenidos Temáticos:</strong> {{ curso.contenidos_requeridos }}</p>
+        <p><strong>Número de Docentes:</strong> {{ curso.numero_docentes }}</p>
+        <p><strong>Tipo de Asignatura:</strong> {{ curso.tipo_asignatura }}</p>
+        <p><strong>Actividad/Event:</strong> {{ curso.actividad_evento }}</p>
+        <p><strong>Objetivo:</strong> {{ curso.objetivo }}</p>
+        <p><strong>Carreras Atendidas:</strong> {{ curso.carreras_atendidas }}</p>
+        <p><strong>Período:</strong> {{ curso.periodo }}</p>
+        <p><strong>Turno:</strong> {{ curso.turno }}</p>
+        <p><strong>Fecha de Fin:</strong> {{ curso.fecha_fin | date }}</p>
+        <p><strong>Justificación:</strong> {{ curso.justificacion }}</p>
+        <p><strong>Número de Horas:</strong> {{ curso.numero_horas }}</p>
+        <p><strong>Horario:</strong> {{ curso.horario }}</p>
+        <p><strong>Lugar:</strong> {{ curso.lugar }}</p>
+        <p><strong>Requisitos:</strong> {{ curso.requisitos }}</p>
+        <p><strong>Tipo de Curso:</strong> {{ curso.tipo_curso }}</p>
+        <!-- Información del Instructor -->
+        <p><strong>Nombre del Instructor:</strong> {{ curso.nombre_instructor }} {{ curso.apellidopaterno_instructor }} {{ curso.apellidomaterno_instructor }}</p>
+        <p><strong>CURP del Instructor:</strong> {{ curso.curp_instructor }}</p>
+        <p><strong>RFC del Instructor:</strong> {{ curso.rfc_instructor }}</p>
+        <p><strong>Máximo de Estudios del Instructor:</strong> {{ curso.maxestudios_instructor }}</p>
+        <p><strong>Email del Instructor:</strong> {{ curso.email_instructor }}</p>
+      </div>
+
+      <!-- Botón de inscripción -->
+      <button class="btn-inscribe" (click)="inscribir(curso.id)" [disabled]="curso.inscrito">Inscribirse</button>
+      <span *ngIf="curso.inscrito" class="inscrito-text">Inscrito</span>
+    </li>
+  </ul>
+</div>

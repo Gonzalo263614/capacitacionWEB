@@ -57,6 +57,7 @@ export class MaestroComponent implements OnInit {
           headers: {
             Authorization: `Bearer ${token}` // Enviar el token en el header
           }
+          
         }).subscribe(
           (response: any) => {
             console.log('Inscripción exitosa:', response);

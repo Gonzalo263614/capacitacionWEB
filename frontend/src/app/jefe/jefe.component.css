@@ -1,13 +1,37 @@
+/* Estilos generales */
+body {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    background-color: #f4f7f9;
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+h1, h2 {
+    text-align: center;
+    color: #333;
+}
+
+p {
+    text-align: center;
+    color: #666;
+    font-size: 18px;
+    line-height: 1.5;
+}
+
 /* Estilos para el botón de abrir/cerrar formulario */
 .btn-toggle-form {
     background-color: #007bff;
     color: white;
     border: none;
-    padding: 10px 20px;
+    padding: 12px 25px;
     border-radius: 5px;
     cursor: pointer;
-    margin-bottom: 20px;
+    display: block;
+    margin: 20px auto;
     font-size: 16px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
 }
 
 .btn-toggle-form:hover {
@@ -16,25 +40,33 @@
 
 /* Estilos del formulario */
 .form-container {
-    background-color: #f9f9f9;
-    padding: 20px;
+    background-color: #ffffff;
+    padding: 25px;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    width: 500px;
-    margin: 0 auto;
+    width: 600px;
+    margin: 20px auto;
+}
+
+.form-container h2 {
+    text-align: center;
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 15px;
 }
 
 .form-container label {
     display: block;
     font-weight: bold;
-    margin-top: 10px;
+    margin-top: 15px;
+    color: #555;
 }
 
 .form-container input,
 .form-container textarea,
 .form-container select {
     width: 100%;
-    padding: 8px;
+    padding: 10px;
     margin-top: 5px;
     border: 1px solid #ccc;
     border-radius: 5px;
@@ -45,32 +77,48 @@
     background-color: #28a745;
     color: white;
     border: none;
-    padding: 10px 15px;
+    padding: 12px;
     border-radius: 5px;
     cursor: pointer;
-    margin-top: 15px;
+    margin-top: 20px;
+    width: 100%;
+    font-size: 16px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
 }
 
 .form-container .btn-submit:hover {
     background-color: #218838;
 }
+
+/* Estilos del título del formulario */
 .form-title {
     text-align: center;
-    font-size: 28px; /* Aumentar tamaño */
-    font-weight: 700; /* Hacerlo más grueso */
-    color: rgb(0, 0, 0); /* Cambiar color a blanco */
+    font-size: 28px;
+    font-weight: 700;
+    color: #333;
     margin-bottom: 25px;
-    font-family: 'Helvetica Neue', Arial, sans-serif;
-    /*background: linear-gradient(90deg, #2980b9, #6dd5ed); /* Degradado */
-    background: linear-gradient(90deg, #eff1f5, #ccc8c8); /* Degradado */
-    padding: 20px; /* Espaciado alrededor del texto */
-    border-radius: 8px; /* Bordes redondeados */
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Sombra */
-    transition: transform 0.3s ease;
+    background: linear-gradient(90deg, #eff1f5, #ccc8c8);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
+
+/* Estilos del logo */
 .logo {
     display: block;
-    margin: 0 auto 20px; /* Centrar y agregar margen inferior */
-    width: 120px; /* Ajusta el tamaño del logo aquí */
-    height: auto; /* Mantener proporciones del logo */
+    margin: 0 auto 20px;
+    width: 120px;
+    height: auto;
+}
+
+/* Estilos para los campos de error */
+.mensaje {
+    color: green;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.mensaje.error {
+    color: red;
 }

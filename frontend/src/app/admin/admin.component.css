@@ -50,3 +50,17 @@ button:last-of-type {
     width: 120px; /* Ajusta el tamaño del logo aquí */
     height: auto; /* Mantener proporciones del logo */
 }
+button {
+    margin: 15px 0;
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+button:hover {
+    background-color: #45a049;
+}
