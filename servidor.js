@@ -64,10 +64,12 @@ app.post('/register', (req, res) => {
                 console.error('Error inserting user:', err);
                 return res.status(500).json({ error: 'Error inserting user' });
             }
-            res.status(201).json({ message: 'User registered successfully' });
+            const userId = results.insertId; // Obtener el ID del usuario recién creado
+            res.status(201).json({ message: 'User registered successfully', userId }); // Devolver el ID
         });
     });
 });
+
 
 // Ruta para el login
 app.post('/login', (req, res) => {
@@ -292,6 +294,20 @@ app.get('/inscripciones/:cursoId', (req, res) => {
         });
     });
 });
+// Ruta para inscribir a un instructor en un curso
+app.post('/instructor-curso', (req, res) => {
+    const { id_usuario_instructor, id_curso_propuesto } = req.body;
+
+    const query = 'INSERT INTO instructor_curso (id_usuario_instructor, id_curso_propuesto) VALUES (?, ?)';
+    connection.query(query, [id_usuario_instructor, id_curso_propuesto], (err, results) => {
+        if (err) {
+            console.error('Error inserting instructor-course record:', err);
+            return res.status(500).json({ error: 'Error inserting instructor-course record' });
+        }
+        res.status(201).json({ message: 'Instructor-course record created successfully' });
+    });
+});
+
 
 // Iniciar el servidor en el puerto 3000
 const PORT = 3000;

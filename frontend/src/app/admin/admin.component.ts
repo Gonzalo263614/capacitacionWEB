@@ -10,7 +10,7 @@ export class AdminComponent implements OnInit {
   cursos: any[] = [];
   mostrarCursos: boolean = false; // Variable para controlar si se muestran los cursos
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   ngOnInit(): void {
     this.obtenerCursos();
@@ -32,7 +32,7 @@ export class AdminComponent implements OnInit {
         if (estado === 'aceptado') {
           this.registrarInstructor(id);
         }
-        this.obtenerCursos(); 
+        this.obtenerCursos();
       }, error => {
         console.error('Error al actualizar el curso:', error);
       });
@@ -53,9 +53,24 @@ export class AdminComponent implements OnInit {
           password: curso.password_instructor,
         };
 
+        // Registrar el instructor
         this.http.post('http://localhost:3000/register', instructorData)
-          .subscribe(response => {
+          .subscribe((response: any) => {
             console.log('Instructor registrado:', response);
+            const instructorId = response.userId; // Obtener el ID del instructor
+
+            // Agregar la entrada en la tabla instructor_curso
+            const instructorCursoData = {
+              id_usuario_instructor: instructorId,
+              id_curso_propuesto: cursoId
+            };
+
+            this.http.post('http://localhost:3000/instructor-curso', instructorCursoData)
+              .subscribe(() => {
+                console.log('Instructor inscrito en el curso exitosamente.');
+              }, error => {
+                console.error('Error al inscribir al instructor en el curso:', error);
+              });
           }, error => {
             console.error('Error al registrar el instructor:', error);
           });
@@ -63,6 +78,7 @@ export class AdminComponent implements OnInit {
         console.error('Error al obtener datos del curso:', error);
       });
   }
+
 
   // Función para alternar la visibilidad de los cursos
   toggleCursos() {
