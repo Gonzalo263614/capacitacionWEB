@@ -72,10 +72,9 @@ app.post('/register', (req, res) => {
 
 
 // Ruta para el login
+// Login route
 app.post('/login', (req, res) => {
     const { email, password } = req.body;
-
-    console.log('Login request received:', { email, password });
 
     // Buscar usuario por email
     const query = 'SELECT * FROM usuarios WHERE email = ?';
@@ -85,12 +84,10 @@ app.post('/login', (req, res) => {
             return res.status(500).json({ error: 'Error fetching user' });
         }
         if (results.length === 0) {
-            console.log('No user found with this email');
             return res.status(401).json({ error: 'Invalid credentials' });
         }
 
         const user = results[0];
-        console.log('User found:', user);
 
         // Comparar contraseñas
         bcrypt.compare(password, user.password, (err, isMatch) => {
@@ -99,17 +96,18 @@ app.post('/login', (req, res) => {
                 return res.status(500).json({ error: 'Error comparing passwords' });
             }
             if (!isMatch) {
-                console.log('Password does not match');
                 return res.status(401).json({ error: 'Invalid credentials' });
             }
 
             // Generar token
             const token = jwt.sign({ id: user.id, rol: user.rol }, secretKey, { expiresIn: '1h' });
-            console.log('Login successful, token generated');
-            res.json({ token, rol: user.rol });
+
+            // Incluir el ID del usuario en la respuesta
+            res.json({ token, rol: user.rol, id: user.id });
         });
     });
 });
+
 
 // Ruta para obtener el perfil del usuario
 app.get('/profile', (req, res) => {
@@ -307,7 +305,28 @@ app.post('/instructor-curso', (req, res) => {
         res.status(201).json({ message: 'Instructor-course record created successfully' });
     });
 });
+app.get('/instructor/curso/:id', (req, res) => {
+    const idInstructor = req.params.id;
 
+    // Primero, obtener el id del curso desde la tabla instructor_curso
+    const query = `SELECT cp.*
+                   FROM instructor_curso ic
+                   JOIN cursos_propuestos cp ON ic.id_curso_propuesto = cp.id
+                   WHERE ic.id_usuario_instructor = ?`;
+
+    connection.query(query, [idInstructor], (err, results) => {
+        if (err) {
+            console.error('Error al obtener el curso:', err);
+            res.status(500).json({ error: 'Error al obtener el curso' });
+            return;
+        }
+        if (results.length === 0) {
+            res.status(404).json({ error: 'No se encontró un curso para este instructor' });
+        } else {
+            res.json(results[0]);  // Enviar los detalles del curso encontrado
+        }
+    });
+});
 
 // Iniciar el servidor en el puerto 3000
 const PORT = 3000;

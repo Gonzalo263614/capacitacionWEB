@@ -15,16 +15,19 @@ export class LoginComponent {
 
   login() {
     const loginData = { email: this.email, password: this.password };
-
-    this.http.post<{ token: string, rol: string }>('http://localhost:3000/login', loginData)
+  
+    this.http.post<{ token: string, rol: string, id: number }>('http://localhost:3000/login', loginData)
       .subscribe({
         next: (response) => {
           // Guardar el token en localStorage
           localStorage.setItem('token', response.token);
-
+  
           // Guardar el rol del usuario en localStorage
           localStorage.setItem('userRole', response.rol);
-          
+  
+          // Guardar el id del usuario en localStorage
+          localStorage.setItem('userId', response.id.toString());
+  
           // Navegar según el rol del usuario
           if (response.rol === 'maestro') {
             this.router.navigate(['/maestro']);
@@ -40,7 +43,7 @@ export class LoginComponent {
           console.error('Error en el login', err);
         }
       });
-  }
+  }  
 
   goToRegister() {
     this.router.navigate(['/register']); // Redirige a la página de registro

@@ -11,19 +11,29 @@ import { filter } from 'rxjs/operators';
 export class NavbarComponent {
   isProfilePage: boolean;
   userRole: string | null;
+  userId: string | null;  // Agrega la variable para el userId
 
   constructor(private router: Router, @Inject(PLATFORM_ID) private platformId: Object) {
     this.isProfilePage = this.router.url === '/profile';
 
     // Solo acceder a localStorage si estamos en el navegador
     if (isPlatformBrowser(this.platformId)) {
+      // Obtener el rol y el ID del usuario desde localStorage
       const storedRole = localStorage.getItem('userRole');
+      const storedId = localStorage.getItem('userId');  // Obtener el id
+      
       this.userRole = storedRole ? storedRole.toLowerCase() : null;
+      this.userId = storedId;  // Asignar el id
+      
+      // Imprimir el rol y el ID en la consola
       console.log('Rol del usuario:', this.userRole);
+      console.log('ID del usuario:', this.userId);  // Imprimir el id
     } else {
       this.userRole = null; // Si no estamos en el navegador
+      this.userId = null;
     }
 
+    // Resto del código para actualizar el estado de isProfilePage
     this.router.events.pipe(filter(() => this.router.url === '/profile')).subscribe(() => {
       this.isProfilePage = true;
     });
