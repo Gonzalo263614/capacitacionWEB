@@ -47,7 +47,7 @@ app.get('/usuarios', (req, res) => {
 });
 
 app.post('/register', (req, res) => {
-    const { email, password, nombre, apellidopaterno, apellidomaterno, rol, curp, rfc, maxestudios, tipo_contrato } = req.body;
+    const { email, password, nombre, apellidopaterno, apellidomaterno, rol, curp, rfc, maxestudios, sexo, departamento, tipo_contrato } = req.body;
 
     // Cifrar la contraseña
     bcrypt.hash(password, 10, (err, hash) => {
@@ -57,8 +57,8 @@ app.post('/register', (req, res) => {
         }
 
         // Insertar el nuevo usuario en la base de datos
-        const query = 'INSERT INTO usuarios (email, password, nombre, apellidopaterno, apellidomaterno, rol, curp, rfc, maxestudios, tipo_contrato) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
-        connection.query(query, [email, hash, nombre, apellidopaterno, apellidomaterno, rol, curp, rfc, maxestudios, tipo_contrato], (err, results) => {
+        const query = 'INSERT INTO usuarios (email, password, nombre, apellidopaterno, apellidomaterno, rol, curp, rfc, maxestudios, sexo, departamento, tipo_contrato) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+        connection.query(query, [email, hash, nombre, apellidopaterno, apellidomaterno, rol, curp, rfc, maxestudios, sexo, departamento, tipo_contrato], (err, results) => {
             if (err) {
                 console.error('Error inserting user:', err);
                 return res.status(500).json({ error: 'Error inserting user' });
@@ -68,6 +68,9 @@ app.post('/register', (req, res) => {
         });
     });
 });
+
+
+
 
 // Ruta para el login
 // Login route

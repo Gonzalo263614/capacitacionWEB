@@ -32,7 +32,7 @@ export class RegisterComponent {
       console.error('Passwords do not match');
       return;
     }
-
+  
     const user = {
       email: this.email,
       password: this.password,
@@ -43,9 +43,11 @@ export class RegisterComponent {
       curp: this.curp,
       rfc: this.rfc,
       maxestudios: this.maxestudios,
+      sexo: this.sexo, // Asegúrate de incluir el sexo
+      departamento: this.departamento, // Añadir departamento
       tipo_contrato: this.tipo_contrato  // Añadir tipo de contrato
     };
-
+  
     this.http.post(this.apiUrl, user).subscribe(
       response => {
         console.log('User registered successfully', response);
@@ -65,5 +67,5 @@ export class RegisterComponent {
         console.error('Error registering user', error);
       }
     );
-  }
+  }  
 }
