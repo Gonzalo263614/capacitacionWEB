@@ -139,19 +139,19 @@ app.post('/proponer-curso', (req, res) => {
         nombre_curso, asignaturas_requeridas, contenidos_requeridos, numero_docentes, tipo_asignatura, actividad_evento,
         objetivo, carreras_atendidas, periodo, turno, fecha_inicio, fecha_fin, justificacion,
         numero_horas, horario, lugar, requisitos, tipo_curso, nombre_instructor, apellidopaterno_instructor, apellidomaterno_instructor,
-        curp_instructor, rfc_instructor, maxestudios_instructor, email_instructor, password_instructor
+        curp_instructor, rfc_instructor, maxestudios_instructor, email_instructor, password_instructor , sexo_instructor, tipo_contrato_instructor
     } = req.body;
 
     const query = `INSERT INTO cursos_propuestos (nombre_curso, asignaturas_requeridas, contenidos_requeridos, numero_docentes, tipo_asignatura,
       actividad_evento, objetivo, carreras_atendidas, periodo, turno, fecha_inicio, fecha_fin, justificacion,
       numero_horas, horario, lugar, requisitos, tipo_curso, nombre_instructor, apellidopaterno_instructor, apellidomaterno_instructor,
-      curp_instructor, rfc_instructor, maxestudios_instructor, email_instructor, password_instructor)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+      curp_instructor, rfc_instructor, maxestudios_instructor, email_instructor, password_instructor, sexo_instructor, tipo_contrato_instructor)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
     connection.query(query, [nombre_curso, asignaturas_requeridas, contenidos_requeridos, numero_docentes, tipo_asignatura,
         actividad_evento, objetivo, carreras_atendidas, periodo, turno, fecha_inicio, fecha_fin, justificacion,
         numero_horas, horario, lugar, requisitos, tipo_curso, nombre_instructor, apellidopaterno_instructor, apellidomaterno_instructor,
-        curp_instructor, rfc_instructor, maxestudios_instructor, email_instructor, password_instructor], (err, results) => {
+        curp_instructor, rfc_instructor, maxestudios_instructor, email_instructor, password_instructor, sexo_instructor, tipo_contrato_instructor], (err, results) => {
         if (err) {
             console.error('Error al proponer el curso:', err);
             return res.status(500).json({ error: 'Error al proponer el curso' });

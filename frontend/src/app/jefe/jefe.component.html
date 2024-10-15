@@ -75,9 +75,9 @@
     <select [(ngModel)]="tipoCurso" name="tipoCurso">
       <option value="Formación Docente">Formación Docente</option>
       <option value="Actualización Profesional">Actualización Profesional</option>
-      <option value="Superación Personal">Superación Personal</option>
     </select>
 
+    <!-- Datos del instructor -->
     <!-- Datos del instructor -->
     <h3>Datos del Instructor</h3>
     <label>Nombre del Instructor</label>
@@ -101,10 +101,27 @@
     <label>Email del Instructor</label>
     <input [(ngModel)]="emailInstructor" name="emailInstructor">
 
+    <label>Sexo del Instructor</label>
+    <select [(ngModel)]="sexoInstructor" name="sexoInstructor">
+      <option value="M">Masculino</option>
+      <option value="F">Femenino</option>
+    </select>
+
+    <label>Tipo de Contrato del Instructor</label>
+    <select [(ngModel)]="tipoContratoInstructor" name="tipoContratoInstructor">
+      <option value="tiempo completo">Tiempo Completo</option>
+      <option value="30 hrs">30 Horas</option>
+      <option value="20 hrs">20 Horas</option>
+      <option value="asignatura">Asignatura</option>
+      <option value="honorarios">Honorarios</option>
+      <option value="no aplica">No Aplica</option>
+    </select>
+
     <!-- Contraseña generada automáticamente -->
     <label>Contraseña del Instructor (Generada Automáticamente)</label>
     <input [(ngModel)]="passwordInstructor" name="passwordInstructor" readonly>
 
     <button type="submit" class="btn-submit">Proponer Curso</button>
+
   </form>
 </div>

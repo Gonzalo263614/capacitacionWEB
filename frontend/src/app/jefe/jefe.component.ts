@@ -38,11 +38,14 @@ export class JefeComponent {
   rfcInstructor = '';
   maxestudiosInstructor = '';
   emailInstructor = '';
-  
+  // Datos del instructor
+  sexoInstructor = '';
+  tipoContratoInstructor = '';
+
   // Contraseña generada automáticamente
   passwordInstructor = 'contraseña1234';  // Contraseña predeterminada
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   proponerCurso() {
     const curso = {
@@ -74,6 +77,8 @@ export class JefeComponent {
       rfc_instructor: this.rfcInstructor,
       maxestudios_instructor: this.maxestudiosInstructor,
       email_instructor: this.emailInstructor,
+      sexo_instructor: this.sexoInstructor,  // Nuevo campo
+      tipo_contrato_instructor: this.tipoContratoInstructor,  // Nuevo campo
       password_instructor: this.passwordInstructor // Contraseña fija
     };
 
