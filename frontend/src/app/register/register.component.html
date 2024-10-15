@@ -54,9 +54,48 @@
   </div>
 
   <div class="form-group">
-    <label for="maxestudios">Máximo de Estudios:</label>
-    <input type="text" id="maxestudios" [(ngModel)]="maxestudios" name="maxestudios">
+    <label for="maxestudios">Máximo Grado de Estudios:</label>
+    <select id="maxestudios" [(ngModel)]="maxestudios" name="maxestudios" required>
+      <option value="Licenciatura">Licenciatura</option>
+      <option value="Maestría">Maestría</option>
+      <option value="Doctorado">Doctorado</option>
+      <option value="Técnico Superior">Técnico Superior</option>
+    </select>
+  </div>  
+
+  <div class="form-group">
+    <label for="sexo">Sexo:</label>
+    <select id="sexo" [(ngModel)]="sexo" name="sexo" required>
+      <option value="M">Masculino</option>
+      <option value="F">Femenino</option>
+    </select>
   </div>
 
+  <div class="form-group">
+    <label for="departamento">Departamento Académico:</label>
+    <select id="departamento" [(ngModel)]="departamento" name="departamento" required>
+      <option value="Ciencias Básicas">Ciencias Básicas</option>
+      <option value="Ciencias Económico - Administrativas">Ciencias Económico - Administrativas</option>
+      <option value="Desarrollo Académico">Desarrollo Académico</option>
+      <option value="Eléctrica - Electrónica">Eléctrica - Electrónica</option>
+      <option value="Ingeniería Industrial">Ingeniería Industrial</option>
+      <option value="Metal - Mecánica">Metal - Mecánica</option>
+      <option value="Sistemas y Computación">Sistemas y Computación</option>
+      <option value="Química y Bioquímica">Química y Bioquímica</option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label for="tipo_contrato">Tipo de Contrato:</label>
+    <select id="tipo_contrato" [(ngModel)]="tipo_contrato" name="tipo_contrato" required>
+      <option value="tiempo completo">Tiempo Completo</option>
+      <option value="30 hrs">30 hrs</option>
+      <option value="20 hrs">20 hrs</option>
+      <option value="asignatura">Asignatura</option>
+      <option value="honorarios">Honorarios</option>
+      <option value="no aplica">No Aplica</option>
+    </select>
+  </div>
+  
   <button type="submit" class="btn">Registrar</button>
 </form>

@@ -19,6 +19,9 @@ export class RegisterComponent {
   curp: string = '';
   rfc: string = '';
   maxestudios: string = '';
+  sexo: string = '';
+  departamento: string = '';
+  tipo_contrato: string = '';  // Nueva propiedad
 
   private apiUrl = 'http://localhost:3000/register'; // URL del endpoint para registrar
 
@@ -27,7 +30,6 @@ export class RegisterComponent {
   register() {
     if (this.password !== this.confirmPassword) {
       console.error('Passwords do not match');
-      // Aquí puedes mostrar un mensaje de error al usuario
       return;
     }
 
@@ -40,23 +42,23 @@ export class RegisterComponent {
       rol: this.rol,
       curp: this.curp,
       rfc: this.rfc,
-      maxestudios: this.maxestudios
+      maxestudios: this.maxestudios,
+      tipo_contrato: this.tipo_contrato  // Añadir tipo de contrato
     };
 
     this.http.post(this.apiUrl, user).subscribe(
       response => {
         console.log('User registered successfully', response);
-        // Mostrar el alert
         Swal.fire({
           icon: 'success',
           title: 'Éxito',
           text: 'Usuario registrado exitosamente.',
           confirmButtonText: 'Aceptar',
-          background: '#f0f0f0', // Cambia el color de fondo
-          color: '#333', // Cambia el color del texto
-          confirmButtonColor: '#007bff' // Cambia el color del botón
+          background: '#f0f0f0',
+          color: '#333',
+          confirmButtonColor: '#007bff'
         }).then(() => {
-          this.router.navigate(['/login']); // Redirige al login después de cerrar el alert
+          this.router.navigate(['/login']);
         });
       },
       error => {
