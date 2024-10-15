@@ -96,7 +96,12 @@
     <input [(ngModel)]="rfcInstructor" name="rfcInstructor">
 
     <label>Máximo Nivel de Estudios del Instructor</label>
-    <input [(ngModel)]="maxestudiosInstructor" name="maxestudiosInstructor">
+    <select [(ngModel)]="maxestudiosInstructor" name="maxestudiosInstructor">
+      <option value="Licenciatura">Licenciatura</option>
+      <option value="Maestría">Maestría</option>
+      <option value="Doctorado">Doctorado</option>
+      <option value="Técnico Superior">Técnico Superior</option>
+    </select>
 
     <label>Email del Instructor</label>
     <input [(ngModel)]="emailInstructor" name="emailInstructor">

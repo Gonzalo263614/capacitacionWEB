@@ -37,7 +37,9 @@
       <p><strong>CURP del Instructor:</strong> {{ curso.curp_instructor }}</p>
       <p><strong>RFC del Instructor:</strong> {{ curso.rfc_instructor }}</p>
       <p><strong>Máximo de Estudios del Instructor:</strong> {{ curso.maxestudios_instructor }}</p>
-      <p><strong>Email del Instructor:</strong> {{ curso.email_instructor }}</p>    
+      <p><strong>Email del Instructor:</strong> {{ curso.email_instructor }}</p>  
+      <p><strong>Sexo del Instructor:</strong> {{ curso.sexo_instructor }}</p>
+      <p><strong>Tipo de Contrato del Instructor:</strong> {{ curso.tipo_contrato_instructor }}</p>    
 
       <button *ngIf="curso.estado === 'pendiente'" (click)="actualizarEstado(curso.id, 'aceptado')">Aceptar</button>
       <button *ngIf="curso.estado === 'pendiente'" (click)="actualizarEstado(curso.id, 'rechazado')">Rechazar</button>

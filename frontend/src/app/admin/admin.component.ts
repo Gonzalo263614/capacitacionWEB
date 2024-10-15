@@ -51,6 +51,9 @@ export class AdminComponent implements OnInit {
           maxestudios: curso.maxestudios_instructor,
           email: curso.email_instructor,
           password: curso.password_instructor,
+          sexo: curso.sexo_instructor,
+          departamento: 'No aplica',
+          tipo_contrato: curso.tipo_contrato_instructor,
         };
 
         // Registrar el instructor
