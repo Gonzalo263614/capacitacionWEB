@@ -45,7 +45,34 @@ export class JefeComponent {
   // Contraseña generada automáticamente
   passwordInstructor = 'contraseña1234';  // Contraseña predeterminada
 
+  departamentosAcademicos = [
+    'Ciencias Básicas',
+    'Ciencias Económico - Administrativas',
+    'Desarrollo Académico',
+    'Eléctrica - Electrónica',
+    'Ingeniería Industrial',
+    'Metal - Mecánica',
+    'Sistemas y Computación',
+    'Química y Bioquímica'
+  ];
+  departamentosSeleccionados: string[] = [];
+
   constructor(private http: HttpClient) { }
+
+  onCheckboxChange(departamento: string, event: any) {
+    if (event.target.checked) {
+      // Si se selecciona, lo agregamos a la lista de seleccionados
+      this.departamentosSeleccionados.push(departamento);
+    } else {
+      // Si se deselecciona, lo eliminamos de la lista de seleccionados
+      const index = this.departamentosSeleccionados.indexOf(departamento);
+      if (index > -1) {
+        this.departamentosSeleccionados.splice(index, 1);
+      }
+    }
+    // Imprimir la lista actualizada de departamentos seleccionados
+    console.log('Departamentos seleccionados:', this.departamentosSeleccionados);
+  }
 
   proponerCurso() {
     const curso = {
@@ -58,7 +85,6 @@ export class JefeComponent {
       objetivo: this.objetivo,
       carreras_atendidas: this.carrerasAtendidas,
       periodo: this.periodo,
-      facilitadores_propuestos: this.facilitadoresPropuestos,
       turno: this.turno,
       fecha_inicio: this.fechaInicio,
       fecha_fin: this.fechaFin,
@@ -68,7 +94,6 @@ export class JefeComponent {
       lugar: this.lugar,
       requisitos: this.requisitos,
       tipo_curso: this.tipoCurso,
-
       // Datos del instructor
       nombre_instructor: this.nombreInstructor,
       apellidopaterno_instructor: this.apellidopaternoInstructor,
@@ -77,16 +102,17 @@ export class JefeComponent {
       rfc_instructor: this.rfcInstructor,
       maxestudios_instructor: this.maxestudiosInstructor,
       email_instructor: this.emailInstructor,
-      sexo_instructor: this.sexoInstructor,  // Nuevo campo
-      tipo_contrato_instructor: this.tipoContratoInstructor,  // Nuevo campo
-      password_instructor: this.passwordInstructor // Contraseña fija
+      sexo_instructor: this.sexoInstructor,
+      tipo_contrato_instructor: this.tipoContratoInstructor,
+      password_instructor: this.passwordInstructor,
+      // Departamentos seleccionados
+      departamentosSeleccionados: this.departamentosSeleccionados
     };
 
-    // Enviar los datos del curso al backend
     this.http.post('http://localhost:3000/proponer-curso', curso)
       .subscribe(response => {
         console.log('Curso propuesto:', response);
-        this.mostrarFormulario = false;  // Cerrar el formulario al enviar los datos
+        this.mostrarFormulario = false;
       }, error => {
         console.error('Error al proponer el curso:', error);
       });

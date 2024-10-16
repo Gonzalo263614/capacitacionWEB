@@ -122,3 +122,29 @@ p {
 .mensaje.error {
     color: red;
 }
+
+/* Estilo para organizar los checkboxes en una cuadrícula */
+/* Estilo para organizar los checkboxes en una cuadrícula */
+.checkbox-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+    margin-top: 10px;
+}
+
+/* Alineación y espaciado mejorado */
+.checkbox-grid label {
+    display: flex;
+    align-items: center;  /* Asegura que el checkbox y el texto estén alineados */
+    font-size: 14px;
+    color: #333;
+    cursor: pointer;
+    margin: 0;  /* Elimina cualquier margen innecesario */
+}
+
+/* Ajuste del tamaño del checkbox */
+.checkbox-grid input[type="checkbox"] {
+    margin-right: 8px;  /* Ajusta el espacio entre el checkbox y el texto */
+    transform: scale(1.1);  /* Ajuste de tamaño más moderado */
+    vertical-align: middle;  /* Alinea el checkbox verticalmente con el texto */
+}

@@ -133,32 +133,49 @@ app.get('/profile', (req, res) => {
     });
 });
 
-// Ruta para proponer un curso
 app.post('/proponer-curso', (req, res) => {
     const {
         nombre_curso, asignaturas_requeridas, contenidos_requeridos, numero_docentes, tipo_asignatura, actividad_evento,
         objetivo, carreras_atendidas, periodo, turno, fecha_inicio, fecha_fin, justificacion,
         numero_horas, horario, lugar, requisitos, tipo_curso, nombre_instructor, apellidopaterno_instructor, apellidomaterno_instructor,
-        curp_instructor, rfc_instructor, maxestudios_instructor, email_instructor, password_instructor , sexo_instructor, tipo_contrato_instructor
+        curp_instructor, rfc_instructor, maxestudios_instructor, email_instructor, password_instructor, sexo_instructor, tipo_contrato_instructor,
+        departamentosSeleccionados
     } = req.body;
 
-    const query = `INSERT INTO cursos_propuestos (nombre_curso, asignaturas_requeridas, contenidos_requeridos, numero_docentes, tipo_asignatura,
+    // Inserta el curso en la tabla de cursos_propuestos
+    const queryCurso = `INSERT INTO cursos_propuestos (nombre_curso, asignaturas_requeridas, contenidos_requeridos, numero_docentes, tipo_asignatura,
       actividad_evento, objetivo, carreras_atendidas, periodo, turno, fecha_inicio, fecha_fin, justificacion,
       numero_horas, horario, lugar, requisitos, tipo_curso, nombre_instructor, apellidopaterno_instructor, apellidomaterno_instructor,
       curp_instructor, rfc_instructor, maxestudios_instructor, email_instructor, password_instructor, sexo_instructor, tipo_contrato_instructor)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`; 
 
-    connection.query(query, [nombre_curso, asignaturas_requeridas, contenidos_requeridos, numero_docentes, tipo_asignatura,
+    connection.query(queryCurso, [nombre_curso, asignaturas_requeridas, contenidos_requeridos, numero_docentes, tipo_asignatura,
         actividad_evento, objetivo, carreras_atendidas, periodo, turno, fecha_inicio, fecha_fin, justificacion,
         numero_horas, horario, lugar, requisitos, tipo_curso, nombre_instructor, apellidopaterno_instructor, apellidomaterno_instructor,
-        curp_instructor, rfc_instructor, maxestudios_instructor, email_instructor, password_instructor, sexo_instructor, tipo_contrato_instructor], (err, results) => {
-        if (err) {
-            console.error('Error al proponer el curso:', err);
-            return res.status(500).json({ error: 'Error al proponer el curso' });
-        }
-        res.status(201).json({ message: 'Curso propuesto exitosamente' });
+        curp_instructor, rfc_instructor, maxestudios_instructor, email_instructor, password_instructor, sexo_instructor, tipo_contrato_instructor], (err, result) => {
+      
+      if (err) {
+        console.error('Error al insertar el curso:', err);
+        res.status(500).json({ error: 'Error al insertar el curso' });  // Respuesta en JSON
+      } else {
+        const cursoId = result.insertId;  // Obtener el ID del curso recién insertado
+
+        // Relacionar los departamentos seleccionados con el curso
+        const queryDepartamento = `INSERT INTO departamentos (nombre) VALUES ?`; // Inserta solo el nombre del departamento
+        const valoresDepartamento = departamentosSeleccionados.map(dep => [dep]);
+
+        connection.query(queryDepartamento, [valoresDepartamento], (err, result) => {
+          if (err) {
+            console.error('Error al insertar departamentos:', err);
+            res.status(500).json({ error: 'Error al insertar departamentos' });  // Respuesta en JSON
+          } else {
+            res.status(200).json({ message: 'Curso y departamentos insertados correctamente' });  // Respuesta en JSON
+          }
+        });
+      }
     });
 });
+
 
 
 // Ruta para que el admin acepte o rechace un curso

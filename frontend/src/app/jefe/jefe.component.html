@@ -16,6 +16,16 @@
     <label>Nombre del Curso</label>
     <input [(ngModel)]="nombreCurso" name="nombreCurso" required>
 
+    <h3>Departamentos Académicos</h3>
+    <div class="checkbox-grid">
+      <div *ngFor="let departamento of departamentosAcademicos">
+        <label>
+          <input type="checkbox" (change)="onCheckboxChange(departamento, $event)">
+          {{ departamento }}
+        </label>
+      </div>
+    </div>
+
     <label>Asignaturas Requeridas</label>
     <textarea [(ngModel)]="asignaturasRequeridas" name="asignaturasRequeridas"></textarea>
 
