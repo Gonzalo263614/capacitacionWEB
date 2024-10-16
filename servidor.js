@@ -178,6 +178,7 @@ app.post('/proponer-curso', (req, res) => {
 
 
 
+
 // Ruta para que el admin acepte o rechace un curso
 app.put('/actualizar-curso/:id', (req, res) => {
     const { id } = req.params;
