@@ -113,8 +113,44 @@ export class JefeComponent {
       .subscribe(response => {
         console.log('Curso propuesto:', response);
         this.mostrarFormulario = false;
+        // Limpiar campos y resetear array de departamentos seleccionados
+        this.limpiarFormulario();
       }, error => {
         console.error('Error al proponer el curso:', error);
       });
+  }
+  // Función para limpiar el formulario y resetear el array de departamentos seleccionados
+  limpiarFormulario() {
+    this.nombreCurso = '';
+    this.asignaturasRequeridas = '';
+    this.contenidosRequeridos = '';
+    this.numeroDocentes = 0;
+    this.tipoAsignatura = '';
+    this.actividadEvento = '';
+    this.objetivo = '';
+    this.carrerasAtendidas = '';
+    this.periodo = '';
+    this.turno = '';
+    this.fechaInicio = '';
+    this.fechaFin = '';
+    this.justificacion = '';
+    this.numeroHoras = 0;
+    this.horario = '';
+    this.lugar = '';
+    this.requisitos = '';
+    this.tipoCurso = '';
+    this.nombreInstructor = '';
+    this.apellidopaternoInstructor = '';
+    this.apellidomaternoInstructor = '';
+    this.curpInstructor = '';
+    this.rfcInstructor = '';
+    this.maxestudiosInstructor = '';
+    this.emailInstructor = '';
+    this.sexoInstructor = '';
+    this.tipoContratoInstructor = '';
+    this.passwordInstructor = 'contraseña1234';  // Restaurar contraseña predeterminada
+
+    // Reiniciar el array de departamentos seleccionados
+    this.departamentosSeleccionados = [];
   }
 }

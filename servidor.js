@@ -133,6 +133,7 @@ app.get('/profile', (req, res) => {
     });
 });
 
+//Proponer un curso
 app.post('/proponer-curso', (req, res) => {
     const {
         nombre_curso, asignaturas_requeridas, contenidos_requeridos, numero_docentes, tipo_asignatura, actividad_evento,
@@ -142,40 +143,65 @@ app.post('/proponer-curso', (req, res) => {
         departamentosSeleccionados
     } = req.body;
 
-    // Inserta el curso en la tabla de cursos_propuestos
-    const queryCurso = `INSERT INTO cursos_propuestos (nombre_curso, asignaturas_requeridas, contenidos_requeridos, numero_docentes, tipo_asignatura,
-      actividad_evento, objetivo, carreras_atendidas, periodo, turno, fecha_inicio, fecha_fin, justificacion,
-      numero_horas, horario, lugar, requisitos, tipo_curso, nombre_instructor, apellidopaterno_instructor, apellidomaterno_instructor,
-      curp_instructor, rfc_instructor, maxestudios_instructor, email_instructor, password_instructor, sexo_instructor, tipo_contrato_instructor)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`; 
+    // Paso 1: Insertar el curso en la tabla `cursos_propuestos`
+    const queryInsertCurso = `
+        INSERT INTO cursos_propuestos (
+            nombre_curso, asignaturas_requeridas, contenidos_requeridos, numero_docentes, tipo_asignatura, actividad_evento,
+            objetivo, carreras_atendidas, periodo, turno, fecha_inicio, fecha_fin, justificacion, numero_horas, horario, lugar, 
+            requisitos, tipo_curso, nombre_instructor, apellidopaterno_instructor, apellidomaterno_instructor, curp_instructor,
+            rfc_instructor, maxestudios_instructor, email_instructor, password_instructor, sexo_instructor, tipo_contrato_instructor
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
 
-    connection.query(queryCurso, [nombre_curso, asignaturas_requeridas, contenidos_requeridos, numero_docentes, tipo_asignatura,
-        actividad_evento, objetivo, carreras_atendidas, periodo, turno, fecha_inicio, fecha_fin, justificacion,
-        numero_horas, horario, lugar, requisitos, tipo_curso, nombre_instructor, apellidopaterno_instructor, apellidomaterno_instructor,
-        curp_instructor, rfc_instructor, maxestudios_instructor, email_instructor, password_instructor, sexo_instructor, tipo_contrato_instructor], (err, result) => {
-      
-      if (err) {
-        console.error('Error al insertar el curso:', err);
-        res.status(500).json({ error: 'Error al insertar el curso' });  // Respuesta en JSON
-      } else {
-        const cursoId = result.insertId;  // Obtener el ID del curso recién insertado
+    connection.query(queryInsertCurso, [
+        nombre_curso, asignaturas_requeridas, contenidos_requeridos, numero_docentes, tipo_asignatura, actividad_evento,
+        objetivo, carreras_atendidas, periodo, turno, fecha_inicio, fecha_fin, justificacion, numero_horas, horario, lugar,
+        requisitos, tipo_curso, nombre_instructor, apellidopaterno_instructor, apellidomaterno_instructor, curp_instructor,
+        rfc_instructor, maxestudios_instructor, email_instructor, password_instructor, sexo_instructor, tipo_contrato_instructor
+    ], (err, result) => {
+        if (err) {
+            console.error('Error al insertar el curso:', err);
+            return res.status(500).json({ error: 'Error al insertar el curso' });
+        }
 
-        // Relacionar los departamentos seleccionados con el curso
-        const queryDepartamento = `INSERT INTO departamentos (nombre) VALUES ?`; // Inserta solo el nombre del departamento
+        // Obtén el ID del curso recién insertado
+        const nuevoCursoId = result.insertId;
+
+        // Paso 2: Insertar los departamentos seleccionados
+        const queryInsertDeptos = `INSERT INTO departamentos (nombre) VALUES ?`;
         const valoresDepartamento = departamentosSeleccionados.map(dep => [dep]);
 
-        connection.query(queryDepartamento, [valoresDepartamento], (err, result) => {
-          if (err) {
-            console.error('Error al insertar departamentos:', err);
-            res.status(500).json({ error: 'Error al insertar departamentos' });  // Respuesta en JSON
-          } else {
-            res.status(200).json({ message: 'Curso y departamentos insertados correctamente' });  // Respuesta en JSON
-          }
+        connection.query(queryInsertDeptos, [valoresDepartamento], (err, result) => {
+            if (err) {
+                console.error('Error al insertar departamentos:', err);
+                return res.status(500).json({ error: 'Error al insertar departamentos' });
+            }
+
+            // Paso 3: Obtener los IDs de los departamentos recién insertados
+            const primerDepartamentoId = result.insertId;
+            const nuevosDeptosIds = [];
+
+            // Crear una lista de IDs de los departamentos insertados
+            for (let i = 0; i < departamentosSeleccionados.length; i++) {
+                nuevosDeptosIds.push(primerDepartamentoId + i);
+            }
+
+            // Paso 4: Insertar la relación curso-departamento en la tabla `departamento_curso`
+            const queryRelacionCursoDepto = `INSERT INTO departamento_curso (departamento_id, curso_id) VALUES ?`;
+            const valoresRelacion = nuevosDeptosIds.map(deptoId => [deptoId, nuevoCursoId]);
+
+            connection.query(queryRelacionCursoDepto, [valoresRelacion], (err, result) => {
+                if (err) {
+                    console.error('Error al insertar la relación departamento-curso:', err);
+                    return res.status(500).json({ error: 'Error al insertar la relación departamento-curso' });
+                }
+
+                // Respuesta exitosa
+                res.status(200).json({ message: 'Curso, departamentos y relación insertados correctamente' });
+            });
         });
-      }
     });
 });
-
 
 
 
@@ -234,7 +260,7 @@ app.get('/cursos/:id', (req, res) => {
 app.post('/inscribir/:id', (req, res) => {
     const { id } = req.params;  // ID del curso
     const token = req.headers.authorization?.split(' ')[1]; // Obtener el token del header
-    
+
     if (!token) return res.status(401).json({ error: 'No token provided' });
 
     jwt.verify(token, secretKey, (err, decoded) => {
