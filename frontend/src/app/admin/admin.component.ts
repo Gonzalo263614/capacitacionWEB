@@ -20,8 +20,21 @@ export class AdminComponent implements OnInit {
     this.http.get('http://localhost:3000/cursos-propuestos')
       .subscribe((data: any) => {
         this.cursos = data.filter((curso: any) => curso.estado === 'pendiente');
+        // Después de obtener los cursos, también puedes cargar los departamentos relacionados
+        this.cursos.forEach(curso => {
+          this.obtenerDepartamentos(curso.id, curso);
+        });
       }, error => {
         console.error('Error al obtener los cursos:', error);
+      });
+  }
+
+  obtenerDepartamentos(cursoId: number, curso: any) {
+    this.http.get(`http://localhost:3000/departamentos-por-curso/${cursoId}`)
+      .subscribe((data: any) => {
+        curso.departamentos = data.map((d: any) => d.nombre); // Guarda los nombres de los departamentos en el objeto curso
+      }, error => {
+        console.error('Error al obtener los departamentos:', error);
       });
   }
 

@@ -230,6 +230,25 @@ app.get('/cursos-propuestos', (req, res) => {
         res.json(results);
     });
 });
+
+app.get('/departamentos-por-curso/:cursoId', (req, res) => {
+    const cursoId = req.params.cursoId;
+    const query = `
+        SELECT d.nombre 
+        FROM departamentos d
+        JOIN departamento_curso dc ON d.id = dc.departamento_id
+        WHERE dc.curso_id = ?;
+    `;
+    
+    connection.query(query, [cursoId], (err, results) => {
+        if (err) {
+            console.error('Error fetching departments for course:', err);
+            return res.status(500).json({ error: 'Error fetching departments for course' });
+        }
+        res.json(results);
+    });
+});
+
 // Ruta para obtener los cursos aceptados
 app.get('/cursos', (req, res) => {
     const query = 'SELECT * FROM cursos_propuestos WHERE estado = "aceptado"';
