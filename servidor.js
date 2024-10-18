@@ -239,7 +239,7 @@ app.get('/departamentos-por-curso/:cursoId', (req, res) => {
         JOIN departamento_curso dc ON d.id = dc.departamento_id
         WHERE dc.curso_id = ?;
     `;
-    
+
     connection.query(query, [cursoId], (err, results) => {
         if (err) {
             console.error('Error fetching departments for course:', err);
@@ -334,6 +334,31 @@ app.post('/inscribir/:id', (req, res) => {
     });
 });
 
+app.get('/mi-perfil', (req, res) => {
+    const token = req.headers.authorization?.split(' ')[1]; // Obtener el token del header
+
+    if (!token) return res.status(401).json({ error: 'No token provided' });
+
+    jwt.verify(token, secretKey, (err, decoded) => {
+        if (err) return res.status(401).json({ error: 'Invalid token' });
+
+        const userId = decoded.id; // Obtener el ID del usuario del token
+
+        const userQuery = `SELECT departamento FROM usuarios WHERE id = ?`;
+        connection.query(userQuery, [userId], (err, result) => {
+            if (err) {
+                console.error('Error querying user profile:', err);
+                return res.status(500).json({ error: 'Error querying user profile' });
+            }
+
+            if (result.length > 0) {
+                res.status(200).json(result[0]); // Enviar el departamento del usuario
+            } else {
+                res.status(404).json({ error: 'User not found' });
+            }
+        });
+    });
+});
 
 // Ruta para verificar si un usuario está inscrito en un curso
 app.get('/inscripciones/:cursoId', (req, res) => {

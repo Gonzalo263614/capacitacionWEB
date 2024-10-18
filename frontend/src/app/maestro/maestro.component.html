@@ -9,7 +9,16 @@
   <ul class="course-list">
     <li class="course-item" *ngFor="let curso of cursos">
       <p><strong>Nombre del Curso:</strong> {{ curso.nombre_curso }}</p>
+      <p><strong>Departamentos Relacionados:</strong>
+        <span *ngIf="curso.departamentos && curso.departamentos.length > 0">
+          {{ curso.departamentos.join(', ') }}
+        </span>
+        <span *ngIf="!curso.departamentos || curso.departamentos.length === 0">
+          No hay departamentos asociados
+        </span>
+      </p>
       <p><strong>Fecha de Inicio:</strong> {{ curso.fecha_inicio | date }}</p>
+      <p><strong>Fecha Final:</strong> {{ curso.fecha_fin | date }}</p>
       <button class="btn-details" (click)="toggleDetails(curso.id)">
         {{ curso.mostrarDetalles ? 'Ocultar' : 'Ver Más' }}
       </button>
@@ -33,7 +42,8 @@
         <p><strong>Requisitos:</strong> {{ curso.requisitos }}</p>
         <p><strong>Tipo de Curso:</strong> {{ curso.tipo_curso }}</p>
         <!-- Información del Instructor -->
-        <p><strong>Nombre del Instructor:</strong> {{ curso.nombre_instructor }} {{ curso.apellidopaterno_instructor }} {{ curso.apellidomaterno_instructor }}</p>
+        <p><strong>Nombre del Instructor:</strong> {{ curso.nombre_instructor }} {{ curso.apellidopaterno_instructor }}
+          {{ curso.apellidomaterno_instructor }}</p>
         <p><strong>CURP del Instructor:</strong> {{ curso.curp_instructor }}</p>
         <p><strong>RFC del Instructor:</strong> {{ curso.rfc_instructor }}</p>
         <p><strong>Máximo de Estudios del Instructor:</strong> {{ curso.maxestudios_instructor }}</p>
