@@ -94,6 +94,21 @@ export class AdminComponent implements OnInit {
         console.error('Error al obtener datos del curso:', error);
       });
   }
+  mostrarCampoComentario(curso: any) {
+    curso.mostrarComentario = !curso.mostrarComentario; // Alterna la visibilidad del campo de comentario
+  }
+
+  solicitarRevision(id: number, comentario: string) {
+    const data = { estado: 'pendiente_revision', comentario };
+
+    this.http.put(`http://localhost:3000/actualizar-curso/${id}`, data)
+      .subscribe(response => {
+        console.log('Curso enviado para revisión:', response);
+        this.obtenerCursos(); // Vuelve a cargar los cursos para actualizar la lista
+      }, error => {
+        console.error('Error al solicitar revisión del curso:', error);
+      });
+  }
 
 
   // Función para alternar la visibilidad de los cursos

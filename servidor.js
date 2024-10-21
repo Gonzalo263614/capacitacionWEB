@@ -132,6 +132,21 @@ app.get('/profile', (req, res) => {
         });
     });
 });
+// Obtener cursos pendientes de revisión
+app.get('/cursos-pendientes', (req, res) => {
+    const query = `
+        SELECT * FROM cursos_propuestos 
+        WHERE estado = 'pendiente_revision'
+    `;
+
+    connection.query(query, (err, results) => {
+        if (err) {
+            console.error('Error al obtener cursos pendientes:', err);
+            return res.status(500).json({ error: 'Error al obtener cursos pendientes' });
+        }
+        res.status(200).json(results);
+    });
+});
 
 //Proponer un curso
 app.post('/proponer-curso', (req, res) => {
@@ -205,19 +220,44 @@ app.post('/proponer-curso', (req, res) => {
 
 
 
-// Ruta para que el admin acepte o rechace un curso
+// // Ruta para que el admin acepte o rechace un curso
+// app.put('/actualizar-curso/:id', (req, res) => {
+//     const { id } = req.params;
+//     const { estado } = req.body; // 'aceptado' o 'rechazado'
+//     const query = 'UPDATE cursos_propuestos SET estado = ? WHERE id = ?';
+//     connection.query(query, [estado, id], (err, results) => {
+//         if (err) {
+//             console.error('Error updating course status:', err);
+//             return res.status(500).json({ error: 'Error updating course status' });
+//         }
+//         res.status(200).json({ message: `Course ${estado}` });
+//     });
+// });
 app.put('/actualizar-curso/:id', (req, res) => {
-    const { id } = req.params;
-    const { estado } = req.body; // 'aceptado' o 'rechazado'
-    const query = 'UPDATE cursos_propuestos SET estado = ? WHERE id = ?';
-    connection.query(query, [estado, id], (err, results) => {
-        if (err) {
-            console.error('Error updating course status:', err);
-            return res.status(500).json({ error: 'Error updating course status' });
+    const cursoId = req.params.id;
+    const { estado, comentario } = req.body;
+
+    // Lista de estados permitidos
+    const estadosPermitidos = ['pendiente', 'aceptado', 'rechazado', 'pendiente_revision'];
+
+    // Verifica si el estado es válido
+    if (!estadosPermitidos.includes(estado)) {
+        return res.status(400).json({ error: 'Estado no válido' });
+    }
+
+    let query = 'UPDATE cursos_propuestos SET estado = ?, comentario_revision = ? WHERE id = ?';
+    let values = [estado, comentario || null, cursoId];
+
+    connection.query(query, values, (error, results) => {
+        if (error) {
+            console.error('Error al actualizar el curso:', error);
+            res.status(500).json({ error: 'Error al actualizar el curso' });
+        } else {
+            res.status(200).json({ message: 'Curso actualizado correctamente' });
         }
-        res.status(200).json({ message: `Course ${estado}` });
     });
 });
+
 
 // Ruta para obtener los cursos propuestos
 app.get('/cursos-propuestos', (req, res) => {
@@ -447,7 +487,7 @@ app.get('/curso/:cursoId', (req, res) => {
             console.error('Error al obtener los detalles del curso:', err);
             return res.status(500).json({ error: 'Error al obtener los detalles del curso' });
         }
-    
+
         if (results.length === 0) {
             return res.status(404).json({ error: 'Curso no encontrado' });  // Maneja el caso en que no se encuentra el curso
         }
@@ -463,7 +503,7 @@ app.post('/curso/:cursoId/guardar-asistencias', (req, res) => {
 
     // Inserta las asistencias en la base de datos
     const queryAsistencia = `INSERT INTO asistencias (curso_id, usuario_id, fecha, asistencia) VALUES ?`;
-    
+
     // Formatea los datos para la inserción
     const registrosAsistencia = asistencias.map(asistencia => [asistencia.curso_id, asistencia.usuario_id, asistencia.fecha, asistencia.asistencia]);
 
@@ -479,39 +519,39 @@ app.post('/curso/:cursoId/guardar-asistencias', (req, res) => {
 app.get('/curso/:cursoId/asistencias', (req, res) => {
     const cursoId = req.params.cursoId;
     const fecha = req.query.fecha; // Obtiene la fecha desde los parámetros de consulta
-  
+
     const query = `SELECT COUNT(*) AS existe FROM asistencias WHERE curso_id = ? AND fecha = ?`;
-  
+
     connection.query(query, [cursoId, fecha], (err, results) => {
-      if (err) {
-        console.error('Error al verificar asistencias:', err);
-        return res.status(500).json({ error: 'Error al verificar asistencias' });
-      }
-      // Si existe al menos un registro, entonces ya se ha pasado lista
-      const existe = results[0].existe > 0;
-      res.json({ existe });
+        if (err) {
+            console.error('Error al verificar asistencias:', err);
+            return res.status(500).json({ error: 'Error al verificar asistencias' });
+        }
+        // Si existe al menos un registro, entonces ya se ha pasado lista
+        const existe = results[0].existe > 0;
+        res.json({ existe });
     });
-  });
-  
-  // Ruta para guardar asistencias de un curso
-  app.post('/curso/:cursoId/guardar-asistencias', (req, res) => {
+});
+
+// Ruta para guardar asistencias de un curso
+app.post('/curso/:cursoId/guardar-asistencias', (req, res) => {
     const cursoId = req.params.cursoId;
     const asistencias = req.body;  // Recibe la lista de asistencias
-  
+
     // Inserta las asistencias en la base de datos
     const queryAsistencia = `INSERT INTO asistencias (curso_id, usuario_id, fecha, asistencia) VALUES ?`;
-  
+
     // Formatea los datos para la inserción
     const registrosAsistencia = asistencias.map(asistencia => [asistencia.curso_id, asistencia.usuario_id, asistencia.fecha, asistencia.asistencia]);
-  
+
     connection.query(queryAsistencia, [registrosAsistencia], (err) => {
-      if (err) {
-        return res.status(500).json({ error: 'Error al insertar asistencias' });
-      }
-      res.json({ message: 'Asistencias guardadas exitosamente' });
+        if (err) {
+            return res.status(500).json({ error: 'Error al insertar asistencias' });
+        }
+        res.json({ message: 'Asistencias guardadas exitosamente' });
     });
-  });
-  
+});
+
 // Iniciar el servidor en el puerto 3000
 const PORT = 3000;
 app.listen(PORT, () => {

@@ -8,7 +8,7 @@ import { HttpClient } from '@angular/common/http';
 })
 export class JefeComponent {
   mostrarFormulario = false;
-
+  cursosPendientes: any[] = []; // Variable para almacenar cursos pendientes
   // Datos del curso
   nombreCurso = '';
   asignaturasRequeridas = '';
@@ -57,7 +57,9 @@ export class JefeComponent {
   ];
   departamentosSeleccionados: string[] = [];
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) { 
+    this.obtenerCursosPendientes(); // Llamar a la función al iniciar el componente
+  }
 
   onCheckboxChange(departamento: string, event: any) {
     if (event.target.checked) {
@@ -153,4 +155,18 @@ export class JefeComponent {
     // Reiniciar el array de departamentos seleccionados
     this.departamentosSeleccionados = [];
   }
+  obtenerCursosPendientes() {
+    this.http.get<any[]>('http://localhost:3000/cursos-pendientes')
+      .subscribe(response => {
+        this.cursosPendientes = response; // Almacenar la respuesta en la variable
+      }, error => {
+        console.error('Error al obtener cursos pendientes:', error);
+      });
+  }
+  modificarCurso(curso: any) {
+    // Aquí puedes implementar la lógica para modificar el curso,
+    // por ejemplo, abrir un formulario para editar el curso.
+    console.log('Modificar curso:', curso);
+  }
+  
 }

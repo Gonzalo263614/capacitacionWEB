@@ -52,6 +52,15 @@
 
       <button *ngIf="curso.estado === 'pendiente'" (click)="actualizarEstado(curso.id, 'aceptado')">Aceptar</button>
       <button *ngIf="curso.estado === 'pendiente'" (click)="actualizarEstado(curso.id, 'rechazado')">Rechazar</button>
+      <!-- Botón para solicitar revisión, visible solo si el curso está en estado pendiente -->
+      <button *ngIf="curso.estado === 'pendiente'" (click)="mostrarCampoComentario(curso)">Solicitar Revisión</button>
+
+      <!-- Campo de comentario y botón para enviar la solicitud de revisión -->
+      <div *ngIf="curso.mostrarComentario">
+        <textarea [(ngModel)]="curso.comentario" placeholder="Escriba el comentario para revisión"></textarea>
+        <button (click)="solicitarRevision(curso.id, curso.comentario)">Enviar Comentario</button>
+      </div>
+
     </li>
   </ul>
 </div>
