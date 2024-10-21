@@ -14,6 +14,7 @@ import { InstructorComponent } from './instructor/instructor.component';
 import { JefeComponent } from './jefe/jefe.component';
 import { NavbarComponent } from './navbar/navbar.component';
 import { ProfileComponent } from './profile/profile.component';
+import { CursoDetalleComponent } from './curso-detalle/curso-detalle.component';
 
 @NgModule({
   declarations: [
@@ -25,7 +26,8 @@ import { ProfileComponent } from './profile/profile.component';
     InstructorComponent,
     JefeComponent,
     NavbarComponent,
-    ProfileComponent
+    ProfileComponent,
+    CursoDetalleComponent
   ],
   imports: [
     BrowserModule,

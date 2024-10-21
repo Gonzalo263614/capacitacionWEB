@@ -1,0 +1,42 @@
+<h2>Detalles del Curso</h2>
+<button (click)="toggleCurso()">
+  {{ showCurso ? 'Ocultar detalles' : 'Mostrar detalles' }}
+</button>
+
+<!-- Se muestran los detalles del curso solo si showCurso es verdadero -->
+<div *ngIf="showCurso && curso">
+  <p><strong>Nombre del curso:</strong> {{ curso.nombre_curso }}</p>
+  <p><strong>Periodo:</strong> {{ curso.periodo }}</p>
+  <p><strong>Fecha de inicio:</strong> {{ curso.fecha_inicio | date }}</p>
+  <p><strong>Fecha de fin:</strong> {{ curso.fecha_fin | date }}</p>
+</div>
+
+<h2>Maestros Inscritos</h2>
+<button (click)="toggleMaestros()">
+  {{ showMaestros ? 'Ocultar maestros' : 'Mostrar maestros' }}
+</button>
+
+<!-- Se muestra la tabla de maestros solo si showMaestros es verdadero -->
+<div *ngIf="showMaestros && maestros.length > 0">
+  <table>
+    <thead>
+      <tr>
+        <th>Nombre</th>
+        <th>Apellido Paterno</th>
+        <th>Apellido Materno</th>
+        <th>Email</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let maestro of maestros">
+        <td>{{ maestro.nombre }}</td>
+        <td>{{ maestro.apellidopaterno }}</td>
+        <td>{{ maestro.apellidomaterno }}</td>
+        <td>{{ maestro.email }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<p *ngIf="maestros.length === 0 && showMaestros">No hay maestros inscritos en este curso.</p>
+<p *ngIf="error" class="error">{{ error }}</p>

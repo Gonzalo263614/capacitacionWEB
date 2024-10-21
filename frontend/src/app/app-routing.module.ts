@@ -8,6 +8,7 @@ import { InstructorComponent } from './instructor/instructor.component';
 import { JefeComponent } from './jefe/jefe.component';
 import { ProfileComponent } from './profile/profile.component'; // Importa el componente de perfil
 import { AuthGuard } from './auth.guard'; // Importa el AuthGuard
+import { CursoDetalleComponent } from './curso-detalle/curso-detalle.component';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -18,6 +19,7 @@ const routes: Routes = [
   { path: 'jefe', component: JefeComponent },
   { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },
   { path: '', redirectTo: '/login', pathMatch: 'full' },
+  { path: 'curso/:id', component: CursoDetalleComponent },
 ];
 
 @NgModule({

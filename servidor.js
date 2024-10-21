@@ -416,6 +416,46 @@ app.get('/instructor/curso/:id', (req, res) => {
         }
     });
 });
+// Ruta para obtener los maestros inscritos en un curso
+app.get('/curso/:cursoId/maestros', (req, res) => {
+    const cursoId = req.params.cursoId;
+
+    // Consulta para obtener los maestros inscritos en el curso
+    const query = `
+        SELECT usuarios.nombre, usuarios.apellidopaterno, usuarios.apellidomaterno, usuarios.email
+        FROM inscripciones
+        JOIN usuarios ON inscripciones.usuario_id = usuarios.id
+        WHERE inscripciones.curso_id = ? AND usuarios.rol = 'maestro';
+    `;
+
+    connection.query(query, [cursoId], (err, results) => {
+        if (err) {
+            console.error('Error fetching maestros:', err);
+            return res.status(500).json({ error: 'Error fetching maestros' });
+        }
+        res.json(results); // Devuelve los resultados de los maestros
+    });
+});
+// Ruta para obtener los detalles de un curso
+app.get('/curso/:cursoId', (req, res) => {
+    const cursoId = req.params.cursoId;
+
+    // Consulta para obtener los detalles del curso
+    const query = 'SELECT * FROM cursos_propuestos WHERE id = ?';  // Asegúrate de que la tabla 'cursos' y la columna 'id' existan
+    connection.query(query, [cursoId], (err, results) => {
+        if (err) {
+            console.error('Error al obtener los detalles del curso:', err);
+            return res.status(500).json({ error: 'Error al obtener los detalles del curso' });
+        }
+    
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'Curso no encontrado' });  // Maneja el caso en que no se encuentra el curso
+        }
+
+        res.json(results[0]);  // Devuelve el primer resultado que será el curso
+    });
+});
+
 
 // Iniciar el servidor en el puerto 3000
 const PORT = 3000;
