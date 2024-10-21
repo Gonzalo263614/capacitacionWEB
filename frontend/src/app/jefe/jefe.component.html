@@ -8,13 +8,6 @@
 <button (click)="mostrarFormulario = !mostrarFormulario" class="btn-toggle-form">
   {{ mostrarFormulario ? 'Cerrar Formulario' : 'Proponer un nuevo curso' }}
 </button>
-<h2>Cursos Pendientes de Revisión</h2>
-<div *ngFor="let curso of cursosPendientes">
-  <h3>{{ curso.nombre_curso }}</h3>
-  <p><strong>Comentarios:</strong> {{ curso.comentario_revision }}</p>
-  <button (click)="modificarCurso(curso)">Modificar</button>
-</div>
-
 <div *ngIf="mostrarFormulario" class="form-container">
   <h2>Proponer un nuevo curso</h2>
   <form (ngSubmit)="proponerCurso()">
@@ -145,4 +138,10 @@
     <button type="submit" class="btn-submit">Proponer Curso</button>
 
   </form>
+</div>
+<h2>Cursos Pendientes de Revisión</h2>
+<div *ngFor="let curso of cursosPendientes">
+  <h3>{{ curso.nombre_curso }}</h3>
+  <p><strong>Comentarios:</strong> {{ curso.comentario_revision }}</p>
+  <button (click)="modificarCurso(curso)">Modificar</button>
 </div>
