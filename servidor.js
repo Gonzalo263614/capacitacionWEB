@@ -456,7 +456,62 @@ app.get('/curso/:cursoId', (req, res) => {
     });
 });
 
+// Ruta para guardar asistencias de un curso
+app.post('/curso/:cursoId/guardar-asistencias', (req, res) => {
+    const cursoId = req.params.cursoId;
+    const asistencias = req.body;  // Recibe la lista de asistencias
 
+    // Inserta las asistencias en la base de datos
+    const queryAsistencia = `INSERT INTO asistencias (curso_id, usuario_id, fecha, asistencia) VALUES ?`;
+    
+    // Formatea los datos para la inserción
+    const registrosAsistencia = asistencias.map(asistencia => [asistencia.curso_id, asistencia.usuario_id, asistencia.fecha, asistencia.asistencia]);
+
+    connection.query(queryAsistencia, [registrosAsistencia], (err) => {
+        if (err) {
+            return res.status(500).json({ error: 'Error al insertar asistencias' });
+        }
+        res.json({ message: 'Asistencias guardadas exitosamente' });
+    });
+});
+
+// Ruta para verificar si ya se ha pasado lista un día específico
+app.get('/curso/:cursoId/asistencias', (req, res) => {
+    const cursoId = req.params.cursoId;
+    const fecha = req.query.fecha; // Obtiene la fecha desde los parámetros de consulta
+  
+    const query = `SELECT COUNT(*) AS existe FROM asistencias WHERE curso_id = ? AND fecha = ?`;
+  
+    connection.query(query, [cursoId, fecha], (err, results) => {
+      if (err) {
+        console.error('Error al verificar asistencias:', err);
+        return res.status(500).json({ error: 'Error al verificar asistencias' });
+      }
+      // Si existe al menos un registro, entonces ya se ha pasado lista
+      const existe = results[0].existe > 0;
+      res.json({ existe });
+    });
+  });
+  
+  // Ruta para guardar asistencias de un curso
+  app.post('/curso/:cursoId/guardar-asistencias', (req, res) => {
+    const cursoId = req.params.cursoId;
+    const asistencias = req.body;  // Recibe la lista de asistencias
+  
+    // Inserta las asistencias en la base de datos
+    const queryAsistencia = `INSERT INTO asistencias (curso_id, usuario_id, fecha, asistencia) VALUES ?`;
+  
+    // Formatea los datos para la inserción
+    const registrosAsistencia = asistencias.map(asistencia => [asistencia.curso_id, asistencia.usuario_id, asistencia.fecha, asistencia.asistencia]);
+  
+    connection.query(queryAsistencia, [registrosAsistencia], (err) => {
+      if (err) {
+        return res.status(500).json({ error: 'Error al insertar asistencias' });
+      }
+      res.json({ message: 'Asistencias guardadas exitosamente' });
+    });
+  });
+  
 // Iniciar el servidor en el puerto 3000
 const PORT = 3000;
 app.listen(PORT, () => {

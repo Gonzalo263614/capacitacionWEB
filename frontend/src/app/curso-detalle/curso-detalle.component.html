@@ -1,3 +1,6 @@
+<app-navbar></app-navbar>
+<h2 class="form-title">Formación y Actualización Profesional Docente</h2>
+<img src="TecNM.png" alt="Logo de la Institución" class="logo">
 <h2>Detalles del Curso</h2>
 <button (click)="toggleCurso()">
   {{ showCurso ? 'Ocultar detalles' : 'Mostrar detalles' }}
@@ -13,11 +16,11 @@
 
 <h2>Maestros Inscritos</h2>
 <button (click)="toggleMaestros()">
-  {{ showMaestros ? 'Ocultar maestros' : 'Mostrar maestros' }}
+  {{ showMaestros ? 'Ocultar pase de lista' : 'Pase de lista ' }}
 </button>
 
-<!-- Se muestra la tabla de maestros solo si showMaestros es verdadero -->
-<div *ngIf="showMaestros && maestros.length > 0">
+<!-- Tabla para mostrar maestros solo si showMaestros es verdadero -->
+<div *ngIf="showMaestros">
   <table>
     <thead>
       <tr>
@@ -25,6 +28,7 @@
         <th>Apellido Paterno</th>
         <th>Apellido Materno</th>
         <th>Email</th>
+        <th>Asistencia</th>
       </tr>
     </thead>
     <tbody>
@@ -33,9 +37,13 @@
         <td>{{ maestro.apellidopaterno }}</td>
         <td>{{ maestro.apellidomaterno }}</td>
         <td>{{ maestro.email }}</td>
+        <td>
+          <input type="checkbox" [(ngModel)]="maestro.asistio" />
+        </td>
       </tr>
     </tbody>
   </table>
+  <button (click)="verificarAsistenciaYaPasada()">Guardar Asistencias</button>
 </div>
 
 <p *ngIf="maestros.length === 0 && showMaestros">No hay maestros inscritos en este curso.</p>
