@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-
+import Swal from 'sweetalert2';
 @Component({
   selector: 'app-jefe',
   templateUrl: './jefe.component.html',
@@ -8,7 +8,10 @@ import { HttpClient } from '@angular/common/http';
 })
 export class JefeComponent {
   mostrarFormulario = false;
-  cursosPendientes: any[] = []; // Variable para almacenar cursos pendientes
+  mostrarFormularioModificar = false; // Controla la visibilidad del formulario de modificar
+  cursosPendientes: any[] = [];
+  cursoSeleccionado: any = null; // Almacena el curso seleccionado para modificar
+
   // Datos del curso
   nombreCurso = '';
   asignaturasRequeridas = '';
@@ -57,10 +60,68 @@ export class JefeComponent {
   ];
   departamentosSeleccionados: string[] = [];
 
-  constructor(private http: HttpClient) { 
+  constructor(private http: HttpClient) {
     this.obtenerCursosPendientes(); // Llamar a la función al iniciar el componente
   }
 
+  abrirFormularioModificar(curso: any) {
+    this.cursoSeleccionado = curso;
+    this.mostrarFormularioModificar = true;
+
+    // Cargar los datos del curso seleccionado en el formulario
+    this.nombreCurso = curso.nombre_curso;
+    this.asignaturasRequeridas = curso.asignaturas_requeridas;
+    this.contenidosRequeridos = curso.contenidos_requeridos;
+    this.numeroDocentes = curso.numero_docentes;
+    this.tipoAsignatura = curso.tipo_asignatura;
+    this.actividadEvento = curso.actividad_evento;
+    this.objetivo = curso.objetivo;
+    this.carrerasAtendidas = curso.carreras_atendidas;
+    this.periodo = curso.periodo;
+    this.turno = curso.turno;
+    this.fechaInicio = curso.fecha_inicio; // Asegúrate de que el campo sea correcto
+    this.fechaFin = curso.fecha_fin;       // Asegúrate de que el campo sea correcto
+    this.justificacion = curso.justificacion;
+    this.numeroHoras = curso.numero_horas;
+    this.horario = curso.horario;
+    this.lugar = curso.lugar;
+    this.requisitos = curso.requisitos;
+    this.tipoCurso = curso.tipo_curso;
+
+    // Instructor
+    this.nombreInstructor = curso.nombre_instructor;
+    this.apellidopaternoInstructor = curso.apellidopaterno_instructor;
+    this.apellidomaternoInstructor = curso.apellidomaterno_instructor;
+    this.curpInstructor = curso.curp_instructor;
+    this.rfcInstructor = curso.rfc_instructor;
+    this.maxestudiosInstructor = curso.maxestudios_instructor;
+    this.emailInstructor = curso.email_instructor;
+    this.sexoInstructor = curso.sexo_instructor;
+    this.tipoContratoInstructor = curso.tipo_contrato_instructor;
+  }
+  modificarCursoConfirmado() {
+    // Eliminar el curso anterior en el orden especificado
+    this.eliminarCurso(this.cursoSeleccionado.id)
+      .subscribe(() => {
+        // Proponer el nuevo curso con los datos modificados
+        this.proponerCurso();
+        Swal.fire({
+          icon: 'success',
+          title: 'Cambios Guardados',
+          text: 'El curso ha sido modificado exitosamente.',
+          confirmButtonText: 'Aceptar',
+          background: '#f0f0f0',
+          color: '#333',
+          confirmButtonColor: '#007bff'
+        });
+      }, error => {
+        console.error('Error al eliminar el curso:', error);
+      });
+  }
+  eliminarCurso(cursoId: number) {
+    // Eliminar primero de `departamento_curso`, luego `departamentos` y finalmente `cursos_propuestos`
+    return this.http.delete(`http://localhost:3000/eliminar-curso/${cursoId}`);
+  }
   onCheckboxChange(departamento: string, event: any) {
     if (event.target.checked) {
       // Si se selecciona, lo agregamos a la lista de seleccionados
@@ -168,5 +229,5 @@ export class JefeComponent {
     // por ejemplo, abrir un formulario para editar el curso.
     console.log('Modificar curso:', curso);
   }
-  
+
 }

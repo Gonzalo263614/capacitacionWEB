@@ -218,6 +218,37 @@ app.post('/proponer-curso', (req, res) => {
     });
 });
 
+// Eliminar un curso propuesto
+app.delete('/eliminar-curso/:id', (req, res) => {
+    const cursoId = req.params.id;
+
+    // Paso 1: Eliminar relaciones con departamentos en la tabla `departamento_curso`
+    const queryEliminarRelaciones = `
+        DELETE FROM departamento_curso WHERE curso_id = ?
+    `;
+
+    connection.query(queryEliminarRelaciones, [cursoId], (err, result) => {
+        if (err) {
+            console.error('Error al eliminar relación curso-departamento:', err);
+            return res.status(500).json({ error: 'Error al eliminar relación curso-departamento' });
+        }
+
+        // Paso 2: Eliminar el curso de la tabla `cursos_propuestos`
+        const queryEliminarCurso = `
+            DELETE FROM cursos_propuestos WHERE id = ?
+        `;
+
+        connection.query(queryEliminarCurso, [cursoId], (err, result) => {
+            if (err) {
+                console.error('Error al eliminar el curso:', err);
+                return res.status(500).json({ error: 'Error al eliminar el curso' });
+            }
+
+            // Respuesta exitosa
+            res.status(200).json({ message: 'Curso eliminado correctamente' });
+        });
+    });
+});
 
 
 // // Ruta para que el admin acepte o rechace un curso

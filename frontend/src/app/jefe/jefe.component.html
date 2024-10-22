@@ -8,6 +8,8 @@
 <button (click)="mostrarFormulario = !mostrarFormulario" class="btn-toggle-form">
   {{ mostrarFormulario ? 'Cerrar Formulario' : 'Proponer un nuevo curso' }}
 </button>
+
+
 <div *ngIf="mostrarFormulario" class="form-container">
   <h2>Proponer un nuevo curso</h2>
   <form (ngSubmit)="proponerCurso()">
@@ -139,9 +141,140 @@
 
   </form>
 </div>
+
 <h2>Cursos Pendientes de Revisión</h2>
 <div *ngFor="let curso of cursosPendientes">
   <h3>{{ curso.nombre_curso }}</h3>
   <p><strong>Comentarios:</strong> {{ curso.comentario_revision }}</p>
-  <button (click)="modificarCurso(curso)">Modificar</button>
+  <button (click)="abrirFormularioModificar(curso)">Modificar</button>
+</div>
+
+<!-- Formulario para modificar el curso -->
+<div *ngIf="mostrarFormularioModificar" class="form-container">
+  <h2>Modificar Curso</h2>
+  <form (ngSubmit)="modificarCursoConfirmado()">
+    <!-- Campos del curso (reutiliza los mismos del formulario de proponer curso) -->
+    <label>Nombre del Curso</label>
+    <input [(ngModel)]="nombreCurso" name="nombreCurso" required>
+
+    <!-- Resto de los campos idénticos al formulario de proponer curso -->
+    <!-- ... -->
+    <h3>Departamentos Académicos</h3>
+    <div class="checkbox-grid">
+      <div *ngFor="let departamento of departamentosAcademicos">
+        <label>
+          <input type="checkbox" (change)="onCheckboxChange(departamento, $event)">
+          {{ departamento }}
+        </label>
+      </div>
+    </div>
+
+    <label>Asignaturas Requeridas</label>
+    <textarea [(ngModel)]="asignaturasRequeridas" name="asignaturasRequeridas"></textarea>
+
+    <label>Contenidos Requeridos</label>
+    <textarea [(ngModel)]="contenidosRequeridos" name="contenidosRequeridos"></textarea>
+
+    <label>Número de Docentes</label>
+    <input type="number" [(ngModel)]="numeroDocentes" name="numeroDocentes">
+
+    <label>Tipo de Asignatura</label>
+    <select [(ngModel)]="tipoAsignatura" name="tipoAsignatura">
+      <option value="carrera generica">Carrera Genérica</option>
+      <option value="modulo especialidad">Módulo de Especialidad</option>
+    </select>
+
+    <label>Actividad/Evento</label>
+    <input [(ngModel)]="actividadEvento" name="actividadEvento">
+
+    <label>Objetivo</label>
+    <textarea [(ngModel)]="objetivo" name="objetivo"></textarea>
+
+    <label>Carreras Atendidas</label>
+    <textarea [(ngModel)]="carrerasAtendidas" name="carrerasAtendidas"></textarea>
+
+    <label>Período</label>
+    <input [(ngModel)]="periodo" name="periodo">
+
+    <label>Turno</label>
+    <select [(ngModel)]="turno" name="turno">
+      <option value="M">Mañana</option>
+      <option value="V">Tarde</option>
+    </select>
+
+    <label>Fecha de Inicio</label>
+    <input type="date" [(ngModel)]="fechaInicio" name="fechaInicio">
+
+    <label>Fecha de Fin</label>
+    <input type="date" [(ngModel)]="fechaFin" name="fechaFin">
+
+    <!-- Nuevos campos -->
+    <label>Justificación</label>
+    <textarea [(ngModel)]="justificacion" name="justificacion"></textarea>
+
+    <label>Número de Horas</label>
+    <input type="number" [(ngModel)]="numeroHoras" name="numeroHoras">
+
+    <label>Horario</label>
+    <input [(ngModel)]="horario" name="horario">
+
+    <label>Lugar</label>
+    <input [(ngModel)]="lugar" name="lugar">
+
+    <label>Requisitos</label>
+    <textarea [(ngModel)]="requisitos" name="requisitos"></textarea>
+
+    <label>Tipo de Curso</label>
+    <select [(ngModel)]="tipoCurso" name="tipoCurso">
+      <option value="Formación Docente">Formación Docente</option>
+      <option value="Actualización Profesional">Actualización Profesional</option>
+    </select>
+
+    <!-- Datos del instructor -->
+    <!-- Datos del instructor -->
+    <h3>Datos del Instructor</h3>
+    <label>Nombre del Instructor</label>
+    <input [(ngModel)]="nombreInstructor" name="nombreInstructor">
+
+    <label>Apellido Paterno del Instructor</label>
+    <input [(ngModel)]="apellidopaternoInstructor" name="apellidopaternoInstructor">
+
+    <label>Apellido Materno del Instructor</label>
+    <input [(ngModel)]="apellidomaternoInstructor" name="apellidomaternoInstructor">
+
+    <label>CURP del Instructor</label>
+    <input [(ngModel)]="curpInstructor" name="curpInstructor">
+
+    <label>RFC del Instructor</label>
+    <input [(ngModel)]="rfcInstructor" name="rfcInstructor">
+
+    <label>Máximo Nivel de Estudios del Instructor</label>
+    <select [(ngModel)]="maxestudiosInstructor" name="maxestudiosInstructor">
+      <option value="Licenciatura">Licenciatura</option>
+      <option value="Maestría">Maestría</option>
+      <option value="Doctorado">Doctorado</option>
+      <option value="Técnico Superior">Técnico Superior</option>
+    </select>
+
+    <label>Email del Instructor</label>
+    <input [(ngModel)]="emailInstructor" name="emailInstructor">
+
+    <label>Sexo del Instructor</label>
+    <select [(ngModel)]="sexoInstructor" name="sexoInstructor">
+      <option value="M">Masculino</option>
+      <option value="F">Femenino</option>
+    </select>
+
+    <label>Tipo de Contrato del Instructor</label>
+    <select [(ngModel)]="tipoContratoInstructor" name="tipoContratoInstructor">
+      <option value="tiempo completo">Tiempo Completo</option>
+      <option value="30 hrs">30 Horas</option>
+      <option value="20 hrs">20 Horas</option>
+      <option value="asignatura">Asignatura</option>
+      <option value="honorarios">Honorarios</option>
+      <option value="no aplica">No Aplica</option>
+    </select>
+
+    <button type="submit" class="btn-submit">Guardar Cambios</button>
+  </form>
 </div>
