@@ -3,9 +3,23 @@ const mysql = require('mysql2');
 const cors = require('cors'); // Para permitir peticiones desde el frontend
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-
+const path = require('path');
 const app = express();
 const secretKey = 's3cureR@ndom$ecretKey#2024!'; // Cambia esta clave por una más segura
+
+const fs = require('fs'); // Importar el módulo fs
+const multer = require('multer');
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'uploads/'); // Carpeta donde se guardarán los archivos
+    },
+    filename: function (req, file, cb) {
+        cb(null, file.originalname); // Usar solo el nombre original del archivo
+    }
+});
+
+
+const upload = multer({ storage: storage });
 
 // Middleware para permitir solicitudes desde el frontend
 app.use(cors());
@@ -15,9 +29,11 @@ app.use(express.json());
 const connection = mysql.createConnection({
     host: 'localhost',
     user: 'root',
-    password: 'Contraseña2190.', // Usa tu contraseña
+    password: 'root', // Usa tu contraseña
     database: 'capacitacionDB'
 });
+
+
 
 // CONEXION BASE DE DATOS
 connection.connect((err) => {
@@ -551,6 +567,42 @@ app.post('/curso/:cursoId/guardar-asistencias', (req, res) => {
         res.json({ message: 'Asistencias guardadas exitosamente' });
     });
 });
+
+// Ruta para subir archivos
+app.post('/uploads', upload.single('archivo'), (req, res) => {
+    const archivo = req.file;
+    const usuarioId = req.body.usuarioId;  // Obtener el ID del instructor dinámicamente
+    const cursoId = req.body.cursoId;  // Obtener el ID del curso dinámicamente
+  
+    // Validación de archivos
+    if (!archivo) {
+      return res.status(400).json({ error: 'No se ha subido ningún archivo' });
+    }
+  
+    // Validación de IDs
+    if (!usuarioId || !cursoId) {
+      return res.status(400).json({ error: 'ID de usuario o curso no válidos.' });
+    }
+  
+    // Leer el archivo como un buffer para almacenarlo como blob
+    const archivoData = fs.readFileSync(archivo.path);
+  
+    // Mostrar valores a insertar
+    const sql = 'INSERT INTO archivos (nombre_archivo, archivo, curso_id, instructor_id) VALUES (?, ?, ?, ?)';
+    const values = [archivo.originalname, archivoData, cursoId, usuarioId];
+  
+    console.log('Valores a insertar:', values);
+    console.log('Tamaño del archivo leído:', archivoData.length); // Verifica el tamaño del archivo
+  
+    connection.query(sql, values, (err, result) => {
+      if (err) {
+        console.error('Error al guardar el archivo en la base de datos:', err.message); // Registra el mensaje de error
+        return res.status(500).send('Error al guardar el archivo en la base de datos.');
+      }
+      res.status(200).send('Archivo subido y guardado exitosamente en la base de datos.');
+    });
+  });
+
 
 // Iniciar el servidor en el puerto 3000
 const PORT = 3000;
