@@ -14,6 +14,10 @@ export class CursoDetalleComponent implements OnInit {
   showCurso: boolean = false;  // Control para mostrar u ocultar detalles del curso
   showMaestros: boolean = false;  // Control para mostrar u ocultar la lista de maestros
   showPasarLista: boolean = false;  // Control para mostrar u ocultar el pase de lista
+  
+  selectedFile: File | null = null;
+  uploadSuccess: boolean | null = null;  // Para controlar el estado de éxito de la subida
+  uploadError: boolean | null = null;  // Para manejar errores de subida
 
   constructor(
     private route: ActivatedRoute,
@@ -115,4 +119,45 @@ export class CursoDetalleComponent implements OnInit {
         }
       });
   }
+
+  onSubmit() {
+    const cursoId = this.route.snapshot.paramMap.get('id');
+    const usuarioId = localStorage.getItem('userId'); 
+    const formData = new FormData();
+
+    if (usuarioId == null) { // Verifica que usuarioId no sea null
+      console.error('cursoId es null. Asegúrate de que el parámetro existe en la ruta.');
+      return;
+    }
+
+    if (cursoId === null) {
+      console.error('cursoId es null. Asegúrate de que el parámetro existe en la ruta.');
+      return; // O manejar el error de la manera que desees
+    }
+    if (this.selectedFile) {
+      formData.append('archivo', this.selectedFile);
+      formData.append('usuarioId', usuarioId);  // Reemplaza '1' por el ID real del usuario
+      formData.append('cursoId', cursoId);  // Reemplaza '101' por el ID real del curso
+  
+      this.http.post('http://localhost:3000/uploads', formData, { responseType: 'text' })
+        .subscribe({
+          next: (response) => {
+            console.log('Respuesta del servidor:', response); // Manejar la respuesta correctamente
+            this.uploadSuccess = true;
+          },
+          error: (error) => {
+            console.error('Error al subir archivo', error);
+            this.uploadError = true;
+          }
+        });
+    }
+  }
+
+  onFileSelected(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
+      this.selectedFile = file;
+    }
+  }
+
 }
