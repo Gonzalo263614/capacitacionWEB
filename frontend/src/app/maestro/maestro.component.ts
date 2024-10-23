@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-maestro',
   templateUrl: './maestro.component.html',
@@ -9,12 +9,17 @@ import { HttpClient } from '@angular/common/http';
 export class MaestroComponent implements OnInit {
   cursos: any[] = [];
 
-  constructor(private http: HttpClient) { }
+  constructor(
+    private http: HttpClient,
+    private router: Router  // Inyección de Router para redireccionar
+  ) { }
 
   ngOnInit(): void {
     this.obtenerCursos();
   }
-
+  irACurso(cursoId: number) {
+    this.router.navigate([`/cursos/${cursoId}`]); // Redirigir al componente del curso
+  }
   obtenerCursos() {
     this.http.get('http://localhost:3000/cursos')
       .subscribe((data: any) => {

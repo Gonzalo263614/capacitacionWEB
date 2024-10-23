@@ -15,6 +15,7 @@ import { JefeComponent } from './jefe/jefe.component';
 import { NavbarComponent } from './navbar/navbar.component';
 import { ProfileComponent } from './profile/profile.component';
 import { CursoDetalleComponent } from './curso-detalle/curso-detalle.component';
+import { CursoComponent } from './curso/curso.component';
 
 @NgModule({
   declarations: [
@@ -27,7 +28,8 @@ import { CursoDetalleComponent } from './curso-detalle/curso-detalle.component';
     JefeComponent,
     NavbarComponent,
     ProfileComponent,
-    CursoDetalleComponent
+    CursoDetalleComponent,
+    CursoComponent
   ],
   imports: [
     BrowserModule,

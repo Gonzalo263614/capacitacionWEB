@@ -9,6 +9,7 @@ import { JefeComponent } from './jefe/jefe.component';
 import { ProfileComponent } from './profile/profile.component'; // Importa el componente de perfil
 import { AuthGuard } from './auth.guard'; // Importa el AuthGuard
 import { CursoDetalleComponent } from './curso-detalle/curso-detalle.component';
+import { CursoComponent } from './curso/curso.component';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -20,6 +21,7 @@ const routes: Routes = [
   { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },
   { path: '', redirectTo: '/login', pathMatch: 'full' },
   { path: 'curso/:id', component: CursoDetalleComponent },
+  { path: 'cursos/:id', component: CursoComponent }, // Ruta para el curso específico
 ];
 
 @NgModule({
