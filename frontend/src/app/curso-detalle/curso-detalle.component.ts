@@ -33,12 +33,12 @@ export class CursoDetalleComponent implements OnInit {
           this.http.get<any[]>(`http://localhost:3000/curso/${cursoId}/maestros`)
             .subscribe({
               next: (maestros) => {
-                // Agrega una propiedad para la asistencia
+                // Asegúrate de que los maestros incluyen la propiedad `id`
                 this.maestros = maestros.map(maestro => ({
                   ...maestro,
                   asistio: false  // Inicialmente, nadie ha asistido
                 }));
-                console.log('Maestros obtenidos:', this.maestros);  // Log para verificar
+                console.log('Maestros obtenidos:', this.maestros);  // Log para verificar propiedades
               },
               error: (err) => {
                 console.error('Error al obtener los maestros:', err);
@@ -61,11 +61,6 @@ export class CursoDetalleComponent implements OnInit {
   // Método para alternar la visibilidad de la lista de maestros
   toggleMaestros(): void {
     this.showMaestros = !this.showMaestros;
-  }
-
-  // Método para mostrar/ocultar el pase de lista
-  togglePasarLista(): void {
-    this.showPasarLista = !this.showPasarLista;
   }
 
   // Método para verificar si ya se ha pasado lista ese día
@@ -98,10 +93,11 @@ export class CursoDetalleComponent implements OnInit {
     // Filtrar solo los maestros que han asistido
     const asistencias = this.maestros.map(maestro => ({
       curso_id: cursoId,
-      usuario_id: maestro.id,
+      usuario_id: maestro.id,  // Verifica que `maestro.id` ahora esté presente
       fecha: fechaHoy,
       asistencia: maestro.asistio
     }));
+    
 
     // Guardar asistencias en la base de datos
     this.http.post(`http://localhost:3000/curso/${cursoId}/guardar-asistencias`, asistencias)

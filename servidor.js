@@ -488,12 +488,13 @@ app.get('/instructor/curso/:id', (req, res) => {
     });
 });
 // Ruta para obtener los maestros inscritos en un curso
+// Ruta para obtener los maestros inscritos en un curso
 app.get('/curso/:cursoId/maestros', (req, res) => {
     const cursoId = req.params.cursoId;
 
-    // Consulta para obtener los maestros inscritos en el curso
+    // Consulta para obtener los maestros inscritos en el curso, asegurando que el campo `id` esté presente
     const query = `
-        SELECT usuarios.nombre, usuarios.apellidopaterno, usuarios.apellidomaterno, usuarios.email
+        SELECT usuarios.id, usuarios.nombre, usuarios.apellidopaterno, usuarios.apellidomaterno, usuarios.email
         FROM inscripciones
         JOIN usuarios ON inscripciones.usuario_id = usuarios.id
         WHERE inscripciones.curso_id = ? AND usuarios.rol = 'maestro';
@@ -504,9 +505,10 @@ app.get('/curso/:cursoId/maestros', (req, res) => {
             console.error('Error fetching maestros:', err);
             return res.status(500).json({ error: 'Error fetching maestros' });
         }
-        res.json(results); // Devuelve los resultados de los maestros
+        res.json(results); // Devuelve los resultados de los maestros, ahora con el `id`
     });
 });
+
 // Ruta para obtener los detalles de un curso
 app.get('/curso/:cursoId', (req, res) => {
     const cursoId = req.params.cursoId;
@@ -527,24 +529,24 @@ app.get('/curso/:cursoId', (req, res) => {
     });
 });
 
-// Ruta para guardar asistencias de un curso
-app.post('/curso/:cursoId/guardar-asistencias', (req, res) => {
-    const cursoId = req.params.cursoId;
-    const asistencias = req.body;  // Recibe la lista de asistencias
+// // Ruta para guardar asistencias de un curso
+// app.post('/curso/:cursoId/guardar-asistencias', (req, res) => {
+//     const cursoId = req.params.cursoId;
+//     const asistencias = req.body;  // Recibe la lista de asistencias
 
-    // Inserta las asistencias en la base de datos
-    const queryAsistencia = `INSERT INTO asistencias (curso_id, usuario_id, fecha, asistencia) VALUES ?`;
+//     // Inserta las asistencias en la base de datos
+//     const queryAsistencia = `INSERT INTO asistencias (curso_id, usuario_id, fecha, asistencia) VALUES ?`;
 
-    // Formatea los datos para la inserción
-    const registrosAsistencia = asistencias.map(asistencia => [asistencia.curso_id, asistencia.usuario_id, asistencia.fecha, asistencia.asistencia]);
+//     // Formatea los datos para la inserción
+//     const registrosAsistencia = asistencias.map(asistencia => [asistencia.curso_id, asistencia.usuario_id, asistencia.fecha, asistencia.asistencia]);
 
-    connection.query(queryAsistencia, [registrosAsistencia], (err) => {
-        if (err) {
-            return res.status(500).json({ error: 'Error al insertar asistencias' });
-        }
-        res.json({ message: 'Asistencias guardadas exitosamente' });
-    });
-});
+//     connection.query(queryAsistencia, [registrosAsistencia], (err) => {
+//         if (err) {
+//             return res.status(500).json({ error: 'Error al insertar asistencias' });
+//         }
+//         res.json({ message: 'Asistencias guardadas exitosamente' });
+//     });
+// });
 
 // Ruta para verificar si ya se ha pasado lista un día específico
 app.get('/curso/:cursoId/asistencias', (req, res) => {
