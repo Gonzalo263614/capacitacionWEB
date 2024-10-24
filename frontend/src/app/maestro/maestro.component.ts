@@ -18,7 +18,7 @@ export class MaestroComponent implements OnInit {
     this.obtenerCursos();
   }
   irACurso(cursoId: number) {
-    this.router.navigate([`/cursos/${cursoId}`]); // Redirigir al componente del curso
+    this.router.navigate([`/curso/${cursoId}/asistencias`]); // Redirigir al componente del curso
   }
   obtenerCursos() {
     this.http.get('http://localhost:3000/cursos')

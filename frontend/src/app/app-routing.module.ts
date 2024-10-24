@@ -20,9 +20,14 @@ const routes: Routes = [
   { path: 'jefe', component: JefeComponent },
   { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },
   { path: '', redirectTo: '/login', pathMatch: 'full' },
-  { path: 'curso/:id', component: CursoDetalleComponent },
-  { path: 'cursos/:id', component: CursoComponent }, // Ruta para el curso específico
+  
+  // Ruta para ver el detalle del curso
+  { path: 'curso/:id/detalle', component: CursoDetalleComponent }, 
+  
+  // Ruta para ver las asistencias del curso
+  { path: 'curso/:id/asistencias', component: CursoComponent }, 
 ];
+
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],

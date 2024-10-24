@@ -585,6 +585,31 @@ app.post('/curso/:cursoId/guardar-asistencias', (req, res) => {
     });
 });
 
+app.get('/asistencias/:cursoId/:usuarioId', (req, res) => {
+    const cursoId = req.params.cursoId;
+    const usuarioId = req.params.usuarioId;
+
+    console.log('Curso ID:', cursoId); // Verifica si el cursoId es correcto
+    console.log('Usuario ID:', usuarioId); // Verifica si el usuarioId es correcto
+
+    const query = `
+      SELECT fecha, asistencia 
+      FROM asistencias 
+      WHERE curso_id = ? AND usuario_id = ?
+    `;
+
+    connection.query(query, [cursoId, usuarioId], (err, results) => {
+        if (err) {
+            console.error('Error al obtener las asistencias:', err);
+            res.status(500).send('Error al obtener las asistencias');
+        } else {
+            console.log('Resultados de asistencias:', results); // Log para verificar el resultado
+            res.json(results);
+        }
+    });
+});
+
+
 // Iniciar el servidor en el puerto 3000
 const PORT = 3000;
 app.listen(PORT, () => {

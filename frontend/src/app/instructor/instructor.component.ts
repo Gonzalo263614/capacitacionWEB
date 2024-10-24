@@ -45,6 +45,6 @@ export class InstructorComponent implements OnInit {
 
   // Método para redirigir a la pantalla de detalles del curso
   verDetallesCurso(cursoId: number): void {
-    this.router.navigate(['/curso', cursoId]);  // Redirige a la ruta de detalles del curso
+    this.router.navigate([`/curso/${cursoId}/detalle`]); // Redirigir al componente del curso
   }
 }
