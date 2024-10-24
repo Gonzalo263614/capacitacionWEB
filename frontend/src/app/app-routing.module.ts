@@ -10,6 +10,7 @@ import { ProfileComponent } from './profile/profile.component'; // Importa el co
 import { AuthGuard } from './auth.guard'; // Importa el AuthGuard
 import { CursoDetalleComponent } from './curso-detalle/curso-detalle.component';
 import { CursoComponent } from './curso/curso.component';
+import { EncuestaComponent } from './encuesta/encuesta.component';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -26,6 +27,7 @@ const routes: Routes = [
   
   // Ruta para ver las asistencias del curso
   { path: 'curso/:id/asistencias', component: CursoComponent }, 
+  { path: 'encuesta', component: EncuestaComponent }, 
 ];
 
 

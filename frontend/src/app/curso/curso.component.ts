@@ -15,6 +15,7 @@ export class CursoComponent implements OnInit {
   showAsistencias: boolean = false;
   usuarioId: number = 0;  // ID del usuario, en este caso, lo puedes obtener dinámicamente
   cursoId: string | null = '';
+  showEncuesta: boolean = false; // Controla la visibilidad de la encuesta
 
   constructor(
     private route: ActivatedRoute,
@@ -22,18 +23,21 @@ export class CursoComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-        // Obtener el usuarioId desde localStorage
-        const storedUserId = localStorage.getItem('userId');
-        if (storedUserId) {
-          this.usuarioId = parseInt(storedUserId, 10);  // Convertir a número
-        } else {
-          console.error('No se encontró el ID del usuario en localStorage.');
-        }
-    // Asegúrate de que el 'id' esté presente en la URL y correctamente asignado
+    if (typeof window !== 'undefined' && window.localStorage) {
+      const storedUserId = localStorage.getItem('userId');
+      if (storedUserId) {
+        this.usuarioId = parseInt(storedUserId, 10);  // Convertir a número
+      } else {
+        console.error('No se encontró el ID del usuario en localStorage.');
+      }
+    } else {
+      // console.error('localStorage no está disponible.');
+    }
+  
+    // Continuar con la lógica para obtener el curso
     this.cursoId = this.route.snapshot.paramMap.get('id');
-
+  
     if (this.cursoId) {
-      // Obtener los detalles del curso solo si se tiene un cursoId válido
       this.http.get<any>(`http://localhost:3000/curso/${this.cursoId}`)
         .subscribe({
           next: (response) => {
@@ -48,6 +52,9 @@ export class CursoComponent implements OnInit {
       console.error('No se encontró el cursoId en la URL.');
     }
   }
+  
+  
+
 
 
   // Método para alternar la visibilidad de los detalles del curso

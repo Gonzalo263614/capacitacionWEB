@@ -16,6 +16,7 @@ import { NavbarComponent } from './navbar/navbar.component';
 import { ProfileComponent } from './profile/profile.component';
 import { CursoDetalleComponent } from './curso-detalle/curso-detalle.component';
 import { CursoComponent } from './curso/curso.component';
+import { EncuestaComponent } from './encuesta/encuesta.component';
 
 @NgModule({
   declarations: [
@@ -29,7 +30,8 @@ import { CursoComponent } from './curso/curso.component';
     NavbarComponent,
     ProfileComponent,
     CursoDetalleComponent,
-    CursoComponent
+    CursoComponent,
+    EncuestaComponent
   ],
   imports: [
     BrowserModule,

@@ -1,0 +1,58 @@
+<div class="encuesta">
+    <h2>Encuesta sobre el curso: {{ cursoNombre }}</h2>
+    <h3>Encuesta de la eficacia y de opinión de la capacitación del participante</h3>
+    <p>
+        <strong>Por favor, selecciona una opción para cada instrucción:</strong>
+    </p>
+
+    <p>
+        <strong>1 TOTALMENTE EN DESACUERDO&nbsp;&nbsp;2 PARCIALMENTE EN DESACUERDO&nbsp;&nbsp;3 INDIFERENTE&nbsp;&nbsp;4
+            PARCIALMENTE DE ACUERDO&nbsp;&nbsp;5 TOTALMENTE DE ACUERDO</strong>
+    </p>
+    <div *ngFor="let pregunta of preguntas; let i = index">
+        <p>{{ pregunta }}</p>
+        <label *ngFor="let option of [1, 2, 3, 4, 5]">
+            <input type="radio" name="pregunta{{ i }}" [(ngModel)]="respuestas[i]" [value]="option" />
+            {{ option }}
+        </label>
+    </div>
+    <h3> EVALUACIÓN DEL INSTRUCTOR:</h3>
+    <p>
+        <strong>1 TOTALMENTE EN DESACUERDO&nbsp;&nbsp;2 PARCIALMENTE EN DESACUERDO&nbsp;&nbsp;3 INDIFERENTE&nbsp;&nbsp;4
+            PARCIALMENTE DE ACUERDO&nbsp;&nbsp;5 TOTALMENTE DE ACUERDO</strong>
+    </p>
+    <div *ngFor="let pregunta of preguntas2; let i = index">
+        <p>{{ pregunta }}</p>
+        <label *ngFor="let option of [1, 2, 3, 4, 5]">
+            <input type="radio" name="pregunta{{ i }}" [(ngModel)]="respuestas2[i]" [value]="option" />
+            {{ option }}
+        </label>
+    </div>
+    <h3>EVALUACIÓN DEL MATERIAL DIDÁCTICO:</h3>
+    <p>
+        <strong>1 TOTALMENTE EN DESACUERDO&nbsp;&nbsp;2 PARCIALMENTE EN DESACUERDO&nbsp;&nbsp;3 INDIFERENTE&nbsp;&nbsp;4
+            PARCIALMENTE DE ACUERDO&nbsp;&nbsp;5 TOTALMENTE DE ACUERDO</strong>
+    </p>
+    <div *ngFor="let pregunta of preguntas3; let i = index">
+        <p>{{ pregunta }}</p>
+        <label *ngFor="let option of [1, 2, 3, 4, 5]">
+            <input type="radio" name="pregunta{{ i }}" [(ngModel)]="respuestas3[i]" [value]="option" />
+            {{ option }}
+        </label>
+    </div>
+    <h3>EVALUACIÓN DEL CURSO:</h3>
+    <p>
+        <strong>1 TOTALMENTE EN DESACUERDO&nbsp;&nbsp;2 PARCIALMENTE EN DESACUERDO&nbsp;&nbsp;3 INDIFERENTE&nbsp;&nbsp;4
+            PARCIALMENTE DE ACUERDO&nbsp;&nbsp;5 TOTALMENTE DE ACUERDO</strong>
+    </p>
+    <div *ngFor="let pregunta of preguntas4; let i = index">
+        <p>{{ pregunta }}</p>
+        <label *ngFor="let option of [1, 2, 3, 4, 5]">
+            <input type="radio" name="pregunta{{ i }}" [(ngModel)]="respuestas4[i]" [value]="option" />
+            {{ option }}
+        </label>
+    </div>
+    <h3>SUGERENCIAS PARA MEJORAR LOS CURSOS OFRECIDOS POR EL ITA:</h3>
+    <textarea rows="4" cols="50" [(ngModel)]="sugerencias" placeholder="Escribe tus sugerencias aquí"></textarea>
+    <button (click)="enviarEncuesta()">Enviar Encuesta</button>
+</div>
