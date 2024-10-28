@@ -10,6 +10,7 @@ import { ActivatedRoute } from '@angular/router';
 export class CursoComponent implements OnInit {
   curso: any = {};
   asistencias: any[] = [];
+  calificacion: number | null = null;  // Nueva propiedad para almacenar la calificación
   error: string = '';
   showDetalles: boolean = false;
   showAsistencias: boolean = false;
@@ -51,12 +52,21 @@ export class CursoComponent implements OnInit {
     } else {
       console.error('No se encontró el cursoId en la URL.');
     }
+    this.obtenerCalificacion();  // Llamar al método para obtener la calificación al inicializar
   }
-  
-  
-
-
-
+    // Método para obtener la calificación del usuario
+    obtenerCalificacion(): void {
+      this.http.get<any>(`http://localhost:3000/curso/${this.cursoId}/calificacion/${this.usuarioId}`)
+        .subscribe({
+          next: (response) => {
+            this.calificacion = response.calificacion;  // Almacena la calificación en la propiedad
+          },
+          error: (err) => {
+            console.error('Error al obtener la calificación:', err);
+            this.error = 'Error al obtener la calificación. Inténtalo de nuevo más tarde.';
+          }
+        });
+    }
   // Método para alternar la visibilidad de los detalles del curso
   toggleDetalles(): void {
     this.showDetalles = !this.showDetalles;

@@ -699,8 +699,70 @@ function verificarEncuestaRespondida(req, res) {
         res.json({ respondida });
     });
 }
+// Ruta para guardar calificaciones
+app.post('/curso/:id/guardar-calificacion', (req, res) => {
+    const cursoId = req.params.id;
+    const { usuario_id, calificacion } = req.body;
 
+    // Verificar si ya existe una calificación para este usuario en el curso
+    const checkQuery = 'SELECT * FROM calificaciones WHERE curso_id = ? AND usuario_id = ?';
 
+    connection.query(checkQuery, [cursoId, usuario_id], (err, results) => {
+        if (err) {
+            console.error('Error al verificar la calificación existente:', err);
+            return res.status(500).json({ error: 'Error al verificar la calificación existente.' });
+        }
+
+        if (results.length > 0) {
+            // Si hay resultados, significa que ya existe una calificación
+            return res.status(400).json({ message: 'El maestro ya tiene una calificación para este curso.' });
+        }
+
+        // Si no hay calificación, proceder a insertar la nueva calificación
+        const query = 'INSERT INTO calificaciones (curso_id, usuario_id, calificacion) VALUES (?, ?, ?)';
+
+        connection.query(query, [cursoId, usuario_id, calificacion], (err, results) => {
+            if (err) {
+                console.error('Error al guardar la calificación:', err);
+                return res.status(500).json({ error: 'Error al guardar la calificación.' });
+            }
+            res.status(200).json({ message: 'Calificación guardada exitosamente.' });
+        });
+    });
+});
+// Ruta para verificar si ya existe una calificación
+app.get('/curso/:id/calificaciones', (req, res) => {
+    const cursoId = req.params.id;
+    const usuarioId = req.query.usuario_id;
+
+    const query = 'SELECT * FROM calificaciones WHERE curso_id = ? AND usuario_id = ?';
+    connection.query(query, [cursoId, usuarioId], (err, results) => {
+        if (err) {
+            console.error('Error al verificar la calificación:', err);
+            return res.status(500).json({ error: 'Error al verificar la calificación.' });
+        }
+        res.status(200).json({ existe: results.length > 0 });
+    });
+});
+app.get('/curso/:cursoId/calificacion/:usuarioId', (req, res) => {
+    const { cursoId, usuarioId } = req.params;
+  
+    // Lógica para obtener la calificación del usuario en el curso
+    const query = 'SELECT calificacion FROM calificaciones WHERE curso_id = ? AND usuario_id = ?';
+    
+    connection.query(query, [cursoId, usuarioId], (err, results) => {
+      if (err) {
+        console.error('Error al obtener la calificación:', err);
+        return res.status(500).json({ error: 'Error al obtener la calificación.' });
+      }
+      if (results.length > 0) {
+        res.status(200).json({ calificacion: results[0].calificacion });
+      } else {
+        res.status(404).json({ error: 'Calificación no encontrada.' });
+      }
+    });
+  });
+  
 // Iniciar el servidor en el puerto 3000
 const PORT = 3000;
 app.listen(PORT, () => {

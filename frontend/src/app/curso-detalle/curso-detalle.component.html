@@ -48,3 +48,32 @@
 
 <p *ngIf="maestros.length === 0 && showMaestros">No hay maestros inscritos en este curso.</p>
 <p *ngIf="error" class="error">{{ error }}</p>
+<!-- Nuevo botón para mostrar la sección de calificaciones -->
+<button (click)="toggleCalificaciones()">
+  {{ showCalificaciones ? 'Ocultar Calificaciones' : 'Agregar Calificaciones' }}
+</button>
+
+<!-- Nueva sección para agregar calificaciones -->
+<div *ngIf="showCalificaciones">
+  <h2>Agregar Calificaciones</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Nombre</th>
+        <th>Calificación</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let maestro of maestros">
+        <td>{{ maestro.nombre }}</td>
+        <td>
+          <input type="number" [(ngModel)]="maestro.calificacion" placeholder="Calificación" />
+        </td>
+        <td>
+          <button (click)="guardarCalificacion(maestro.id)">Agregar Calificación</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
