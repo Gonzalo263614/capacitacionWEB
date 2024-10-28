@@ -95,4 +95,8 @@ export class CursoComponent implements OnInit {
       this.obtenerAsistencias();
     }
   }
+    // Método para descargar la constancia
+    descargarConstancia(): void {
+      console.log('Descargar'); // Imprime "Descargar" en la consola
+    }
 }

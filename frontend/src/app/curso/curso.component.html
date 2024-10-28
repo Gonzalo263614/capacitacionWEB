@@ -13,6 +13,10 @@
     <button (click)="toggleAsistencias()">
       {{ showAsistencias ? 'Ocultar asistencias' : 'Ver asistencias' }}
     </button>
+    <!-- Botón para descargar constancia -->
+    <button (click)="descargarConstancia()" *ngIf="calificacion !== null">
+      Descargar constancia
+    </button>
   </div>
 
   <!-- Detalles del curso -->
@@ -24,7 +28,8 @@
     <p><strong>Fecha de fin:</strong> {{ curso.fecha_fin }}</p>
     <p><strong>Instructor:</strong> {{ curso.nombre_instructor }} {{ curso.apellidopaterno_instructor }} {{
       curso.apellidomaterno_instructor }}</p>
-    <p><strong>Tu calificación:</strong> {{ calificacion !== null ? calificacion : 'No disponible' }}</p> <!-- Mostrar la calificación -->
+    <p><strong>Tu calificación:</strong> {{ calificacion !== null ? calificacion : 'No disponible' }}</p>
+    <!-- Mostrar la calificación -->
   </div>
 
   <!-- Asistencias -->
