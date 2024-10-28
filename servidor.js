@@ -608,6 +608,97 @@ app.get('/asistencias/:cursoId/:usuarioId', (req, res) => {
         }
     });
 });
+// Ruta para recibir los datos de la encuesta
+app.post('/api/encuesta', (req, res) => {
+    const { id_inscripcion, respuestas1, respuestas2, respuestas3, respuestas4, respuestas5, sugerencias } = req.body;
+
+    // Construir una consulta SQL para insertar los datos
+    const query = `
+  INSERT INTO encuestas (id_inscripcion, respuestas_seccion1, respuestas_seccion2, respuestas_seccion3, respuestas_seccion4, respuestas_seccion5, sugerencias)
+  VALUES (?, ?, ?, ?, ?, ?, ?)
+`;
+
+    const values = [
+        id_inscripcion,
+        JSON.stringify(respuestas1),
+        JSON.stringify(respuestas2),
+        JSON.stringify(respuestas3),
+        JSON.stringify(respuestas4),
+        JSON.stringify(respuestas5),
+        sugerencias
+    ];
+
+    connection.query(query, values, (error, results) => {
+        if (error) {
+            console.error('Error al guardar la encuesta:', error);
+            res.status(500).json({ message: 'Error al guardar la encuesta' });
+        } else {
+            res.status(200).json({ message: 'Encuesta guardada exitosamente' });
+        }
+    });
+});
+
+// Nueva ruta para obtener el id_inscripcion
+app.get('/api/inscripcion/:cursoId/:usuarioId', (req, res) => {
+    const cursoId = req.params.cursoId;
+    const usuarioId = req.params.usuarioId;
+
+    const query = `
+        SELECT id FROM inscripciones 
+        WHERE usuario_id = ? AND curso_id = ? LIMIT 1
+    `;
+
+    connection.query(query, [usuarioId, cursoId], (error, results) => {
+        if (error) {
+            console.error('Error al obtener id_inscripcion:', error);
+            res.status(500).json({ message: 'Error al obtener id_inscripcion' });
+        } else if (results.length > 0) {
+            res.status(200).json({ id: results[0].id });
+        } else {
+            res.status(404).json({ message: 'Inscripción no encontrada' });
+        }
+    });
+});
+
+// Definición de la ruta en Express.js
+app.get('/api/encuesta/respondida/:idInscripcion', verificarEncuestaRespondida);
+
+// Esta función manejará la verificación de la encuesta
+function verificarEncuestaRespondida(req, res) {
+    const { idInscripcion } = req.params;
+
+    // Realiza la consulta para verificar si la encuesta fue respondida
+    const query = 'SELECT COUNT(*) AS respondida FROM respuestas WHERE id_inscripcion = ?';
+
+    connection.query(query, [idInscripcion], (err, results) => {
+        if (err) {
+            console.error('Error al verificar la respuesta:', err);
+            return res.status(500).json({ message: 'Error al verificar la respuesta' });
+        }
+
+        // Comprueba si la encuesta fue respondida
+        const respondida = results[0].respondida > 0;
+        res.json({ respondida });
+    });
+}
+
+// Función para verificar si la encuesta ya fue respondida
+function verificarEncuestaRespondida(req, res) {
+    const { idInscripcion } = req.params;
+
+    // Cambia 'respuestas' por 'encuestas'
+    const query = 'SELECT COUNT(*) AS respondida FROM encuestas WHERE id_inscripcion = ?';
+
+    connection.query(query, [idInscripcion], (err, results) => {
+        if (err) {
+            console.error('Error al verificar la respuesta:', err);
+            return res.status(500).json({ message: 'Error al verificar la respuesta', error: err.message });
+        }
+
+        const respondida = results[0].respondida > 0;
+        res.json({ respondida });
+    });
+}
 
 
 // Iniciar el servidor en el puerto 3000
