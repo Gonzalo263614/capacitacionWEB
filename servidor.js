@@ -148,25 +148,91 @@ app.get('/cursos-pendientes', (req, res) => {
     });
 });
 
-//Proponer un curso
+// //Proponer un curso
+// app.post('/proponer-curso', (req, res) => {
+//     const {
+//         nombre_curso, asignaturas_requeridas, contenidos_requeridos, numero_docentes, tipo_asignatura, actividad_evento,
+//         objetivo, carreras_atendidas, periodo, turno, fecha_inicio, fecha_fin, justificacion,
+//         numero_horas, horario, lugar, requisitos, tipo_curso, nombre_instructor, apellidopaterno_instructor, apellidomaterno_instructor,
+//         curp_instructor, rfc_instructor, maxestudios_instructor, email_instructor, password_instructor, sexo_instructor, tipo_contrato_instructor,
+//         departamentosSeleccionados
+//     } = req.body;
+
+//     // Paso 1: Insertar el curso en la tabla `cursos_propuestos`
+//     const queryInsertCurso = `
+//         INSERT INTO cursos_propuestos (
+//             nombre_curso, asignaturas_requeridas, contenidos_requeridos, numero_docentes, tipo_asignatura, actividad_evento,
+//             objetivo, carreras_atendidas, periodo, turno, fecha_inicio, fecha_fin, justificacion, numero_horas, horario, lugar, 
+//             requisitos, tipo_curso, nombre_instructor, apellidopaterno_instructor, apellidomaterno_instructor, curp_instructor,
+//             rfc_instructor, maxestudios_instructor, email_instructor, password_instructor, sexo_instructor, tipo_contrato_instructor
+//         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+//     `;
+
+//     connection.query(queryInsertCurso, [
+//         nombre_curso, asignaturas_requeridas, contenidos_requeridos, numero_docentes, tipo_asignatura, actividad_evento,
+//         objetivo, carreras_atendidas, periodo, turno, fecha_inicio, fecha_fin, justificacion, numero_horas, horario, lugar,
+//         requisitos, tipo_curso, nombre_instructor, apellidopaterno_instructor, apellidomaterno_instructor, curp_instructor,
+//         rfc_instructor, maxestudios_instructor, email_instructor, password_instructor, sexo_instructor, tipo_contrato_instructor
+//     ], (err, result) => {
+//         if (err) {
+//             console.error('Error al insertar el curso:', err);
+//             return res.status(500).json({ error: 'Error al insertar el curso' });
+//         }
+
+//         // Obtén el ID del curso recién insertado
+//         const nuevoCursoId = result.insertId;
+
+//         // Paso 2: Insertar los departamentos seleccionados
+//         const queryInsertDeptos = `INSERT INTO departamentos (nombre) VALUES ?`;
+//         const valoresDepartamento = departamentosSeleccionados.map(dep => [dep]);
+
+//         connection.query(queryInsertDeptos, [valoresDepartamento], (err, result) => {
+//             if (err) {
+//                 console.error('Error al insertar departamentos:', err);
+//                 return res.status(500).json({ error: 'Error al insertar departamentos' });
+//             }
+
+//             // Paso 3: Obtener los IDs de los departamentos recién insertados
+//             const primerDepartamentoId = result.insertId;
+//             const nuevosDeptosIds = [];
+
+//             // Crear una lista de IDs de los departamentos insertados
+//             for (let i = 0; i < departamentosSeleccionados.length; i++) {
+//                 nuevosDeptosIds.push(primerDepartamentoId + i);
+//             }
+
+//             // Paso 4: Insertar la relación curso-departamento en la tabla `departamento_curso`
+//             const queryRelacionCursoDepto = `INSERT INTO departamento_curso (departamento_id, curso_id) VALUES ?`;
+//             const valoresRelacion = nuevosDeptosIds.map(deptoId => [deptoId, nuevoCursoId]);
+
+//             connection.query(queryRelacionCursoDepto, [valoresRelacion], (err, result) => {
+//                 if (err) {
+//                     console.error('Error al insertar la relación departamento-curso:', err);
+//                     return res.status(500).json({ error: 'Error al insertar la relación departamento-curso' });
+//                 }
+
+//                 // Respuesta exitosa
+//                 res.status(200).json({ message: 'Curso, departamentos y relación insertados correctamente' });
+//             });
+//         });
+//     });
+// });
+
 app.post('/proponer-curso', (req, res) => {
     const {
         nombre_curso, asignaturas_requeridas, contenidos_requeridos, numero_docentes, tipo_asignatura, actividad_evento,
         objetivo, carreras_atendidas, periodo, turno, fecha_inicio, fecha_fin, justificacion,
         numero_horas, horario, lugar, requisitos, tipo_curso, nombre_instructor, apellidopaterno_instructor, apellidomaterno_instructor,
         curp_instructor, rfc_instructor, maxestudios_instructor, email_instructor, password_instructor, sexo_instructor, tipo_contrato_instructor,
-        departamentosSeleccionados
+        departamentosSeleccionados, id_jefe  // <-- Asegúrate de recibir `id_jefe`
     } = req.body;
 
-    // Paso 1: Insertar el curso en la tabla `cursos_propuestos`
-    const queryInsertCurso = `
-        INSERT INTO cursos_propuestos (
-            nombre_curso, asignaturas_requeridas, contenidos_requeridos, numero_docentes, tipo_asignatura, actividad_evento,
-            objetivo, carreras_atendidas, periodo, turno, fecha_inicio, fecha_fin, justificacion, numero_horas, horario, lugar, 
-            requisitos, tipo_curso, nombre_instructor, apellidopaterno_instructor, apellidomaterno_instructor, curp_instructor,
-            rfc_instructor, maxestudios_instructor, email_instructor, password_instructor, sexo_instructor, tipo_contrato_instructor
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `;
+    const queryInsertCurso = `INSERT INTO cursos_propuestos (
+        nombre_curso, asignaturas_requeridas, contenidos_requeridos, numero_docentes, tipo_asignatura, actividad_evento,
+        objetivo, carreras_atendidas, periodo, turno, fecha_inicio, fecha_fin, justificacion, numero_horas, horario, lugar, 
+        requisitos, tipo_curso, nombre_instructor, apellidopaterno_instructor, apellidomaterno_instructor, curp_instructor,
+        rfc_instructor, maxestudios_instructor, email_instructor, password_instructor, sexo_instructor, tipo_contrato_instructor
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
     connection.query(queryInsertCurso, [
         nombre_curso, asignaturas_requeridas, contenidos_requeridos, numero_docentes, tipo_asignatura, actividad_evento,
@@ -179,76 +245,122 @@ app.post('/proponer-curso', (req, res) => {
             return res.status(500).json({ error: 'Error al insertar el curso' });
         }
 
-        // Obtén el ID del curso recién insertado
         const nuevoCursoId = result.insertId;
 
-        // Paso 2: Insertar los departamentos seleccionados
-        const queryInsertDeptos = `INSERT INTO departamentos (nombre) VALUES ?`;
-        const valoresDepartamento = departamentosSeleccionados.map(dep => [dep]);
-
-        connection.query(queryInsertDeptos, [valoresDepartamento], (err, result) => {
+        // Paso adicional: Insertar en jefe_curso
+        const queryInsertJefeCurso = 'INSERT INTO jefe_curso (id_curso, id_jefe) VALUES (?, ?)';
+        connection.query(queryInsertJefeCurso, [nuevoCursoId, id_jefe], (err, result) => {
             if (err) {
-                console.error('Error al insertar departamentos:', err);
-                return res.status(500).json({ error: 'Error al insertar departamentos' });
+                console.error('Error al insertar en jefe_curso:', err);
+                return res.status(500).json({ error: 'Error al asociar jefe con el curso' });
             }
 
-            // Paso 3: Obtener los IDs de los departamentos recién insertados
-            const primerDepartamentoId = result.insertId;
-            const nuevosDeptosIds = [];
+            // Insertar los departamentos seleccionados y la relación curso-departamento
+            const queryInsertDeptos = 'INSERT INTO departamentos (nombre) VALUES ?';
+            const valoresDepartamento = departamentosSeleccionados.map(dep => [dep]);
 
-            // Crear una lista de IDs de los departamentos insertados
-            for (let i = 0; i < departamentosSeleccionados.length; i++) {
-                nuevosDeptosIds.push(primerDepartamentoId + i);
-            }
-
-            // Paso 4: Insertar la relación curso-departamento en la tabla `departamento_curso`
-            const queryRelacionCursoDepto = `INSERT INTO departamento_curso (departamento_id, curso_id) VALUES ?`;
-            const valoresRelacion = nuevosDeptosIds.map(deptoId => [deptoId, nuevoCursoId]);
-
-            connection.query(queryRelacionCursoDepto, [valoresRelacion], (err, result) => {
+            connection.query(queryInsertDeptos, [valoresDepartamento], (err, result) => {
                 if (err) {
-                    console.error('Error al insertar la relación departamento-curso:', err);
-                    return res.status(500).json({ error: 'Error al insertar la relación departamento-curso' });
+                    console.error('Error al insertar departamentos:', err);
+                    return res.status(500).json({ error: 'Error al insertar departamentos' });
                 }
 
-                // Respuesta exitosa
-                res.status(200).json({ message: 'Curso, departamentos y relación insertados correctamente' });
+                const primerDepartamentoId = result.insertId;
+                const nuevosDeptosIds = [];
+
+                for (let i = 0; i < departamentosSeleccionados.length; i++) {
+                    nuevosDeptosIds.push(primerDepartamentoId + i);
+                }
+
+                const queryRelacionCursoDepto = 'INSERT INTO departamento_curso (departamento_id, curso_id) VALUES ?';
+                const valoresRelacion = nuevosDeptosIds.map(deptoId => [deptoId, nuevoCursoId]);
+
+                connection.query(queryRelacionCursoDepto, [valoresRelacion], (err, result) => {
+                    if (err) {
+                        console.error('Error al insertar la relación departamento-curso:', err);
+                        return res.status(500).json({ error: 'Error al insertar la relación departamento-curso' });
+                    }
+
+                    res.status(200).json({ message: 'Curso, jefe, departamentos y relaciones insertados correctamente' });
+                });
+            });
+        });
+    });
+});
+// Eliminar un curso propuesto
+app.delete('/eliminar-curso/:id', (req, res) => {
+    const cursoId = req.params.id;
+
+    // Paso 1: Eliminar relaciones con jefe en la tabla `jefe_curso`
+    const queryEliminarJefeCurso = `
+        DELETE FROM jefe_curso WHERE id_curso = ?
+    `;
+    
+    connection.query(queryEliminarJefeCurso, [cursoId], (err, result) => {
+        if (err) {
+            console.error('Error al eliminar relación jefe-curso:', err);
+            return res.status(500).json({ error: 'Error al eliminar relación jefe-curso' });
+        }
+
+        // Paso 2: Eliminar relaciones con departamentos en la tabla `departamento_curso`
+        const queryEliminarRelaciones = `
+            DELETE FROM departamento_curso WHERE curso_id = ?
+        `;
+
+        connection.query(queryEliminarRelaciones, [cursoId], (err, result) => {
+            if (err) {
+                console.error('Error al eliminar relación curso-departamento:', err);
+                return res.status(500).json({ error: 'Error al eliminar relación curso-departamento' });
+            }
+
+            // Paso 3: Eliminar el curso de la tabla `cursos_propuestos`
+            const queryEliminarCurso = `
+                DELETE FROM cursos_propuestos WHERE id = ?
+            `;
+
+            connection.query(queryEliminarCurso, [cursoId], (err, result) => {
+                if (err) {
+                    console.error('Error al eliminar el curso:', err);
+                    return res.status(500).json({ error: 'Error al eliminar el curso' });
+                }
+
+                res.status(200).json({ message: 'Curso eliminado exitosamente' });
             });
         });
     });
 });
 
-// Eliminar un curso propuesto
-app.delete('/eliminar-curso/:id', (req, res) => {
-    const cursoId = req.params.id;
+// // Eliminar un curso propuesto
+// app.delete('/eliminar-curso/:id', (req, res) => {
+//     const cursoId = req.params.id;
 
-    // Paso 1: Eliminar relaciones con departamentos en la tabla `departamento_curso`
-    const queryEliminarRelaciones = `
-        DELETE FROM departamento_curso WHERE curso_id = ?
-    `;
+//     // Paso 1: Eliminar relaciones con departamentos en la tabla `departamento_curso`
+//     const queryEliminarRelaciones = `
+//         DELETE FROM departamento_curso WHERE curso_id = ?
+//     `;
 
-    connection.query(queryEliminarRelaciones, [cursoId], (err, result) => {
-        if (err) {
-            console.error('Error al eliminar relación curso-departamento:', err);
-            return res.status(500).json({ error: 'Error al eliminar relación curso-departamento' });
-        }
+//     connection.query(queryEliminarRelaciones, [cursoId], (err, result) => {
+//         if (err) {
+//             console.error('Error al eliminar relación curso-departamento:', err);
+//             return res.status(500).json({ error: 'Error al eliminar relación curso-departamento' });
+//         }
 
-        // Paso 2: Eliminar el curso de la tabla `cursos_propuestos`
-        const queryEliminarCurso = `
-            DELETE FROM cursos_propuestos WHERE id = ?
-        `;
+//         // Paso 2: Eliminar el curso de la tabla `cursos_propuestos`
+//         const queryEliminarCurso = `
+//             DELETE FROM cursos_propuestos WHERE id = ?
+//         `;
 
-        connection.query(queryEliminarCurso, [cursoId], (err, result) => {
-            if (err) {
-                console.error('Error al eliminar el curso:', err);
-                return res.status(500).json({ error: 'Error al eliminar el curso' });
-            }
+//         connection.query(queryEliminarCurso, [cursoId], (err, result) => {
+//             if (err) {
+//                 console.error('Error al eliminar el curso:', err);
+//                 return res.status(500).json({ error: 'Error al eliminar el curso' });
+//             }
 
-            // Respuesta exitosa
-            res.status(200).json({ message: 'Curso eliminado correctamente' });
-        });
-    });
-});
+//             // Respuesta exitosa
+//             res.status(200).json({ message: 'Curso eliminado correctamente' });
+//         });
+//     });
+// });
 
 
 // // Ruta para que el admin acepte o rechace un curso

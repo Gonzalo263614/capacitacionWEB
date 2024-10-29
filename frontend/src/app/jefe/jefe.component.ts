@@ -59,11 +59,24 @@ export class JefeComponent {
     'Química y Bioquímica'
   ];
   departamentosSeleccionados: string[] = [];
+  idJefe = 1;  // Por ejemplo, esto podría provenir del sistema de autenticación
 
   constructor(private http: HttpClient) {
     this.obtenerCursosPendientes(); // Llamar a la función al iniciar el componente
   }
+  ngOnInit(): void {
+    // Obtener el idJefe del localStorage
+    if (typeof window !== 'undefined' && window.localStorage) {
+      const storedIdJefe = localStorage.getItem('userId');
+      if (storedIdJefe) {
+        this.idJefe = parseInt(storedIdJefe, 10);  // Convertir a número
+      } else {
+        console.error('No se encontró el ID del jefe en localStorage.');
+      }
+    }
 
+    // Aquí puedes continuar con otras inicializaciones si es necesario
+  }
   abrirFormularioModificar(curso: any) {
     this.cursoSeleccionado = curso;
     this.mostrarFormularioModificar = true;
@@ -157,7 +170,6 @@ export class JefeComponent {
       lugar: this.lugar,
       requisitos: this.requisitos,
       tipo_curso: this.tipoCurso,
-      // Datos del instructor
       nombre_instructor: this.nombreInstructor,
       apellidopaterno_instructor: this.apellidopaternoInstructor,
       apellidomaterno_instructor: this.apellidomaternoInstructor,
@@ -168,20 +180,20 @@ export class JefeComponent {
       sexo_instructor: this.sexoInstructor,
       tipo_contrato_instructor: this.tipoContratoInstructor,
       password_instructor: this.passwordInstructor,
-      // Departamentos seleccionados
-      departamentosSeleccionados: this.departamentosSeleccionados
+      departamentosSeleccionados: this.departamentosSeleccionados,
+      id_jefe: this.idJefe  // Enviar el ID del jefe junto con el curso
     };
 
     this.http.post('http://localhost:3000/proponer-curso', curso)
       .subscribe(response => {
         console.log('Curso propuesto:', response);
         this.mostrarFormulario = false;
-        // Limpiar campos y resetear array de departamentos seleccionados
         this.limpiarFormulario();
       }, error => {
         console.error('Error al proponer el curso:', error);
       });
   }
+
   // Función para limpiar el formulario y resetear el array de departamentos seleccionados
   limpiarFormulario() {
     this.nombreCurso = '';
