@@ -282,12 +282,28 @@
 <h2>Cursos Propuestos</h2>
 <div *ngFor="let curso of cursosPropuestos">
   <h3>{{ curso.nombre_curso }}</h3>
-  
+
   <!-- Botón para mostrar/ocultar la encuesta -->
   <button (click)="toggleEncuesta(curso.id)">
     {{ showEncuesta[curso.id] ? 'Ocultar encuesta' : 'Mostrar encuesta' }}
   </button>
 
-  <!-- Encuesta -->
-  <app-encuestajefe *ngIf="showEncuesta[curso.id]" [cursoNombre]="curso.nombre_curso"></app-encuestajefe>
+  <!-- Listado de maestros con su botón para responder la encuesta -->
+  <div *ngIf="showEncuesta[curso.id]">
+    <h4>Maestros Inscritos</h4>
+    <div *ngFor="let maestro of curso.maestrosInscritos">
+      <span>{{ maestro.nombre }} {{ maestro.apellidopaterno }} {{ maestro.apellidomaterno }}</span>
+      <button (click)="responderEncuesta(maestro.id, curso.id)">
+        {{ encuestaVisible[curso.id] === maestro.id ? 'Ocultar Encuesta' : 'Responder Encuesta' }}
+      </button>
+
+      <!-- EncuestaJefe se muestra solo para el maestro seleccionado -->
+      <app-encuestajefe
+        *ngIf="encuestaVisible[curso.id] === maestro.id"
+        [cursoNombre]="curso.nombre_curso"
+        [idMaestro]="maestro.id" 
+        (close)="encuestaVisible[curso.id] = null">
+      </app-encuestajefe>
+    </div>
+  </div>
 </div>

@@ -74,13 +74,15 @@ export class JefeComponent {
       const storedIdJefe = localStorage.getItem('userId');
       if (storedIdJefe) {
         this.idJefe = parseInt(storedIdJefe, 10);  // Convertir a número
+        // Llamar a obtenerCursosPropuestos con el idJefe
+        this.obtenerCursosPropuestos(this.idJefe);
       } else {
         console.error('No se encontró el ID del jefe en localStorage.');
       }
     }
-    this.obtenerCursosPropuestos();
     // Aquí puedes continuar con otras inicializaciones si es necesario
   }
+
   abrirFormularioModificar(curso: any) {
     this.cursoSeleccionado = curso;
     this.mostrarFormularioModificar = true;
@@ -246,24 +248,33 @@ export class JefeComponent {
     console.log('Modificar curso:', curso);
   }
 
-  obtenerCursosPropuestos() {
-    const idJefe = this.idJefe; // ID del jefe actual
-    
-    // URL completa apuntando al backend
-    this.http.get<any[]>(`http://localhost:3000/jefe/${idJefe}/cursos`).subscribe(
-      (data) => {
-        this.cursosPropuestos = data;
-        // Inicializa el control de visibilidad de encuesta para cada curso
-        this.cursosPropuestos.forEach(curso => this.showEncuesta[curso.id] = false);
+  obtenerCursosPropuestos(idJefe: number): void {
+    this.http.get<any[]>(`http://localhost:3000/jefe/${idJefe}/cursos`).subscribe({
+      next: (cursos) => {
+        this.cursosPropuestos = cursos;
+        // Para cada curso, obtener los maestros inscritos
+        this.cursosPropuestos.forEach(curso => {
+          this.http.get<any[]>(`http://localhost:3000/curso/${curso.id}/maestros`).subscribe({
+            next: (maestros) => curso.maestrosInscritos = maestros,
+            error: (err) => console.error(`Error al obtener maestros del curso ${curso.id}:`, err)
+          });
+        });
       },
-      (error) => {
-        console.error('Error al obtener los cursos propuestos:', error);
-      }
-    );
+      error: (err) => console.error('Error al obtener cursos propuestos:', err)
+    });
   }
-  
 
-  toggleEncuesta(cursoId: number) {
+
+  // Dentro de la clase JefeComponent
+  encuestaVisible: { [cursoId: number]: number | null } = {};
+
+  toggleEncuesta(cursoId: number): void {
     this.showEncuesta[cursoId] = !this.showEncuesta[cursoId];
   }
+
+  responderEncuesta(maestroId: number, cursoId: number): void {
+    // Alternar visibilidad: mostrar solo si actualmente está oculto
+    this.encuestaVisible[cursoId] = this.encuestaVisible[cursoId] === maestroId ? null : maestroId;
+  }
+
 }
