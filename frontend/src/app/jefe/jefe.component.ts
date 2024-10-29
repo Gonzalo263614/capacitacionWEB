@@ -12,6 +12,10 @@ export class JefeComponent {
   cursosPendientes: any[] = [];
   cursoSeleccionado: any = null; // Almacena el curso seleccionado para modificar
 
+  mostrarFormulario2: boolean = false;
+  cursosPropuestos: any[] = [];
+  showEncuesta: { [key: number]: boolean } = {}; // Control para mostrar encuestas por ID de curso
+
   // Datos del curso
   nombreCurso = '';
   asignaturasRequeridas = '';
@@ -74,7 +78,7 @@ export class JefeComponent {
         console.error('No se encontró el ID del jefe en localStorage.');
       }
     }
-
+    this.obtenerCursosPropuestos();
     // Aquí puedes continuar con otras inicializaciones si es necesario
   }
   abrirFormularioModificar(curso: any) {
@@ -242,4 +246,24 @@ export class JefeComponent {
     console.log('Modificar curso:', curso);
   }
 
+  obtenerCursosPropuestos() {
+    const idJefe = this.idJefe; // ID del jefe actual
+    
+    // URL completa apuntando al backend
+    this.http.get<any[]>(`http://localhost:3000/jefe/${idJefe}/cursos`).subscribe(
+      (data) => {
+        this.cursosPropuestos = data;
+        // Inicializa el control de visibilidad de encuesta para cada curso
+        this.cursosPropuestos.forEach(curso => this.showEncuesta[curso.id] = false);
+      },
+      (error) => {
+        console.error('Error al obtener los cursos propuestos:', error);
+      }
+    );
+  }
+  
+
+  toggleEncuesta(cursoId: number) {
+    this.showEncuesta[cursoId] = !this.showEncuesta[cursoId];
+  }
 }

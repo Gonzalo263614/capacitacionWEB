@@ -278,3 +278,16 @@
     <button type="submit" class="btn-submit">Guardar Cambios</button>
   </form>
 </div>
+
+<h2>Cursos Propuestos</h2>
+<div *ngFor="let curso of cursosPropuestos">
+  <h3>{{ curso.nombre_curso }}</h3>
+  
+  <!-- Botón para mostrar/ocultar la encuesta -->
+  <button (click)="toggleEncuesta(curso.id)">
+    {{ showEncuesta[curso.id] ? 'Ocultar encuesta' : 'Mostrar encuesta' }}
+  </button>
+
+  <!-- Encuesta -->
+  <app-encuestajefe *ngIf="showEncuesta[curso.id]" [cursoNombre]="curso.nombre_curso"></app-encuestajefe>
+</div>

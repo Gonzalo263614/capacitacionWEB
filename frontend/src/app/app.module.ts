@@ -17,6 +17,7 @@ import { ProfileComponent } from './profile/profile.component';
 import { CursoDetalleComponent } from './curso-detalle/curso-detalle.component';
 import { CursoComponent } from './curso/curso.component';
 import { EncuestaComponent } from './encuesta/encuesta.component';
+import { EncuestajefeComponent } from './encuestajefe/encuestajefe.component';
 
 @NgModule({
   declarations: [
@@ -31,7 +32,8 @@ import { EncuestaComponent } from './encuesta/encuesta.component';
     ProfileComponent,
     CursoDetalleComponent,
     CursoComponent,
-    EncuestaComponent
+    EncuestaComponent,
+    EncuestajefeComponent
   ],
   imports: [
     BrowserModule,

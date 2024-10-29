@@ -295,7 +295,7 @@ app.delete('/eliminar-curso/:id', (req, res) => {
     const queryEliminarJefeCurso = `
         DELETE FROM jefe_curso WHERE id_curso = ?
     `;
-    
+
     connection.query(queryEliminarJefeCurso, [cursoId], (err, result) => {
         if (err) {
             console.error('Error al eliminar relación jefe-curso:', err);
@@ -858,23 +858,66 @@ app.get('/curso/:id/calificaciones', (req, res) => {
 });
 app.get('/curso/:cursoId/calificacion/:usuarioId', (req, res) => {
     const { cursoId, usuarioId } = req.params;
-  
+
     // Lógica para obtener la calificación del usuario en el curso
     const query = 'SELECT calificacion FROM calificaciones WHERE curso_id = ? AND usuario_id = ?';
-    
+
     connection.query(query, [cursoId, usuarioId], (err, results) => {
-      if (err) {
-        console.error('Error al obtener la calificación:', err);
-        return res.status(500).json({ error: 'Error al obtener la calificación.' });
-      }
-      if (results.length > 0) {
-        res.status(200).json({ calificacion: results[0].calificacion });
-      } else {
-        res.status(404).json({ error: 'Calificación no encontrada.' });
-      }
+        if (err) {
+            console.error('Error al obtener la calificación:', err);
+            return res.status(500).json({ error: 'Error al obtener la calificación.' });
+        }
+        if (results.length > 0) {
+            res.status(200).json({ calificacion: results[0].calificacion });
+        } else {
+            res.status(404).json({ error: 'Calificación no encontrada.' });
+        }
     });
-  });
-  
+});
+// Ruta para obtener los cursos propuestos por un jefe específico
+app.get('/jefe/:idJefe/cursos', (req, res) => {
+    const idJefe = req.params.idJefe;
+    console.log(`ID del jefe recibido: ${idJefe}`);
+    
+    // Consulta SQL para obtener los IDs de los cursos asociados al jefe en `jefe_curso`
+    const sqlJefeCurso = `
+        SELECT id_curso 
+        FROM jefe_curso 
+        WHERE id_jefe = ?;
+    `;
+    
+    connection.query(sqlJefeCurso, [idJefe], (error, results) => {
+        if (error) {
+            console.error('Error al obtener los IDs de cursos:', error);
+            return res.status(500).json({ error: 'Error al obtener los IDs de cursos' });
+        }
+        
+        // Extraemos los IDs de los cursos en un array
+        const cursoIds = results.map(row => row.id_curso);
+        
+        // Si no hay cursos asociados, devolvemos un array vacío
+        if (cursoIds.length === 0) {
+            return res.json([]);
+        }
+
+        // Consulta SQL para obtener los detalles de los cursos en `cursos_propuestos` usando los IDs obtenidos
+        const sqlCursosPropuestos = `
+            SELECT * 
+            FROM cursos_propuestos 
+            WHERE id IN (?);
+        `;
+
+        connection.query(sqlCursosPropuestos, [cursoIds], (error, cursos) => {
+            if (error) {
+                console.error('Error al obtener los cursos propuestos:', error);
+                return res.status(500).json({ error: 'Error al obtener los cursos propuestos' });
+            }
+            console.log('Cursos propuestos:', cursos);
+            res.json(cursos);
+        });
+    });
+});
+
 // Iniciar el servidor en el puerto 3000
 const PORT = 3000;
 app.listen(PORT, () => {

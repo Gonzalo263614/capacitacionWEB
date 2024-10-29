@@ -11,7 +11,7 @@ import { AuthGuard } from './auth.guard'; // Importa el AuthGuard
 import { CursoDetalleComponent } from './curso-detalle/curso-detalle.component';
 import { CursoComponent } from './curso/curso.component';
 import { EncuestaComponent } from './encuesta/encuesta.component';
-
+import { EncuestajefeComponent } from './encuestajefe/encuestajefe.component';
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'maestro', component: MaestroComponent },
@@ -28,6 +28,7 @@ const routes: Routes = [
   // Ruta para ver las asistencias del curso
   { path: 'curso/:id/asistencias', component: CursoComponent }, 
   { path: 'encuesta', component: EncuestaComponent }, 
+  { path: 'encuestajefe', component: EncuestajefeComponent }, 
 ];
 
 
