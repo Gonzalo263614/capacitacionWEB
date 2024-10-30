@@ -920,7 +920,9 @@ app.get('/jefe/:idJefe/cursos', (req, res) => {
 // Ruta para guardar la encuesta
 app.post('/api/encuesta/guardar', (req, res) => {
     const { usuarioId, cursoId, idMaestro, respuestas, sugerencias } = req.body;
+
     console.log('Valores obtenidos:', { usuarioId, cursoId, idMaestro, respuestas, sugerencias });
+
     // Consulta para obtener `jefe_curso_id`
     const jefeCursoQuery = 'SELECT id FROM jefe_curso WHERE id_jefe = ? AND id_curso = ?';
     connection.query(jefeCursoQuery, [usuarioId, cursoId], (err, jefeCursoResult) => {
@@ -947,22 +949,37 @@ app.post('/api/encuesta/guardar', (req, res) => {
                 return res.status(404).json({ error: 'Inscripción no encontrada' });
             }
 
-            // Insertar la encuesta en `encuesta_jefe`
-            const insertQuery = `
-                INSERT INTO encuesta_jefe (jefe_curso_id, inscripcion_id, respuestas_seccion1, sugerencias, fecha)
-                VALUES (?, ?, ?, ?, NOW())
-            `;
-            connection.query(insertQuery, [jefeCursoId, inscripcionId, JSON.stringify(respuestas), sugerencias], (err, result) => {
+            // Verificar si el usuario ya ha respondido la encuesta
+            const checkSurveyQuery = 'SELECT id FROM encuesta_jefe WHERE jefe_curso_id = ? AND inscripcion_id = ?';
+            connection.query(checkSurveyQuery, [jefeCursoId, inscripcionId], (err, surveyResult) => {
                 if (err) {
-                    console.error('Error al guardar la encuesta:', err);
-                    return res.status(500).json({ error: 'Error al guardar la encuesta' });
+                    console.error('Error al verificar encuesta:', err);
+                    return res.status(500).json({ error: 'Error al verificar encuesta' });
                 }
 
-                res.status(200).json({ message: 'Encuesta guardada exitosamente' });
+                // Si ya existe un registro, no se permite enviar la encuesta nuevamente
+                if (surveyResult.length > 0) {
+                    return res.status(400).json({ error: 'La encuesta ya ha sido respondida' });
+                }
+
+                // Insertar la encuesta en `encuesta_jefe`
+                const insertQuery = `
+                    INSERT INTO encuesta_jefe (jefe_curso_id, inscripcion_id, respuestas_seccion1, sugerencias, fecha)
+                    VALUES (?, ?, ?, ?, NOW())
+                `;
+                connection.query(insertQuery, [jefeCursoId, inscripcionId, JSON.stringify(respuestas), sugerencias], (err, result) => {
+                    if (err) {
+                        console.error('Error al guardar la encuesta:', err);
+                        return res.status(500).json({ error: 'Error al guardar la encuesta' });
+                    }
+
+                    res.status(200).json({ message: 'Encuesta guardada exitosamente' });
+                });
             });
         });
     });
 });
+
 // Ruta para obtener el ID del curso basado en nombre y estado
 app.get('/api/encuesta/obtenerCursoId', (req, res) => {
     const nombreCurso = req.query.nombre_curso;

@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http'; 
+import { HttpClient } from '@angular/common/http';
 import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
@@ -12,7 +12,7 @@ export class EncuestajefeComponent implements OnInit {
 
   @Input() cursoNombre: string = '';
   @Input() idMaestro!: number;
-  
+
   usuarioId: number = 0;
   cursoId: number | null = null;
   respuestas: number[] = Array(13).fill(0);
@@ -75,8 +75,13 @@ export class EncuestajefeComponent implements OnInit {
         this.encuestaRespondida = true;
       },
       error => {
-        console.error('Error al enviar la encuesta:', error);
+        if (error.status === 400 && error.error.error === 'La encuesta ya ha sido respondida') {
+          alert('Ya has respondido a esta encuesta.');
+        } else {
+          console.error('Error al enviar la encuesta:', error);
+        }
       }
     );
   }
+
 }
