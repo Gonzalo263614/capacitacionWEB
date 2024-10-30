@@ -878,23 +878,23 @@ app.get('/curso/:cursoId/calificacion/:usuarioId', (req, res) => {
 app.get('/jefe/:idJefe/cursos', (req, res) => {
     const idJefe = req.params.idJefe;
     console.log(`ID del jefe recibido: ${idJefe}`);
-    
+
     // Consulta SQL para obtener los IDs de los cursos asociados al jefe en `jefe_curso`
     const sqlJefeCurso = `
         SELECT id_curso 
         FROM jefe_curso 
         WHERE id_jefe = ?;
     `;
-    
+
     connection.query(sqlJefeCurso, [idJefe], (error, results) => {
         if (error) {
             console.error('Error al obtener los IDs de cursos:', error);
             return res.status(500).json({ error: 'Error al obtener los IDs de cursos' });
         }
-        
+
         // Extraemos los IDs de los cursos en un array
         const cursoIds = results.map(row => row.id_curso);
-        
+
         // Si no hay cursos asociados, devolvemos un array vacío
         if (cursoIds.length === 0) {
             return res.json([]);
@@ -915,6 +915,74 @@ app.get('/jefe/:idJefe/cursos', (req, res) => {
             console.log('Cursos propuestos:', cursos);
             res.json(cursos);
         });
+    });
+});
+// Ruta para guardar la encuesta
+app.post('/api/encuesta/guardar', (req, res) => {
+    const { usuarioId, cursoId, idMaestro, respuestas, sugerencias } = req.body;
+    console.log('Valores obtenidos:', { usuarioId, cursoId, idMaestro, respuestas, sugerencias });
+    // Consulta para obtener `jefe_curso_id`
+    const jefeCursoQuery = 'SELECT id FROM jefe_curso WHERE id_jefe = ? AND id_curso = ?';
+    connection.query(jefeCursoQuery, [usuarioId, cursoId], (err, jefeCursoResult) => {
+        if (err) {
+            console.error('Error al obtener jefe_curso_id:', err);
+            return res.status(500).json({ error: 'Error al obtener jefe_curso_id' });
+        }
+
+        const jefeCursoId = jefeCursoResult.length ? jefeCursoResult[0].id : null;
+        if (!jefeCursoId) {
+            return res.status(404).json({ error: 'Jefe_curso no encontrado' });
+        }
+
+        // Consulta para obtener `inscripcion_id`
+        const inscripcionQuery = 'SELECT id FROM inscripciones WHERE usuario_id = ? AND curso_id = ?';
+        connection.query(inscripcionQuery, [idMaestro, cursoId], (err, inscripcionResult) => {
+            if (err) {
+                console.error('Error al obtener inscripcion_id:', err);
+                return res.status(500).json({ error: 'Error al obtener inscripcion_id' });
+            }
+
+            const inscripcionId = inscripcionResult.length ? inscripcionResult[0].id : null;
+            if (!inscripcionId) {
+                return res.status(404).json({ error: 'Inscripción no encontrada' });
+            }
+
+            // Insertar la encuesta en `encuesta_jefe`
+            const insertQuery = `
+                INSERT INTO encuesta_jefe (jefe_curso_id, inscripcion_id, respuestas_seccion1, sugerencias, fecha)
+                VALUES (?, ?, ?, ?, NOW())
+            `;
+            connection.query(insertQuery, [jefeCursoId, inscripcionId, JSON.stringify(respuestas), sugerencias], (err, result) => {
+                if (err) {
+                    console.error('Error al guardar la encuesta:', err);
+                    return res.status(500).json({ error: 'Error al guardar la encuesta' });
+                }
+
+                res.status(200).json({ message: 'Encuesta guardada exitosamente' });
+            });
+        });
+    });
+});
+// Ruta para obtener el ID del curso basado en nombre y estado
+app.get('/api/encuesta/obtenerCursoId', (req, res) => {
+    const nombreCurso = req.query.nombre_curso;
+    const estado = req.query.estado;
+
+    if (!nombreCurso || !estado) {
+        return res.status(400).json({ error: 'Faltan parámetros' });
+    }
+
+    const query = 'SELECT id FROM cursos_propuestos WHERE nombre_curso = ? AND estado = ? LIMIT 1';
+    connection.query(query, [nombreCurso, estado], (error, results) => {
+        if (error) {
+            console.error('Error al obtener el ID del curso:', error);
+            return res.status(500).json({ error: 'Error en el servidor' });
+        }
+        if (results.length > 0) {
+            res.json({ id: results[0].id });
+        } else {
+            res.status(404).json({ error: 'Curso no encontrado' });
+        }
     });
 });
 

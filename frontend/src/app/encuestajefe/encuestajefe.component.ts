@@ -1,25 +1,23 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http'; 
 import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-encuestajefe',
   templateUrl: './encuestajefe.component.html',
-  styleUrl: './encuestajefe.component.css'
+  styleUrls: ['./encuestajefe.component.css']
 })
 export class EncuestajefeComponent implements OnInit {
   constructor(private http: HttpClient, private route: ActivatedRoute) { }
 
   @Input() cursoNombre: string = '';
-  @Input() idMaestro!: number;   // Agregar este nuevo input para el ID del maestro
+  @Input() idMaestro!: number;
   
   usuarioId: number = 0;
-  cursoId: string | null = '';
-  idInscripcion: number | null = null;
-
+  cursoId: number | null = null;
   respuestas: number[] = Array(13).fill(0);
   sugerencias: string = '';
-  encuestaRespondida: boolean = false; // Nueva propiedad
+  encuestaRespondida: boolean = false;
   private apiUrl = 'http://localhost:3000/api/encuesta';
 
   preguntas: string[] = [
@@ -30,7 +28,7 @@ export class EncuestajefeComponent implements OnInit {
     'HA SERVIDO PARA SU DESARROLLO PERSONAL.',
     'SIRVIÓ PARA INTEGRARME MEJOR CON SUS COMPAÑEROS(AS) DE TRABAJO.',
     'PRODUJO UNA MAYOR COMPRENSIÓN DEL SERVICIO QUE PRESTA EL SNEST.',
-    'FALICITÓ UNA MEJORÍA EN SU ACTITUD HACIA LA INSTITUCIÓN O SUS COMPAÑEROS(AS) DE TRABAJO.',
+    'FACILITÓ UNA MEJORÍA EN SU ACTITUD HACIA LA INSTITUCIÓN O SUS COMPAÑEROS(AS) DE TRABAJO.',
     'PERMITIÓ QUE DESARROLLARA ALGUNAS HABILIDADES ADICIONALES.',
     'GENERÓ UNA MEJOR COMPRENSIÓN DE LOS CONCEPTOS GENERALES DEL CURSO APLICABLES A SU CAMPO LABORAL.',
     'RELACIONARON LOS CONOCIMIENTOS IMPARTIDOS DEL CURSO CON LA DOCENCIA.',
@@ -40,66 +38,44 @@ export class EncuestajefeComponent implements OnInit {
 
   ngOnInit(): void {
     const storedUserId = localStorage.getItem('userId');
-    if (storedUserId) {
-      this.usuarioId = parseInt(storedUserId, 10);
-    }
-
-    this.cursoId = this.route.snapshot.paramMap.get('id');
-
-    if (this.cursoId && this.usuarioId) {
-      this.obtenerIdInscripcion();
-    }
+    this.usuarioId = storedUserId ? parseInt(storedUserId, 10) : 0;
+    // Llama al backend para obtener el cursoId basado en cursoNombre y estado aceptado
+    this.obtenerCursoId(this.cursoNombre);
   }
 
-  obtenerIdInscripcion(): void {
-    this.http.get<any>(`http://localhost:3000/api/inscripcion/${this.cursoId}/${this.usuarioId}`)
-      .subscribe({
-        next: (response) => {
-          this.idInscripcion = response.id;
-
-          // Verifica si la encuesta ya fue respondida
-          this.http.get<any>(`${this.apiUrl}/respondida/${this.idInscripcion}`)
-            .subscribe({
-              next: (data) => {
-                this.encuestaRespondida = data.respondida;
-              },
-              error: (err) => {
-                console.error('Error al verificar si la encuesta ya fue respondida:', err);
-              }
-            });
+  obtenerCursoId(cursoNombre: string): void {
+    this.http.get<{ id: number }>(`${this.apiUrl}/obtenerCursoId?nombre_curso=${cursoNombre}&estado=aceptado`)
+      .subscribe(
+        (response) => {
+          this.cursoId = response.id;
         },
-        error: (err) => {
-          console.error('Error al obtener id de inscripción:', err);
+        (error) => {
+          console.error('Error al obtener el ID del curso:', error);
         }
-      });
+      );
   }
 
   enviarEncuesta(): void {
-    if (this.encuestaRespondida) {
-      alert('Ya has respondido esta encuesta.');
+    if (this.cursoId === null) {
+      console.error('El ID del curso no está disponible');
       return;
     }
 
-    if (!this.idInscripcion) {
-      console.error('No se pudo obtener el id de inscripción');
-      return;
-    }
-
-    const encuestaData = {
-      id_inscripcion: this.idInscripcion,
-      respuestas1: this.respuestas,
+    const data = {
+      usuarioId: this.usuarioId,
+      cursoId: this.cursoId,
+      idMaestro: this.idMaestro,
+      respuestas: this.respuestas,
       sugerencias: this.sugerencias
     };
 
-    this.http.post(this.apiUrl, encuestaData).subscribe(
+    this.http.post(`${this.apiUrl}/guardar`, data).subscribe(
       response => {
-        console.log('Encuesta enviada:', response);
-        alert('Encuesta enviada');
+        console.log('Encuesta enviada con éxito:', response);
         this.encuestaRespondida = true;
       },
       error => {
         console.error('Error al enviar la encuesta:', error);
-        alert('Error al enviar la encuesta');
       }
     );
   }
