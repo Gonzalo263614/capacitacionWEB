@@ -843,22 +843,42 @@ app.post('/curso/:id/guardar-calificacion', (req, res) => {
         }
 
         if (results.length > 0) {
-            // Si hay resultados, significa que ya existe una calificación
+            // Si ya existe una calificación
             return res.status(400).json({ message: 'El maestro ya tiene una calificación para este curso.' });
         }
 
-        // Si no hay calificación, proceder a insertar la nueva calificación
-        const query = 'INSERT INTO calificaciones (curso_id, usuario_id, calificacion) VALUES (?, ?, ?)';
+        // Insertar la nueva calificación
+        const insertCalificacionQuery = 'INSERT INTO calificaciones (curso_id, usuario_id, calificacion) VALUES (?, ?, ?)';
 
-        connection.query(query, [cursoId, usuario_id, calificacion], (err, results) => {
+        connection.query(insertCalificacionQuery, [cursoId, usuario_id, calificacion], (err, results) => {
             if (err) {
                 console.error('Error al guardar la calificación:', err);
                 return res.status(500).json({ error: 'Error al guardar la calificación.' });
             }
-            res.status(200).json({ message: 'Calificación guardada exitosamente.' });
+
+            // Si la calificación es mayor o igual a 7, actualizar la tabla usuario_requisitos
+            if (calificacion >= 7) {
+                const updateRequisitosQuery = `
+                    UPDATE usuario_requisitos 
+                    SET calificacion = 1 
+                    WHERE curso_id = ? AND usuario_id = ?
+                `;
+
+                connection.query(updateRequisitosQuery, [cursoId, usuario_id], (err, updateResult) => {
+                    if (err) {
+                        console.error('Error al actualizar usuario_requisitos:', err);
+                        return res.status(500).json({ error: 'Error al actualizar usuario_requisitos.' });
+                    }
+                    res.status(200).json({ message: 'Calificación guardada y requisitos actualizados exitosamente.' });
+                });
+            } else {
+                // Si la calificación es menor a 7, solo guardar la calificación
+                res.status(200).json({ message: 'Calificación guardada exitosamente.' });
+            }
         });
     });
 });
+
 // Ruta para verificar si ya existe una calificación
 app.get('/curso/:id/calificaciones', (req, res) => {
     const cursoId = req.params.id;
@@ -1018,6 +1038,24 @@ app.get('/api/encuesta/obtenerCursoId', (req, res) => {
             res.status(404).json({ error: 'Curso no encontrado' });
         }
     });
+});
+//CONSTANCIA DESCARGAR
+app.get('/requisitos/:usuarioId/:cursoId', (req, res) => {
+    const { usuarioId, cursoId } = req.params;
+
+    connection.query(
+        'SELECT asistencias, calificacion, evidencias, encuesta1, encuestajefes FROM usuario_requisitos WHERE usuario_id = ? AND curso_id = ?',
+        [usuarioId, cursoId],
+        (err, results) => {
+            if (err) {
+                return res.status(500).json({ error: 'Error al obtener los requisitos' });
+            }
+            if (results.length === 0) {
+                return res.status(404).json({ error: 'No se encontraron requisitos' });
+            }
+            res.json(results[0]);
+        }
+    );
 });
 
 // Iniciar el servidor en el puerto 3000

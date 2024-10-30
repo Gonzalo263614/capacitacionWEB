@@ -34,10 +34,10 @@ export class CursoComponent implements OnInit {
     } else {
       // console.error('localStorage no está disponible.');
     }
-  
+
     // Continuar con la lógica para obtener el curso
     this.cursoId = this.route.snapshot.paramMap.get('id');
-  
+
     if (this.cursoId) {
       this.http.get<any>(`http://localhost:3000/curso/${this.cursoId}`)
         .subscribe({
@@ -54,19 +54,19 @@ export class CursoComponent implements OnInit {
     }
     this.obtenerCalificacion();  // Llamar al método para obtener la calificación al inicializar
   }
-    // Método para obtener la calificación del usuario
-    obtenerCalificacion(): void {
-      this.http.get<any>(`http://localhost:3000/curso/${this.cursoId}/calificacion/${this.usuarioId}`)
-        .subscribe({
-          next: (response) => {
-            this.calificacion = response.calificacion;  // Almacena la calificación en la propiedad
-          },
-          error: (err) => {
-            console.error('Error al obtener la calificación:', err);
-            this.error = 'Error al obtener la calificación. Inténtalo de nuevo más tarde.';
-          }
-        });
-    }
+  // Método para obtener la calificación del usuario
+  obtenerCalificacion(): void {
+    this.http.get<any>(`http://localhost:3000/curso/${this.cursoId}/calificacion/${this.usuarioId}`)
+      .subscribe({
+        next: (response) => {
+          this.calificacion = response.calificacion;  // Almacena la calificación en la propiedad
+        },
+        error: (err) => {
+          console.error('Error al obtener la calificación:', err);
+          this.error = 'Error al obtener la calificación. Inténtalo de nuevo más tarde.';
+        }
+      });
+  }
   // Método para alternar la visibilidad de los detalles del curso
   toggleDetalles(): void {
     this.showDetalles = !this.showDetalles;
@@ -95,8 +95,22 @@ export class CursoComponent implements OnInit {
       this.obtenerAsistencias();
     }
   }
-    // Método para descargar la constancia
-    descargarConstancia(): void {
-      console.log('Descargar'); // Imprime "Descargar" en la consola
-    }
+  // Método para descargar la constancia
+  descargarConstancia(): void {
+    this.http.get<any>(`http://localhost:3000/requisitos/${this.usuarioId}/${this.cursoId}`)
+      .subscribe({
+        next: (response) => {
+          const { asistencias, calificacion, evidencias, encuesta1, encuestajefes } = response;
+
+          if (asistencias === 1 && calificacion === 1 && evidencias === 1 && encuesta1 === 1 && encuestajefes === 1) {
+            console.log('Descargar'); // Simulación de descarga de constancia
+          } else {
+            console.warn('No se cumplen todos los requisitos para descargar la constancia');
+          }
+        },
+        error: (err) => {
+          console.error('Error al verificar los requisitos:', err);
+        }
+      });
+  }
 }
