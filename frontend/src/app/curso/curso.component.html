@@ -14,9 +14,11 @@
       {{ showAsistencias ? 'Ocultar asistencias' : 'Ver asistencias' }}
     </button>
     <!-- Botón para descargar constancia -->
-    <button (click)="descargarConstancia()" *ngIf="calificacion !== null">
+    <!-- Botón para descargar constancia, siempre visible -->
+    <button (click)="descargarConstancia()">
       Descargar constancia
     </button>
+
   </div>
 
   <!-- Detalles del curso -->
