@@ -120,6 +120,13 @@ export class EncuestaComponent implements OnInit {
         console.log('Encuesta enviada:', response);
         alert('Encuesta enviada');
         this.encuestaRespondida = true;
+
+        // Actualizar el campo encuesta1 en usuario_requisitos
+        this.http.post(`http://localhost:3000/api/encuesta/actualizar-encuesta/${this.usuarioId}/${this.cursoId}`, {})
+          .subscribe(
+            () => console.log('Campo encuesta1 actualizado en usuario_requisitos'),
+            err => console.error('Error al actualizar encuesta1 en usuario_requisitos:', err)
+          );
       },
       error => {
         console.error('Error al enviar la encuesta:', error);
@@ -127,4 +134,5 @@ export class EncuestaComponent implements OnInit {
       }
     );
   }
+
 }

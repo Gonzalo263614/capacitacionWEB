@@ -737,6 +737,7 @@ app.get('/asistencias/:cursoId/:usuarioId', (req, res) => {
         }
     });
 });
+
 // Ruta para recibir los datos de la encuesta
 app.post('/api/encuesta', (req, res) => {
     const { id_inscripcion, respuestas1, respuestas2, respuestas3, respuestas4, respuestas5, sugerencias } = req.body;
@@ -1056,6 +1057,68 @@ app.get('/requisitos/:usuarioId/:cursoId', (req, res) => {
             res.json(results[0]);
         }
     );
+});
+
+// Ruta para verificar asistencias y actualizar usuario_requisitos
+app.post('/curso/:id/verificar-asistencias', (req, res) => {
+    const cursoId = req.params.id;
+    const { usuario_id } = req.body;
+
+    // Consulta para contar la asistencia total y las asistencias registradas del usuario en el curso
+    const totalAsistenciasQuery = 'SELECT COUNT(*) AS total FROM asistencias WHERE curso_id = ?';
+    const usuarioAsistenciasQuery = 'SELECT COUNT(*) AS asistenciasUsuario FROM asistencias WHERE curso_id = ? AND usuario_id = ? AND asistencia = 1';
+
+    connection.query(totalAsistenciasQuery, [cursoId], (err, totalResults) => {
+        if (err) {
+            console.error('Error al obtener el total de asistencias:', err);
+            return res.status(500).json({ error: 'Error al obtener el total de asistencias.' });
+        }
+
+        const totalAsistencias = totalResults[0].total;
+
+        connection.query(usuarioAsistenciasQuery, [cursoId, usuario_id], (err, usuarioResults) => {
+            if (err) {
+                console.error('Error al obtener las asistencias del usuario:', err);
+                return res.status(500).json({ error: 'Error al obtener las asistencias del usuario.' });
+            }
+
+            const asistenciasUsuario = usuarioResults[0].asistenciasUsuario;
+            const porcentajeAsistencias = (asistenciasUsuario / totalAsistencias) * 100;
+            const cumplioAsistencias = porcentajeAsistencias >= 80 ? 1 : 0;
+
+            // Actualizar el campo `asistencias` en la tabla usuario_requisitos
+            const updateQuery = 'UPDATE usuario_requisitos SET asistencias = ? WHERE curso_id = ? AND usuario_id = ?';
+            connection.query(updateQuery, [cumplioAsistencias, cursoId, usuario_id], (err, updateResults) => {
+                if (err) {
+                    console.error('Error al actualizar asistencias en usuario_requisitos:', err);
+                    return res.status(500).json({ error: 'Error al actualizar asistencias en usuario_requisitos.' });
+                }
+
+                res.status(200).json({ message: 'Asistencias verificadas y actualizadas correctamente.', cumplioAsistencias });
+            });
+        });
+    });
+});
+// Ruta para registrar la encuesta como completada
+// Ruta para actualizar la encuesta
+app.post('/api/encuesta/actualizar-encuesta/:usuarioId/:cursoId', (req, res) => {
+    const { usuarioId, cursoId } = req.params;
+
+    // Consulta para actualizar el campo encuesta1
+    const query = 'UPDATE usuario_requisitos SET encuesta1 = 1 WHERE usuario_id = ? AND curso_id = ?';
+
+    connection.query(query, [usuarioId, cursoId], (err, result) => {
+        if (err) {
+            console.error('Error al actualizar encuesta:', err);
+            return res.status(500).json({ message: 'Error al actualizar encuesta', error: err });
+        }
+
+        if (result.affectedRows > 0) {
+            res.status(200).json({ message: 'Encuesta registrada correctamente' });
+        } else {
+            res.status(404).json({ message: 'No se encontró el registro para actualizar' });
+        }
+    });
 });
 
 // Iniciar el servidor en el puerto 3000

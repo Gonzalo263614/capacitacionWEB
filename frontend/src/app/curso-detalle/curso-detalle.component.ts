@@ -85,7 +85,7 @@ export class CursoDetalleComponent implements OnInit {
       });
   }
 
-  // Método para guardar asistencias
+  // Método para guardar asistencias y verificar el porcentaje de cada maestro
   guardarAsistencias(): void {
     const cursoId = this.route.snapshot.paramMap.get('id');
     const fechaHoy = new Date().toISOString().split('T')[0];  // Obtener la fecha de hoy en formato YYYY-MM-DD
@@ -93,17 +93,21 @@ export class CursoDetalleComponent implements OnInit {
     // Filtrar solo los maestros que han asistido
     const asistencias = this.maestros.map(maestro => ({
       curso_id: cursoId,
-      usuario_id: maestro.id,  // Verifica que `maestro.id` ahora esté presente
+      usuario_id: maestro.id,
       fecha: fechaHoy,
       asistencia: maestro.asistio
     }));
-
 
     // Guardar asistencias en la base de datos
     this.http.post(`http://localhost:3000/curso/${cursoId}/guardar-asistencias`, asistencias)
       .subscribe({
         next: () => {
           alert('Asistencias guardadas exitosamente');
+
+          // Después de guardar las asistencias, verifica y actualiza el porcentaje de cada maestro
+          this.maestros.forEach(maestro => {
+            this.verificarYActualizarAsistencias(maestro.id);
+          });
         },
         error: (err) => {
           console.error('Error al guardar asistencias:', err);
@@ -111,6 +115,7 @@ export class CursoDetalleComponent implements OnInit {
         }
       });
   }
+
   // Método para alternar la visibilidad de la sección de calificaciones
   toggleCalificaciones(): void {
     this.showCalificaciones = !this.showCalificaciones;
@@ -156,6 +161,27 @@ export class CursoDetalleComponent implements OnInit {
     } else {
       alert('Por favor, ingresa una calificación válida.');
     }
+  }
+  // Método para verificar y actualizar asistencias en usuario_requisitos
+  verificarYActualizarAsistencias(maestroId: number): void {
+    const cursoId = this.route.snapshot.paramMap.get('id');
+    const data = {
+      usuario_id: maestroId
+    };
+
+    this.http.post<any>(`http://localhost:3000/curso/${cursoId}/verificar-asistencias`, data)
+      .subscribe({
+        next: (response) => {
+          const mensaje = response.cumplioAsistencias
+            ? 'El maestro cumple con más del 80% de asistencia.'
+            : 'El maestro no cumple con el 80% de asistencia.';
+          alert(mensaje);
+        },
+        error: (err) => {
+          console.error('Error al verificar asistencias:', err);
+          alert('Error al verificar asistencias. Inténtalo de nuevo más tarde.');
+        }
+      });
   }
 
 }
