@@ -1120,6 +1120,24 @@ app.post('/api/encuesta/actualizar-encuesta/:usuarioId/:cursoId', (req, res) => 
         }
     });
 });
+//Encuesta jefes actualizar requisitos
+app.post('/api/encuesta/actualizarEncuestaJefes', (req, res) => {
+    const { idMaestro, cursoId } = req.body;
+    console.log('Datos recibidos:', { idMaestro, cursoId }); // Log para verificar
+
+    const query = 'UPDATE usuario_requisitos SET encuestajefes = 1 WHERE usuario_id = ? AND curso_id = ?';
+
+    connection.query(query, [idMaestro, cursoId], (error, result) => {
+        if (error) {
+            console.error('Error al actualizar encuestajefes:', error);
+            return res.status(500).json({ error: 'Error en el servidor' });
+        }
+        console.log('Resultado de la actualización:', result);
+        res.json({ message: 'Encuesta de jefes actualizada correctamente' });
+    });
+});
+
+
 
 // Iniciar el servidor en el puerto 3000
 const PORT = 3000;

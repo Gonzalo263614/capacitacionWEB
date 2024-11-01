@@ -39,9 +39,13 @@ export class EncuestajefeComponent implements OnInit {
   ngOnInit(): void {
     const storedUserId = localStorage.getItem('userId');
     this.usuarioId = storedUserId ? parseInt(storedUserId, 10) : 0;
-    // Llama al backend para obtener el cursoId basado en cursoNombre y estado aceptado
+
+    console.log('ID del Maestro:', this.idMaestro); // Verifica que idMaestro tenga un valor
+    console.log('ID del Usuario:', this.usuarioId);
+
     this.obtenerCursoId(this.cursoNombre);
   }
+
 
   obtenerCursoId(cursoNombre: string): void {
     this.http.get<{ id: number }>(`${this.apiUrl}/obtenerCursoId?nombre_curso=${cursoNombre}&estado=aceptado`)
@@ -73,6 +77,9 @@ export class EncuestajefeComponent implements OnInit {
       response => {
         console.log('Encuesta enviada con éxito:', response);
         this.encuestaRespondida = true;
+
+        // Actualizar encuestajefes en la tabla usuario_requisitos
+        this.actualizarEncuestaJefes();
       },
       error => {
         if (error.status === 400 && error.error.error === 'La encuesta ya ha sido respondida') {
@@ -83,5 +90,19 @@ export class EncuestajefeComponent implements OnInit {
       }
     );
   }
+
+  actualizarEncuestaJefes(): void {
+    const updateData = { idMaestro: this.idMaestro, cursoId: this.cursoId };
+
+    this.http.post(`${this.apiUrl}/actualizarEncuestaJefes`, updateData).subscribe(
+      () => {
+        console.log('Campo encuestajefes actualizado correctamente para el maestro.');
+      },
+      error => {
+        console.error('Error al actualizar encuestajefes:', error);
+      }
+    );
+  }
+
 
 }
