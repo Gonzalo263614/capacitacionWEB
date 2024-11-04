@@ -1252,6 +1252,71 @@ app.put('/usuario_requisitos/:usuarioId/:cursoId', (req, res) => {
     });
 });
 
+// Ruta para obtener archivos por curso_id
+app.get('/archivos/curso/:cursoId', (req, res) => {
+    const cursoId = req.params.cursoId;
+    const sql = 'SELECT * FROM archivos WHERE curso_id = ?';
+
+    connection.query(sql, [cursoId], (error, results) => {
+        if (error) {
+            return res.status(500).json({ error: 'Error al obtener archivos' });
+        }
+        res.json(results);
+    });
+});
+// Ruta para descargar un archivo por su ID
+app.get('/archivos/download/:id', (req, res) => {
+    const id = req.params.id;
+
+    const query = 'SELECT nombre_archivo, archivo FROM archivos WHERE id = ?';
+
+    connection.query(query, [id], (error, results) => {
+        if (error) {
+            return res.status(500).send('Error al obtener el archivo');
+        }
+
+        if (results.length === 0) {
+            return res.status(404).send('Archivo no encontrado');
+        }
+
+        const archivo = results[0];
+
+        // Asegúrate de que solo se envíen los encabezados una vez
+        res.setHeader('Content-Disposition', `attachment; filename="${archivo.nombre_archivo}"`);
+        res.setHeader('Content-Type', 'application/octet-stream');
+
+        // Envío del archivo
+        res.send(archivo.archivo);
+    });
+});
+
+app.get('/descargar-curso/:id', (req, res) => {
+    const cursoId = req.params.id;
+    const query = 'SELECT * FROM cursos_propuestos WHERE id = ?'; // Filtra por el ID del curso
+
+    connection.query(query, [cursoId], (error, results) => {
+        if (error) {
+            return res.status(500).send('Error al consultar la base de datos');
+        }
+
+        if (results.length === 0) {
+            return res.status(404).send('Curso no encontrado');
+        }
+
+        // Crea el contenido CSV
+        const curso = results[0]; // Obtén el primer (y único) resultado
+        let csv = 'id,nombre_curso,estado,asignaturas_requeridas,contenidos_requeridos,numero_docentes,tipo_asignatura,actividad_evento,objeto,carreras_atendidas,periodo,turno,fecha_inicio,fecha_fin,justificacion,numero_horas,horario,lugar,requisitos,tipo_curso,nombre_instructor,apellidopaterno_instructor,apellidomaterno_instructor,curp_instructor,rfc_instructor,maxestudios_instructor,email_instructor,password_instructor,sexo_instructor,tipo_contrato_instructor,cupo_actual,comentario_revision\n';
+
+        // Asegúrate de que las propiedades coincidan con las de tu tabla
+        csv += `${curso.id},${curso.nombre_curso},${curso.estado},${curso.asignaturas_requeridas},${curso.contenidos_requeridos},${curso.numero_docentes},${curso.tipo_asignatura},${curso.actividad_evento},${curso.objetivo},${curso.carreras_atendidas},${curso.periodo},${curso.turno},${curso.fecha_inicio},${curso.fecha_fin},${curso.justificacion},${curso.numero_horas},${curso.horario},${curso.lugar},${curso.requisitos},${curso.tipo_curso},${curso.nombre_instructor},${curso.apellidopaterno_instructor},${curso.apellidomaterno_instructor},${curso.curp_instructor},${curso.rfc_instructor},${curso.maxestudios_instructor},${curso.email_instructor},${curso.password_instructor},${curso.sexo_instructor},${curso.tipo_contrato_instructor},${curso.cupo_actual},${curso.comentario_revision}\n`;
+
+        // Configura los encabezados para la descarga del archivo
+        res.setHeader('Content-Type', 'text/csv');
+        res.setHeader('Content-Disposition', `attachment; filename="${curso.nombre_curso}_DATOS.csv"`); // El nombre del archivo
+        res.status(200).send(csv);
+    });
+});
+
 
 // Iniciar el servidor en el puerto 3000
 const PORT = 3000;
