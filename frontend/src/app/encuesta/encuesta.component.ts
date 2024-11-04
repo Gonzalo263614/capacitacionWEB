@@ -111,7 +111,6 @@ export class EncuestaComponent implements OnInit {
       respuestas2: this.respuestas2,
       respuestas3: this.respuestas3,
       respuestas4: this.respuestas4,
-      respuestas5: this.respuestas5,
       sugerencias: this.sugerencias
     };
 

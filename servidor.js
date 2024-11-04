@@ -1317,6 +1317,240 @@ app.get('/descargar-curso/:id', (req, res) => {
     });
 });
 
+const { Parser } = require('json2csv'); // Necesario para exportar a CSV
+// Preguntas para cada sección
+const preguntasSeccion1 = [
+    'PERMITIÓ QUE LOS CONOCIMIENTOS ADQUIRIDOS TENGAN APLICACIÓN EN MI ÁMBITO LABORAL A CORTO Y MEDIANO PLAZO.',
+    'AYUDÓ A MEJORAR EL DESEMPEÑO DE MIS FUNCIONES.',
+    'AYUDÓ A CONSIDERAR NUEVAS FORMAS DE TRABAJO.',
+    'PRODUJO UN INCREMENTO EN MI MOTIVACIÓN.',
+    'HA SERVIDO PARA MI DESARROLLO PROFESIONAL.',
+    'SIRVIÓ PARA INTEGRARME MEJOR CON MIS COMPAÑEROS(AS) DE TRABAJO.',
+    'PRODUJO UNA MAYOR COMPRENSIÓN DEL SERVICIO QUE PRESTO EN EL ITA.',
+    'FACILITÓ UNA MEJORÍA EN MI ACTITUD HACIA LA INSTITUCIÓN O MIS COMPAÑEROS(AS) DE TRABAJO.',
+    'PERMITIÓ QUE DESARROLLARA ALGUNAS HABILIDADES ADICIONALES.',
+    'GENERÓ UNA MEJOR COMPRENSIÓN DE LOS CONCEPTOS GENERALES DEL CURSO APLICABLES A MI CAMPO LABORAL.',
+    'RELACIONÉ LOS CONOCIMIENTOS IMPARTIDOS DEL CURSO CON LA DOCENCIA.',
+    'OFRECIERON UN SENTIDO ÉTICO Y MORAL PARA MEJORAR MIS ASPECTOS LABORALES.',
+    'OFRECIERON VALORES COMPATIBLES CON LOS MÍOS.'
+];
+
+const preguntasSeccion2 = [
+    'EXPUSO EL OBJETIVO Y TEMARIO DEL CURSO',
+    'MOSTRÓ DOMINIO DEL CONTENIDO ABORDADO.',
+    'FOMENTÓ LA PARTICIPACIÓN DEL GRUPO.',
+    'ACLARÓ LAS DUDAS QUE SE PRESENTARON.',
+    'DIÓ RETROALIMENTACIÓN A LOS EJERCICIOS REALIZADOS.',
+    'APLICÓ UNA EVALUACIÓN FINAL RELACIONADA CON LOS CONTENIDOS DEL CURSO.',
+    'INICIÓ Y CONCLUYÓ PUNTUALMENTE A LAS SESIONES.'
+];
+
+const preguntasSeccion3 = [
+    'EL MATERIAL DIDÁCTICO FUE ÚTIL A LO LARGO DEL CURSO.',
+    'LA VARIEDAD DE MATERIAL DIDÁCTICO FUE SUFICIENTE PARA APOYAR SU APRENDIZAJE.'
+];
+
+const preguntasSeccion4 = [
+    'LA DISTRIBUCIÓN DEL TIEMPO FUE ADECUADA PARA CUBRIR EL CONTENIDO.',
+    'LOS TEMAS FUERON SUFICIENTES PARA ALCANZAR EL OBJETIVO DEL CURSO.',
+    'EL CURSO COMPRENDIÓ EJERCICIOS DE PRÁCTICA RELACIONADOS CON EL CONTENIDO.',
+    'EL CURSO CUBRIÓ MIS EXPECTATIVAS.'
+];
+
+app.get('/descargar-encuestas/:cursoId', (req, res) => {
+    const cursoId = req.params.cursoId;
+
+    connection.query('SELECT id FROM inscripciones WHERE curso_id = ?', [cursoId], (err, inscripciones) => {
+        if (err) {
+            console.error('Error al obtener inscripciones:', err);
+            return res.status(500).send('Error al obtener inscripciones.');
+        }
+
+        const idsInscripcion = inscripciones.map(inscripcion => inscripcion.id);
+
+        if (!idsInscripcion.length) {
+            return res.status(404).send('No se encontraron inscripciones para este curso.');
+        }
+
+        connection.query('SELECT * FROM encuestas WHERE id_inscripcion IN (?)', [idsInscripcion], (err, encuestas) => {
+            if (err) {
+                console.error('Error al obtener encuestas:', err);
+                return res.status(500).send('Error al obtener encuestas.');
+            }
+
+            if (!encuestas.length) {
+                return res.status(404).send('No se encontraron encuestas para estas inscripciones.');
+            }
+
+            const encuestasTransformadas = encuestas.map(encuesta => {
+                const respuestasSeccion1 = encuesta.respuestas_seccion1 || [];
+                const respuestasSeccion2 = encuesta.respuestas_seccion2 || [];
+                const respuestasSeccion3 = encuesta.respuestas_seccion3 || [];
+                const respuestasSeccion4 = encuesta.respuestas_seccion4 || [];
+
+                const seccion1 = respuestasSeccion1.map((respuesta, index) => ({
+                    pregunta: preguntasSeccion1[index] || `Pregunta ${index + 1}`,
+                    respuesta: respuesta
+                }));
+
+                const seccion2 = respuestasSeccion2.map((respuesta, index) => ({
+                    pregunta: preguntasSeccion2[index] || `Pregunta ${index + 1}`,
+                    respuesta: respuesta
+                }));
+
+                const seccion3 = respuestasSeccion3.map((respuesta, index) => ({
+                    pregunta: preguntasSeccion3[index] || `Pregunta ${index + 1}`,
+                    respuesta: respuesta
+                }));
+
+                const seccion4 = respuestasSeccion4.map((respuesta, index) => ({
+                    pregunta: preguntasSeccion4[index] || `Pregunta ${index + 1}`,
+                    respuesta: respuesta
+                }));
+
+                return {
+                    id: encuesta.id,
+                    id_inscripcion: encuesta.id_inscripcion,
+                    seccion1: seccion1,
+                    seccion2: seccion2,
+                    seccion3: seccion3,
+                    seccion4: seccion4,
+                    sugerencias: encuesta.sugerencias,
+                    fecha: encuesta.fecha
+                };
+            });
+
+            const csvData = encuestasTransformadas.flatMap(encuesta =>
+                encuesta.seccion1.map(item => ({
+                    id: encuesta.id,
+                    id_inscripcion: encuesta.id_inscripcion,
+                    pregunta: item.pregunta,
+                    respuesta: item.respuesta,
+                    seccion: 'Sección 1'
+                })).concat(
+                    encuesta.seccion2.map(item => ({
+                        id: encuesta.id,
+                        id_inscripcion: encuesta.id_inscripcion,
+                        pregunta: item.pregunta,
+                        respuesta: item.respuesta,
+                        seccion: 'Sección 2'
+                    })),
+                    encuesta.seccion3.map(item => ({
+                        id: encuesta.id,
+                        id_inscripcion: encuesta.id_inscripcion,
+                        pregunta: item.pregunta,
+                        respuesta: item.respuesta,
+                        seccion: 'Sección 3'
+                    })),
+                    encuesta.seccion4.map(item => ({
+                        id: encuesta.id,
+                        id_inscripcion: encuesta.id_inscripcion,
+                        pregunta: item.pregunta,
+                        respuesta: item.respuesta,
+                        seccion: 'Sección 4'
+                    }))
+                )
+            );
+
+            const fields = ['id', 'id_inscripcion', 'pregunta', 'respuesta', 'seccion'];
+            const json2csvParser = new Parser({ fields });
+            const csv = json2csvParser.parse(csvData);
+
+            // Agregar BOM para UTF-8
+            const csvWithBOM = '\uFEFF' + csv;
+
+            res.header('Content-Type', 'text/csv; charset=utf-8');
+            res.attachment(`encuestas_curso_${cursoId}.csv`);
+            res.send(csvWithBOM);
+        });
+    });
+});
+// Define las preguntas al inicio del archivo
+const preguntas = [
+    'LOS CONOCIMIENTOS QUE ADQUIRIÓ SU COLABORADOR(A) EN EL CURSO TIENE APLICACIÓN EN EL ÁMBITO LABORAL A CORTO Y MEDIANO PLAZO.',
+    'EL CURSO AYUDÓ A SU COLABORADOR(A) A MEJORAR EL DESEMPEÑO DE SUS FUNCIONES.',
+    'EL CURSO AYUDÓ A SU COLABORADOR(A) A CONSIDERAR NUEVAS FORMAS DE TRABAJO.',
+    'PRODUJO UN INCREMENTO EN SU MOTIVACIÓN.',
+    'HA SERVIDO PARA SU DESARROLLO PERSONAL.',
+    'SIRVIÓ PARA INTEGRARME MEJOR CON SUS COMPAÑEROS(AS) DE TRABAJO.',
+    'PRODUJO UNA MAYOR COMPRENSIÓN DEL SERVICIO QUE PRESTA EL SNEST.',
+    'FACILITÓ UNA MEJORÍA EN SU ACTITUD HACIA LA INSTITUCIÓN O SUS COMPAÑEROS(AS) DE TRABAJO.',
+    'PERMITIÓ QUE DESARROLLARA ALGUNAS HABILIDADES ADICIONALES.',
+    'GENERÓ UNA MEJOR COMPRENSIÓN DE LOS CONCEPTOS GENERALES DEL CURSO APLICABLES A SU CAMPO LABORAL.',
+    'RELACIONARON LOS CONOCIMIENTOS IMPARTIDOS DEL CURSO CON LA DOCENCIA.',
+    'OFRECIERON UN SENTIDO ÉTICO Y MORAL PARA MEJORAR SUS ASPECTOS LABORALES.',
+    'OFRECIERON VALORES COMPATIBLES CON LOS SUYOS.'
+];
+
+// Luego, define tu ruta
+app.get('/descargar-encuestas-jefe/:cursoId', (req, res) => {
+    const cursoId = req.params.cursoId;
+
+    // Primero, obtenemos las inscripciones para el curso
+    connection.query('SELECT id FROM inscripciones WHERE curso_id = ?', [cursoId], (err, inscripciones) => {
+        if (err) {
+            console.error('Error al obtener inscripciones:', err);
+            return res.status(500).send('Error al obtener inscripciones.');
+        }
+
+        const idsInscripcion = inscripciones.map(inscripcion => inscripcion.id);
+
+        if (!idsInscripcion.length) {
+            return res.status(404).send('No se encontraron inscripciones para este curso.');
+        }
+
+        // Ahora obtenemos las encuestas para esos ids de inscripción
+        connection.query('SELECT * FROM encuesta_jefe WHERE inscripcion_id IN (?)', [idsInscripcion], (err, encuestas) => {
+            if (err) {
+                console.error('Error al obtener encuestas de jefe:', err);
+                return res.status(500).send('Error al obtener encuestas de jefe.');
+            }
+
+            if (!encuestas.length) {
+                return res.status(404).send('No se encontraron encuestas de jefe para estas inscripciones.');
+            }
+
+            // Transformamos los datos de las encuestas
+            const encuestasTransformadas = encuestas.map(encuesta => {
+                const respuestasSeccion1 = encuesta.respuestas_seccion1 || [];
+
+                // Crear secciones con preguntas y respuestas
+                const seccion1 = respuestasSeccion1.map((respuesta, index) => ({
+                    pregunta: preguntas[index] || `Pregunta ${index + 1}`,
+                    respuesta: respuesta
+                }));
+
+                return {
+                    id: encuesta.id,
+                    inscripcion_id: encuesta.inscripcion_id,
+                    seccion1: seccion1,
+                    sugerencias: encuesta.sugerencias,
+                    fecha: encuesta.fecha
+                };
+            });
+
+            // Preparar el CSV
+            const csvData = encuestasTransformadas.flatMap(encuesta =>
+                encuesta.seccion1.map(item => ({
+                    id: encuesta.id,
+                    inscripcion_id: encuesta.inscripcion_id,
+                    pregunta: item.pregunta,
+                    respuesta: item.respuesta,
+                    seccion: 'Sección 1'
+                }))
+            );
+
+            const fields = ['id', 'inscripcion_id', 'pregunta', 'respuesta', 'seccion'];
+            const json2csvParser = new Parser({ fields });
+            const csv = json2csvParser.parse(csvData);
+
+            // Agregar BOM para UTF-8
+            res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+            res.setHeader('Content-Disposition', `attachment; filename="Encuestas_Jefe_${cursoId}.csv"`);
+            res.send('\uFEFF' + csv); // Enviar CSV con BOM
+        });
+    });
+});
 
 // Iniciar el servidor en el puerto 3000
 const PORT = 3000;
