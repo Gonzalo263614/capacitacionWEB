@@ -48,7 +48,26 @@ export class DetalleCursoAdminComponent {
       const url = window.URL.createObjectURL(response);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `ITA-AC-FA-FO-01 Diagnóstico de necesidades de formación y actualización profesional docente_${this.curso.nombre_curso}.csv`; // Nombre del archivo
+      a.download = `Diagnóstico de necesidades de formación y actualización profesional docente_${this.curso.nombre_curso}.csv`; // Nombre del archivo
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }, error => {
+      console.error('Error al descargar el archivo:', error);
+    });
+  }
+  descargarCurso2() {
+    const cursoId = this.curso?.id; // Obtén el ID del curso actual
+    if (!cursoId) {
+      console.error('No se encontró el ID del curso.');
+      return;
+    }
+
+    this.http.get(`http://localhost:3000/descargar2-curso/${cursoId}`, { responseType: 'blob' }).subscribe((response: Blob) => {
+      const url = window.URL.createObjectURL(response);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Diagnóstico de necesidades de formación y actualización profesional docente_${this.curso.nombre_curso}.csv`; // Nombre del archivo
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
