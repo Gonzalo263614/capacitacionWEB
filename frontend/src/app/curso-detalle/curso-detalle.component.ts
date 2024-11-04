@@ -15,6 +15,10 @@ export class CursoDetalleComponent implements OnInit {
   showMaestros: boolean = false;  // Control para mostrar u ocultar la lista de maestros
   showPasarLista: boolean = false;  // Control para mostrar u ocultar el pase de lista
   showCalificaciones: boolean = false;  // Control para mostrar u ocultar la sección de calificaciones
+
+  selectedFile: File | null = null;
+  uploadSuccess: boolean | null = null;
+  uploadError: boolean | null = null;
   constructor(
     private route: ActivatedRoute,
     private http: HttpClient
@@ -183,5 +187,41 @@ export class CursoDetalleComponent implements OnInit {
         }
       });
   }
+  // Manejar la selección del archivo
+  onFileSelected(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
+      this.selectedFile = file;
+    }
+  }
 
+  // Enviar el archivo al servidor
+  onSubmit() {
+    const cursoId = this.route.snapshot.paramMap.get('id');
+    const usuarioId = localStorage.getItem('userId');
+    const formData = new FormData();
+
+    if (!usuarioId || !cursoId) {
+      console.error('usuarioId o cursoId son null. Asegúrate de que existen en la ruta.');
+      return;
+    }
+
+    if (this.selectedFile) {
+      formData.append('archivo', this.selectedFile);
+      formData.append('usuarioId', usuarioId);
+      formData.append('cursoId', cursoId);
+
+      this.http.post('http://localhost:3000/uploads', formData, { responseType: 'text' })
+        .subscribe({
+          next: (response) => {
+            console.log('Respuesta del servidor:', response);
+            this.uploadSuccess = true;
+          },
+          error: (error) => {
+            console.error('Error al subir archivo', error);
+            this.uploadError = true;
+          }
+        });
+    }
+  }
 }

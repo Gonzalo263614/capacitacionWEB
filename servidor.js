@@ -1137,7 +1137,57 @@ app.post('/api/encuesta/actualizarEncuestaJefes', (req, res) => {
     });
 });
 
+const multer = require('multer'); 
+const fs = require('fs');
+const path = require('path');
 
+// Crear la carpeta 'uploads' si no existe
+const uploadDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir);
+    console.log('Carpeta "uploads" creada');
+}
+
+// Configuración de multer para almacenar archivos en la carpeta "uploads/"
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'uploads/');
+    },
+    filename: function (req, file, cb) {
+        cb(null, file.originalname);
+    }
+});
+
+const upload = multer({ storage: storage });
+
+
+// Ruta para subir archivos
+app.post('/uploads', upload.single('archivo'), (req, res) => {
+    const archivo = req.file;
+    const usuarioId = req.body.usuarioId;
+    const cursoId = req.body.cursoId;
+
+    if (!archivo) {
+        return res.status(400).json({ error: 'No se ha subido ningún archivo' });
+    }
+
+    if (!usuarioId || !cursoId) {
+        return res.status(400).json({ error: 'ID de usuario o curso no válidos.' });
+    }
+
+    const archivoData = fs.readFileSync(archivo.path);
+
+    const sql = 'INSERT INTO archivos (nombre_archivo, archivo, curso_id, instructor_id) VALUES (?, ?, ?, ?)';
+    const values = [archivo.originalname, archivoData, cursoId, usuarioId];
+
+    connection.query(sql, values, (err, result) => {
+        if (err) {
+            console.error('Error al guardar el archivo en la base de datos:', err.message);
+            return res.status(500).send('Error al guardar el archivo en la base de datos.');
+        }
+        res.status(200).send('Archivo subido y guardado exitosamente en la base de datos.');
+    });
+});
 
 // Iniciar el servidor en el puerto 3000
 const PORT = 3000;
