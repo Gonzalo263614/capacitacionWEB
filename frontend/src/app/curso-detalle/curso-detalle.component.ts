@@ -110,7 +110,7 @@ export class CursoDetalleComponent implements OnInit {
 
           // Después de guardar las asistencias, verifica y actualiza el porcentaje de cada maestro
           this.maestros.forEach(maestro => {
-            this.verificarYActualizarAsistencias(maestro.id);
+            //this.verificarYActualizarAsistencias(maestro.id);
           });
         },
         error: (err) => {
@@ -166,6 +166,7 @@ export class CursoDetalleComponent implements OnInit {
       alert('Por favor, ingresa una calificación válida.');
     }
   }
+
   // Método para verificar y actualizar asistencias en usuario_requisitos
   verificarYActualizarAsistencias(maestroId: number): void {
     const cursoId = this.route.snapshot.paramMap.get('id');

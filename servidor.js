@@ -1218,6 +1218,40 @@ app.post('/uploads', upload.single('archivo'), (req, res) => {
         });
     });
 });
+app.get('/asistencias/count/:usuarioId/:cursoId', (req, res) => {
+    const { usuarioId, cursoId } = req.params;
+    const query = `
+      SELECT COUNT(*) AS totalAsistencias,
+             SUM(asistencia) AS asistenciasCompletas
+      FROM asistencias
+      WHERE usuario_id = ? AND curso_id = ?
+    `;
+
+    connection.query(query, [usuarioId, cursoId], (error, results) => {
+        if (error) {
+            return res.status(500).json({ error: 'Error al contar asistencias' });
+        }
+        res.json(results[0]);
+    });
+});
+
+app.put('/usuario_requisitos/:usuarioId/:cursoId', (req, res) => {
+    const { usuarioId, cursoId } = req.params;
+    const { asistencias } = req.body;
+    const query = `
+      UPDATE usuario_requisitos 
+      SET asistencias = ? 
+      WHERE usuario_id = ? AND curso_id = ?
+    `;
+
+    connection.query(query, [asistencias, usuarioId, cursoId], (error, results) => {
+        if (error) {
+            return res.status(500).json({ error: 'Error al actualizar los requisitos' });
+        }
+        res.json({ message: 'Requisitos actualizados correctamente' });
+    });
+});
+
 
 // Iniciar el servidor en el puerto 3000
 const PORT = 3000;
