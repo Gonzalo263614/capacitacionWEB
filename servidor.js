@@ -1291,56 +1291,87 @@ app.get('/archivos/download/:id', (req, res) => {
 });
 app.get('/descargar-curso/:id', (req, res) => {
     const cursoId = req.params.id;
-    const query = 'SELECT * FROM cursos_propuestos WHERE id = ?'; // Filtra por el ID del curso
+    const cursoQuery = 'SELECT * FROM cursos_propuestos WHERE id = ?';
+    const departamentosQuery = `
+        SELECT d.nombre 
+        FROM departamento_curso dc 
+        JOIN departamentos d ON dc.departamento_id = d.id 
+        WHERE dc.curso_id = ?
+    `;
 
-    connection.query(query, [cursoId], (error, results) => {
+    connection.query(cursoQuery, [cursoId], (error, cursoResults) => {
         if (error) {
             return res.status(500).send('Error al consultar la base de datos');
         }
 
-        if (results.length === 0) {
+        if (cursoResults.length === 0) {
             return res.status(404).send('Curso no encontrado');
         }
 
-        // Crea el contenido CSV
-        const curso = results[0]; // Obtén el primer (y único) resultado
-        let csv = 'id,nombre_curso,asignaturas_requeridas,contenidos_requeridos,numero_docentes,tipo_asignatura,actividad_evento,carreras_atendidas,periodo,turno,fecha_inicio,fecha_fin,nombre_instructor,apellidopaterno_instructor,apellidomaterno_instructor,curp_instructor,rfc_instructor,maxestudios_instructor,email_instructor,sexo_instructor,tipo_contrato_instructor\n';
+        const curso = cursoResults[0];
 
-        // Asegúrate de que las propiedades coincidan con las de tu tabla
-        csv += `${curso.id},${curso.nombre_curso},${curso.asignaturas_requeridas},${curso.contenidos_requeridos},${curso.numero_docentes},${curso.tipo_asignatura},${curso.actividad_evento},${curso.carreras_atendidas},${curso.periodo},${curso.turno},${curso.fecha_inicio},${curso.fecha_fin},${curso.nombre_instructor},${curso.apellidopaterno_instructor},${curso.apellidomaterno_instructor},${curso.curp_instructor},${curso.rfc_instructor},${curso.maxestudios_instructor},${curso.email_instructor},${curso.sexo_instructor},${curso.tipo_contrato_instructor}\n`;
+        connection.query(departamentosQuery, [cursoId], (error, departamentoResults) => {
+            if (error) {
+                return res.status(500).send('Error al consultar los departamentos');
+            }
 
-        // Configura los encabezados para la descarga del archivo
-        res.setHeader('Content-Type', 'text/csv');
-        res.setHeader('Content-Disposition', `attachment; filename="${curso.nombre_curso}_DATOS.csv"`); // El nombre del archivo
-        res.status(200).send(csv);
+            const departamentos = departamentoResults.map(dept => dept.nombre).join(', ');
+
+            let csv = 'id,nombre_curso,asignaturas_requeridas,contenidos_requeridos,numero_docentes,tipo_asignatura,actividad_evento,objetivo,carreras_atendidas,periodo,fecha_inicio,fecha_final,turno,nombre_instructor,apellidopaterno_instructor,apellidomaterno_instructor,departamentos\n';
+            csv += `${curso.id},${curso.nombre_curso},${curso.asignaturas_requeridas},${curso.contenidos_requeridos},${curso.numero_docentes},${curso.tipo_asignatura},${curso.actividad_evento},${curso.objetivo},${curso.carreras_atendidas},${curso.periodo},${curso.fecha_inicio},${curso.fecha_fin},${curso.turno},${curso.nombre_instructor},${curso.apellidopaterno_instructor},${curso.apellidomaterno_instructor},"${departamentos}"\n`;
+
+            // Configura los encabezados para la descarga del archivo con codificación UTF-8
+            res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+            res.setHeader('Content-Disposition', `attachment; filename="${curso.nombre_curso}_DATOS.csv"`);
+            res.status(200).send('\uFEFF' + csv); // Agrega BOM al inicio para que Excel reconozca UTF-8
+        });
     });
 });
+
+
 app.get('/descargar2-curso/:id', (req, res) => {
     const cursoId = req.params.id;
-    const query = 'SELECT * FROM cursos_propuestos WHERE id = ?'; // Filtra por el ID del curso
+    const cursoQuery = 'SELECT * FROM cursos_propuestos WHERE id = ?';
+    const departamentosQuery = `
+        SELECT d.nombre 
+        FROM departamento_curso dc 
+        JOIN departamentos d ON dc.departamento_id = d.id 
+        WHERE dc.curso_id = ?
+    `;
 
-    connection.query(query, [cursoId], (error, results) => {
+    // Primero obtenemos el curso
+    connection.query(cursoQuery, [cursoId], (error, cursoResults) => {
         if (error) {
             return res.status(500).send('Error al consultar la base de datos');
         }
 
-        if (results.length === 0) {
+        if (cursoResults.length === 0) {
             return res.status(404).send('Curso no encontrado');
         }
 
-        // Crea el contenido CSV
-        const curso = results[0]; // Obtén el primer (y único) resultado
-        let csv = 'id,nombre_curso,objetivo,justificacion,fecha_inicio,fecha_fin,numero_horas,horario,lugar,requisitos,nombre_instructor,apellidopaterno_instructor,apellidomaterno_instructor\n';
+        const curso = cursoResults[0];
 
-        // Asegúrate de que las propiedades coincidan con las de tu tabla
-        csv += `${curso.id},${curso.nombre_curso},${curso.objetivo},${curso.justificacion},${curso.fecha_inicio},${curso.fecha_fin},${curso.numero_horas},${curso.horario},${curso.lugar},${curso.requisitos},${curso.nombre_instructor},${curso.apellidopaterno_instructor},${curso.apellidomaterno_instructor}\n`;
+        // Luego, obtenemos los departamentos relacionados al curso
+        connection.query(departamentosQuery, [cursoId], (error, departamentoResults) => {
+            if (error) {
+                return res.status(500).send('Error al consultar los departamentos');
+            }
 
-        // Configura los encabezados para la descarga del archivo
-        res.setHeader('Content-Type', 'text/csv');
-        res.setHeader('Content-Disposition', `attachment; filename="${curso.nombre_curso}_DATOS.csv"`); // El nombre del archivo
-        res.status(200).send(csv);
+            // Unimos los nombres de los departamentos en una sola cadena, separados por comas
+            const departamentos = departamentoResults.map(dept => dept.nombre).join(', ');
+
+            // Generamos el contenido del CSV incluyendo la columna de departamentos
+            let csv = 'id,nombre_curso,tipo_curso,objetivo,justificacion,fecha_inicio,fecha_fin,numero_horas,horario,lugar,requisitos,nombre_instructor,apellidopaterno_instructor,apellidomaterno_instructor,departamentos\n';
+            csv += `${curso.id},${curso.nombre_curso},${curso.tipo_curso},${curso.objetivo},${curso.justificacion},${curso.fecha_inicio},${curso.fecha_fin},${curso.numero_horas},${curso.horario},${curso.lugar},${curso.requisitos},${curso.nombre_instructor},${curso.apellidopaterno_instructor},${curso.apellidomaterno_instructor},"${departamentos}"\n`;
+
+            // Configura los encabezados para la descarga del archivo con codificación UTF-8
+            res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+            res.setHeader('Content-Disposition', `attachment; filename="${curso.nombre_curso}_DATOS.csv"`);
+            res.status(200).send('\uFEFF' + csv); // Agrega BOM al inicio para que Excel reconozca UTF-8
+        });
     });
 });
+
 
 const { Parser } = require('json2csv'); // Necesario para exportar a CSV
 // Preguntas para cada sección
@@ -1574,6 +1605,102 @@ app.get('/descargar-encuestas-jefe/:cursoId', (req, res) => {
             res.setHeader('Content-Disposition', `attachment; filename="Encuestas_Jefe_${cursoId}.csv"`);
             res.send('\uFEFF' + csv); // Enviar CSV con BOM
         });
+    });
+});
+app.get('/descargar-calificaciones/:id', (req, res) => {
+    const cursoId = req.params.id;
+    const query = `
+        SELECT c.id AS curso_id, c.nombre_curso, u.nombre, u.apellidopaterno, u.apellidomaterno, cal.calificacion, cal.fecha 
+        FROM calificaciones cal 
+        JOIN usuarios u ON cal.usuario_id = u.id 
+        JOIN cursos_propuestos c ON cal.curso_id = c.id 
+        WHERE cal.curso_id = ?
+    `;
+
+    connection.query(query, [cursoId], (error, results) => {
+        if (error) {
+            return res.status(500).send('Error al consultar la base de datos');
+        }
+
+        if (results.length === 0) {
+            return res.status(404).send('No se encontraron calificaciones para este curso');
+        }
+
+        // Genera el contenido CSV
+        let csv = 'curso_id,nombre_curso,nombre_usuario,apellidopaterno,apellidomaterno,calificacion,fecha\n';
+
+        results.forEach(row => {
+            csv += `${row.curso_id},"${row.nombre_curso}","${row.nombre}","${row.apellidopaterno}","${row.apellidomaterno}",${row.calificacion},"${row.fecha}"\n`;
+        });
+
+        // Configura los encabezados para la descarga del archivo con codificación UTF-8
+        res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+        res.setHeader('Content-Disposition', `attachment; filename="Calificaciones_${results[0].nombre_curso}.csv"`);
+        res.status(200).send('\uFEFF' + csv); // Agrega BOM al inicio para UTF-8
+    });
+});
+app.get('/descargar-asistencias/:id', (req, res) => {
+    const cursoId = req.params.id;
+    const query = `
+        SELECT a.id AS asistencia_id, c.nombre_curso, u.nombre, u.apellidopaterno, u.apellidomaterno, a.fecha, a.asistencia 
+        FROM asistencias a
+        JOIN usuarios u ON a.usuario_id = u.id 
+        JOIN cursos_propuestos c ON a.curso_id = c.id 
+        WHERE a.curso_id = ?
+    `;
+
+    connection.query(query, [cursoId], (error, results) => {
+        if (error) {
+            return res.status(500).send('Error al consultar la base de datos');
+        }
+
+        if (results.length === 0) {
+            return res.status(404).send('No se encontraron asistencias para este curso');
+        }
+
+        // Genera el contenido CSV
+        let csv = 'asistencia_id,nombre_curso,nombre_usuario,apellidopaterno,apellidomaterno,fecha,asistencia\n';
+
+        results.forEach(row => {
+            csv += `${row.asistencia_id},"${row.nombre_curso}","${row.nombre}","${row.apellidopaterno}","${row.apellidomaterno}","${row.fecha}",${row.asistencia}\n`;
+        });
+
+        // Configura los encabezados para la descarga del archivo con codificación UTF-8
+        res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+        res.setHeader('Content-Disposition', `attachment; filename="Asistencias_${results[0].nombre_curso}.csv"`);
+        res.status(200).send('\uFEFF' + csv); // Agrega BOM al inicio para UTF-8
+    });
+});
+app.get('/descargar-inscripcion/:id', (req, res) => {
+    const cursoId = req.params.id;
+    const query = `
+        SELECT i.id AS inscripcion_id, c.nombre_curso, u.nombre, u.apellidopaterno, u.apellidomaterno, i.fecha_inscripcion
+        FROM inscripciones i
+        JOIN usuarios u ON i.usuario_id = u.id
+        JOIN cursos_propuestos c ON i.curso_id = c.id
+        WHERE i.curso_id = ?
+    `;
+
+    connection.query(query, [cursoId], (error, results) => {
+        if (error) {
+            return res.status(500).send('Error al consultar la base de datos');
+        }
+
+        if (results.length === 0) {
+            return res.status(404).send('No se encontraron inscripciones para este curso');
+        }
+
+        // Genera el contenido CSV
+        let csv = 'inscripcion_id,nombre_curso,nombre_usuario,apellidopaterno,apellidomaterno,fecha_inscripcion\n';
+
+        results.forEach(row => {
+            csv += `${row.inscripcion_id},"${row.nombre_curso}","${row.nombre}","${row.apellidopaterno}","${row.apellidomaterno}","${row.fecha_inscripcion}"\n`;
+        });
+
+        // Configura los encabezados para la descarga del archivo con codificación UTF-8
+        res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+        res.setHeader('Content-Disposition', `attachment; filename="Inscripciones_${results[0].nombre_curso}.csv"`);
+        res.status(200).send('\uFEFF' + csv); // Agrega BOM para UTF-8
     });
 });
 

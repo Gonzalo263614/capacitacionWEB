@@ -67,7 +67,7 @@ export class DetalleCursoAdminComponent {
       const url = window.URL.createObjectURL(response);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `Diagnóstico de necesidades de formación y actualización profesional docente_${this.curso.nombre_curso}.csv`; // Nombre del archivo
+      a.download = `Ficha tecnica para registro del curso_${this.curso.nombre_curso}.csv`; // Nombre del archivo
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -113,6 +113,66 @@ export class DetalleCursoAdminComponent {
         document.body.removeChild(a);
       }, error => {
         console.error('Error al descargar el archivo de encuestas de jefe:', error);
+      });
+  }
+  descargarCalificaciones() {
+    const cursoId = this.curso?.id;
+    if (!cursoId) {
+      console.error('No se encontró el ID del curso.');
+      return;
+    }
+
+    this.http.get(`http://localhost:3000/descargar-calificaciones/${cursoId}`, { responseType: 'blob' })
+      .subscribe((response: Blob) => {
+        const url = window.URL.createObjectURL(response);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Calificaciones_${this.curso.nombre_curso}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      }, error => {
+        console.error('Error al descargar el archivo de calificaciones:', error);
+      });
+  }
+  descargarAsistencias() {
+    const cursoId = this.curso?.id;
+    if (!cursoId) {
+      console.error('No se encontró el ID del curso.');
+      return;
+    }
+
+    this.http.get(`http://localhost:3000/descargar-asistencias/${cursoId}`, { responseType: 'blob' })
+      .subscribe((response: Blob) => {
+        const url = window.URL.createObjectURL(response);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Asistencias_${this.curso.nombre_curso}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      }, error => {
+        console.error('Error al descargar el archivo de asistencias:', error);
+      });
+  }
+  descargarInscripcion() {
+    const cursoId = this.curso?.id;
+    if (!cursoId) {
+      console.error('No se encontró el ID del curso.');
+      return;
+    }
+
+    this.http.get(`http://localhost:3000/descargar-inscripcion/${cursoId}`, { responseType: 'blob' })
+      .subscribe((response: Blob) => {
+        const url = window.URL.createObjectURL(response);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Inscripciones_${this.curso.nombre_curso}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      }, error => {
+        console.error('Error al descargar el archivo de inscripciones:', error);
       });
   }
 
