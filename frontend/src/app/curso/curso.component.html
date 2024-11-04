@@ -1,28 +1,31 @@
+<app-navbar></app-navbar>
 <div class="container">
+  <h2 class="form-title">Formación y Actualización Profesional Docente</h2>
+  <img src="TecNM.png" alt="Logo de la Institución" class="logo">
+
   <!-- Título del curso -->
-  <h1>{{ curso.nombre_curso || 'Título del curso no disponible' }}</h1>
+  <h1 class="course-title">{{ curso.nombre_curso || 'Título del curso no disponible' }}</h1>
 
   <!-- Botones -->
-  <div>
+  <div class="button-group">
     <!-- Botón para mostrar/ocultar detalles del curso -->
-    <button (click)="toggleDetalles()">
+    <button class="btn" (click)="toggleDetalles()">
       {{ showDetalles ? 'Ocultar detalles' : 'Ver detalles' }}
     </button>
 
     <!-- Botón para mostrar/ocultar asistencias -->
-    <button (click)="toggleAsistencias()">
+    <button class="btn" (click)="toggleAsistencias()">
       {{ showAsistencias ? 'Ocultar asistencias' : 'Ver asistencias' }}
     </button>
+
     <!-- Botón para descargar constancia -->
-    <!-- Botón para descargar constancia, siempre visible -->
-    <button (click)="descargarConstancia()">
+    <button class="btn btn-download" (click)="descargarConstancia()">
       Descargar constancia
     </button>
-
   </div>
 
   <!-- Detalles del curso -->
-  <div *ngIf="showDetalles">
+  <div *ngIf="showDetalles" class="course-details">
     <h2>Detalles del curso:</h2>
     <p><strong>Estado:</strong> {{ curso.estado }}</p>
     <p><strong>Periodo:</strong> {{ curso.periodo }}</p>
@@ -31,13 +34,12 @@
     <p><strong>Instructor:</strong> {{ curso.nombre_instructor }} {{ curso.apellidopaterno_instructor }} {{
       curso.apellidomaterno_instructor }}</p>
     <p><strong>Tu calificación:</strong> {{ calificacion !== null ? calificacion : 'No disponible' }}</p>
-    <!-- Mostrar la calificación -->
   </div>
 
   <!-- Asistencias -->
-  <div *ngIf="showAsistencias">
+  <div *ngIf="showAsistencias" class="attendance-section">
     <h2>Asistencias:</h2>
-    <table>
+    <table class="attendance-table">
       <thead>
         <tr>
           <th>Fecha</th>
@@ -46,7 +48,6 @@
       </thead>
       <tbody>
         <tr *ngFor="let asistencia of asistencias">
-          <!-- <td>{{ asistencia.fecha }}</td> -->
           <td>{{ asistencia.fecha | date:'dd/MM/yyyy' }}</td>
           <td>{{ asistencia.asistencia ? 'Asistió' : 'No asistió' }}</td>
         </tr>
@@ -54,11 +55,9 @@
     </table>
   </div>
 </div>
-
 <!-- Botón para mostrar la encuesta -->
-<button (click)="showEncuesta = !showEncuesta">
+<button class="btn" (click)="showEncuesta = !showEncuesta">
   {{ showEncuesta ? 'Ocultar encuesta' : 'Mostrar encuesta' }}
 </button>
-
 <!-- Encuesta -->
 <app-encuesta *ngIf="showEncuesta" [cursoNombre]="curso.nombre_curso"></app-encuesta>

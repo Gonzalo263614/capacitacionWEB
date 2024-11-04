@@ -1,20 +1,78 @@
 .form-title {
     text-align: center;
-    font-size: 28px; /* Aumentar tamaño */
-    font-weight: 700; /* Hacerlo más grueso */
-    color: rgb(0, 0, 0); /* Cambiar color a blanco */
+    font-size: 28px;
+    font-weight: 700;
+    color: rgb(0, 0, 0);
     margin-bottom: 25px;
     font-family: 'Helvetica Neue', Arial, sans-serif;
-    /*background: linear-gradient(90deg, #2980b9, #6dd5ed); /* Degradado */
-    background: linear-gradient(90deg, #eff1f5, #ccc8c8); /* Degradado */
-    padding: 20px; /* Espaciado alrededor del texto */
-    border-radius: 8px; /* Bordes redondeados */
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Sombra */
+    background: linear-gradient(90deg, #eff1f5, #ccc8c8);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     transition: transform 0.3s ease;
 }
+
 .logo {
     display: block;
-    margin: 0 auto 20px; /* Centrar y agregar margen inferior */
-    width: 120px; /* Ajusta el tamaño del logo aquí */
-    height: auto; /* Mantener proporciones del logo */
+    margin: 0 auto 20px;
+    width: 120px;
+    height: auto;
+}
+
+.welcome-section {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.welcome-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: #333;
+}
+
+.welcome-message {
+    font-size: 18px;
+    color: #555;
+}
+
+.curso-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: #333;
+    margin-top: 30px;
+    text-align: center;
+}
+
+.curso-details {
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    margin: 20px auto;
+    max-width: 600px; /* Asegura que no ocupe todo el ancho */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.curso-button {
+    display: block;
+    margin: 10px auto;
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #2980b9;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.curso-button:hover {
+    background-color: #1a6b9a;
+}
+
+.error {
+    color: red;
+    text-align: center;
+    margin-top: 15px;
+    font-weight: bold;
 }

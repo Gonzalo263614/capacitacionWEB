@@ -1,24 +1,29 @@
 <div class="encuesta" *ngIf="!encuestaRespondida; else yaRespondida">
-    <h2>Encuesta sobre el curso: {{ cursoNombre }}</h2>
-    <p>Evaluando al maestro con ID: {{ idMaestro }}</p>
-    <h3>Encuesta de la eficacia y de opinión de la capacitación del participante</h3>
-    <p><strong>Por favor, selecciona una opción para cada instrucción:</strong></p>
+    <h2 class="encuesta-title">Encuesta sobre el curso: {{ cursoNombre }}</h2>
+    <p class="encuesta-info">Evaluando al maestro con ID: <strong>{{ idMaestro }}</strong></p>
+    <h3 class="encuesta-subtitle">Encuesta de la eficacia y de opinión de la capacitación del participante</h3>
+    <p class="instruction"><strong>Por favor, selecciona una opción para cada instrucción:</strong></p>
 
-    <p><strong>1 TOTALMENTE EN DESACUERDO&nbsp;&nbsp;2 PARCIALMENTE EN DESACUERDO&nbsp;&nbsp;3 INDIFERENTE&nbsp;&nbsp;4 PARCIALMENTE DE ACUERDO&nbsp;&nbsp;5 TOTALMENTE DE ACUERDO</strong></p>
+    <p class="rating-scale">
+        <strong>1 TOTALMENTE EN DESACUERDO&nbsp;&nbsp;2 PARCIALMENTE EN DESACUERDO&nbsp;&nbsp;3 INDIFERENTE&nbsp;&nbsp;4 PARCIALMENTE DE ACUERDO&nbsp;&nbsp;5 TOTALMENTE DE ACUERDO</strong>
+    </p>
     
     <!-- Primer bloque de preguntas -->
-    <div *ngFor="let pregunta of preguntas; let i = index">
-        <p>{{ pregunta }}</p>
-        <label *ngFor="let option of [1, 2, 3, 4, 5]">
-            <input type="radio" name="pregunta1_{{ i }}" [(ngModel)]="respuestas[i]" [value]="option" />
-            {{ option }}
-        </label>
+    <div class="pregunta-block" *ngFor="let pregunta of preguntas; let i = index">
+        <p class="pregunta">{{ pregunta }}</p>
+        <div class="options">
+            <label *ngFor="let option of [1, 2, 3, 4, 5]">
+                <input type="radio" name="pregunta1_{{ i }}" [(ngModel)]="respuestas[i]" [value]="option" />
+                {{ option }}
+            </label>
+        </div>
     </div>
 
-    <h3>SUGERENCIAS PARA MEJORAR LOS CURSOS OFRECIDOS POR EL ITA:</h3>
-    <textarea rows="4" cols="50" [(ngModel)]="sugerencias" placeholder="Escribe tus sugerencias aquí"></textarea>
-    <button (click)="enviarEncuesta()">Enviar Encuesta</button>
+    <h3 class="suggestions-title">SUGERENCIAS PARA MEJORAR LOS CURSOS OFRECIDOS POR EL ITA:</h3>
+    <textarea rows="4" cols="50" [(ngModel)]="sugerencias" placeholder="Escribe tus sugerencias aquí" class="suggestions-textarea"></textarea>
+    <button (click)="enviarEncuesta()" class="submit-button">Enviar Encuesta</button>
 </div>
+
 <ng-template #yaRespondida>
-    <p>Ya has respondido esta encuesta. Gracias por tu participación.</p>
-  </ng-template>
+    <p class="thank-you-message">Ya has respondido esta encuesta. Gracias por tu participación.</p>
+</ng-template>

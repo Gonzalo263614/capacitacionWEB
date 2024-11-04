@@ -9,7 +9,6 @@
   {{ mostrarFormulario ? 'Cerrar Formulario' : 'Proponer un nuevo curso' }}
 </button>
 
-
 <div *ngIf="mostrarFormulario" class="form-container">
   <h2>Proponer un nuevo curso</h2>
   <form (ngSubmit)="proponerCurso()">
@@ -89,7 +88,6 @@
     </select>
 
     <!-- Datos del instructor -->
-    <!-- Datos del instructor -->
     <h3>Datos del Instructor</h3>
     <label>Nombre del Instructor</label>
     <input [(ngModel)]="nombreInstructor" name="nombreInstructor">
@@ -138,20 +136,20 @@
     <input [(ngModel)]="passwordInstructor" name="passwordInstructor" readonly>
 
     <button type="submit" class="btn-submit">Proponer Curso</button>
-
   </form>
 </div>
 
-<h2>Cursos Pendientes de Revisión</h2>
-<div *ngFor="let curso of cursosPendientes">
-  <h3>{{ curso.nombre_curso }}</h3>
-  <p><strong>Comentarios:</strong> {{ curso.comentario_revision }}</p>
-  <button (click)="abrirFormularioModificar(curso)">Modificar</button>
+
+<h2 class="section-title">Cursos Pendientes de Revisión</h2>
+<div *ngFor="let curso of cursosPendientes" class="curso-card">
+  <h3 class="curso-title">{{ curso.nombre_curso }}</h3>
+  <p><strong>Volver a colocar departamentos y fecha de inicio/final. Revisar:</strong>: {{ curso.comentario_revision }}</p>
+  <button class="boton-encuesta" (click)="abrirFormularioModificar(curso)">Modificar</button>
 </div>
 
 <!-- Formulario para modificar el curso -->
 <div *ngIf="mostrarFormularioModificar" class="form-container">
-  <h2>Modificar Curso</h2>
+  <h2 class="form-title">Modificar Curso</h2>
   <form (ngSubmit)="modificarCursoConfirmado()">
     <!-- Campos del curso (reutiliza los mismos del formulario de proponer curso) -->
     <label>Nombre del Curso</label>
@@ -279,21 +277,21 @@
   </form>
 </div>
 
-<h2>Cursos Propuestos</h2>
-<div *ngFor="let curso of cursosPropuestos">
-  <h3>{{ curso.nombre_curso }}</h3>
+<h2 class="titulo-principal">Cursos Propuestos</h2>
+<div *ngFor="let curso of cursosPropuestos" class="curso-contenedor">
+  <h3 class="curso-nombre">{{ curso.nombre_curso }}</h3>
 
   <!-- Botón para mostrar/ocultar la encuesta -->
-  <button (click)="toggleEncuesta(curso.id)">
+  <button class="boton-encuesta" (click)="toggleEncuesta(curso.id)">
     {{ showEncuesta[curso.id] ? 'Ocultar encuesta' : 'Mostrar encuesta' }}
   </button>
 
   <!-- Listado de maestros con su botón para responder la encuesta -->
-  <div *ngIf="showEncuesta[curso.id]">
-    <h4>Maestros Inscritos</h4>
-    <div *ngFor="let maestro of curso.maestrosInscritos">
-      <span>{{ maestro.nombre }} {{ maestro.apellidopaterno }} {{ maestro.apellidomaterno }}</span>
-      <button (click)="responderEncuesta(maestro.id, curso.id)">
+  <div *ngIf="showEncuesta[curso.id]" class="maestros-listado">
+    <h4 class="maestros-titulo">Maestros Inscritos</h4>
+    <div *ngFor="let maestro of curso.maestrosInscritos" class="maestro-item">
+      <span class="maestro-nombre">{{ maestro.nombre }} {{ maestro.apellidopaterno }} {{ maestro.apellidomaterno }}</span>
+      <button class="boton-responder" (click)="responderEncuesta(maestro.id, curso.id)">
         {{ encuestaVisible[curso.id] === maestro.id ? 'Ocultar Encuesta' : 'Responder Encuesta' }}
       </button>
 
@@ -301,9 +299,10 @@
       <app-encuestajefe
         *ngIf="encuestaVisible[curso.id] === maestro.id"
         [cursoNombre]="curso.nombre_curso"
-        [idMaestro]="maestro.id" 
-        (close)="encuestaVisible[curso.id] = null">
-      </app-encuestajefe>
+        [idMaestro]="maestro.id"
+        (close)="encuestaVisible[curso.id] = null"
+        class="encuesta-jefe"
+      ></app-encuestajefe>
     </div>
   </div>
 </div>

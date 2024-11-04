@@ -1,19 +1,22 @@
 <app-navbar></app-navbar>
+
 <h2 class="form-title">Formación y Actualización Profesional Docente</h2>
 <img src="TecNM.png" alt="Logo de la Institución" class="logo">
 
-<h1>Bienvenido, Instructor</h1>
-<p>Aquí puedes capacitar y realizar otras acciones.</p>
+<div class="welcome-section">
+    <h1 class="welcome-title">Bienvenido, Instructor</h1>
+    <p class="welcome-message">Aquí puedes capacitar y realizar otras acciones.</p>
+</div>
 
-<h2>Curso Asignado</h2>
-<div *ngIf="curso">
-  <p><strong>Nombre del curso:</strong> {{ curso.nombre_curso }}</p>
-  <p><strong>Periodo:</strong> {{ curso.periodo }}</p>
-  <p><strong>Fecha de inicio:</strong> {{ curso.fecha_inicio | date }}</p>
-  <p><strong>Fecha de fin:</strong> {{ curso.fecha_fin | date }}</p>
-  
-  <!-- Botón para ver los detalles del curso -->
-  <button (click)="verDetallesCurso(curso.id)">Ver Detalles del Curso</button>
+<h2 class="curso-title">Curso Asignado</h2>
+<div *ngIf="curso" class="curso-details">
+    <p><strong>Nombre del curso:</strong> {{ curso.nombre_curso }}</p>
+    <p><strong>Periodo:</strong> {{ curso.periodo }}</p>
+    <p><strong>Fecha de inicio:</strong> {{ curso.fecha_inicio | date }}</p>
+    <p><strong>Fecha de fin:</strong> {{ curso.fecha_fin | date }}</p>
+    
+    <!-- Botón para ver los detalles del curso -->
+    <button (click)="verDetallesCurso(curso.id)" class="curso-button">Ver Detalles del Curso</button>
 </div>
 
 <p *ngIf="error" class="error">{{ error }}</p>

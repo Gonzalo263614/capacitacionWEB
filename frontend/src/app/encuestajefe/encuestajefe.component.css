@@ -1,0 +1,104 @@
+/* Estilos generales para la encuesta */
+.encuesta {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Títulos */
+.encuesta-title {
+    text-align: center;
+    font-size: 28px;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.encuesta-info {
+    text-align: center;
+    font-size: 18px;
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.encuesta-subtitle {
+    font-size: 24px;
+    color: #4a4a4a;
+    margin: 20px 0;
+}
+
+/* Instrucciones */
+.instruction {
+    font-size: 18px;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+/* Escala de calificación */
+.rating-scale {
+    font-size: 16px;
+    margin-bottom: 20px;
+}
+
+/* Bloques de preguntas */
+.pregunta-block {
+    margin-bottom: 15px;
+    padding: 10px;
+    background-color: #e7f3fe;
+    border-radius: 8px;
+}
+
+/* Texto de las preguntas */
+.pregunta {
+    font-size: 18px;
+    color: #333;
+}
+
+/* Opciones de respuesta */
+.options {
+    margin-top: 10px;
+}
+
+/* Estilo del textarea para sugerencias */
+.suggestions-title {
+    margin-top: 20px;
+    font-size: 20px;
+    color: #4a4a4a;
+}
+
+.suggestions-textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    resize: none;
+    margin-bottom: 20px;
+}
+
+/* Botón para enviar la encuesta */
+.submit-button {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    color: white;
+    background-color: #007bff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.submit-button:hover {
+    background-color: #0056b3;
+}
+
+/* Mensaje de agradecimiento */
+.thank-you-message {
+    text-align: center;
+    font-size: 18px;
+    color: #333;
+    margin-top: 20px;
+}

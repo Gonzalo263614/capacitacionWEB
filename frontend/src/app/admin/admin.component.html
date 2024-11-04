@@ -1,79 +1,77 @@
 <app-navbar></app-navbar>
-<h2 class="form-title">Formación y Actualización Profesional Docente</h2>
-<img src="TecNM.png" alt="Logo de la Institución" class="logo"> <!-- Ajusta la ruta según tu estructura -->
-<h1>Bienvenido, Administrador</h1>
+<div class="container">
+  <h2 class="form-title">Formación y Actualización Profesional Docente</h2>
+  <img src="TecNM.png" alt="Logo de la Institución" class="logo">
+  <h1>Bienvenido, Administrador</h1>
 
-<!-- Botón para mostrar/ocultar los cursos -->
-<button (click)="toggleCursos()">
-  {{ mostrarCursos ? 'Ocultar Cursos Propuestos' : 'Mostrar Cursos Propuestos' }}
-</button>
+  <!-- Botón para mostrar/ocultar los cursos -->
+  <button class="toggle-button" (click)="toggleCursos()">
+    {{ mostrarCursos ? 'Ocultar Cursos Propuestos' : 'Mostrar Cursos Propuestos' }}
+  </button>
 
-<!-- Lista de cursos propuestos, visible solo si mostrarCursos es true -->
-<div *ngIf="mostrarCursos">
-  <h2>Cursos Propuestos</h2>
-  <ul>
-    <li *ngFor="let curso of cursos">
-      <p><strong>Nombre del Curso:</strong> {{ curso.nombre_curso }}</p>
-      <p><strong>Departamentos Relacionados:</strong>
-        <span *ngIf="curso.departamentos && curso.departamentos.length > 0">
-          {{ curso.departamentos.join(', ') }}
-        </span>
-        <span *ngIf="!curso.departamentos || curso.departamentos.length === 0">
-          No hay departamentos asociados
-        </span>
-      </p>
-      <p><strong>Asignaturas de Formación:</strong> {{ curso.asignaturas_requeridas }}</p>
-      <p><strong>Contenidos Temáticos:</strong> {{ curso.contenidos_requeridos }}</p>
-      <p><strong>Número de Docentes:</strong> {{ curso.numero_docentes }}</p>
-      <p><strong>Tipo de Asignatura:</strong> {{ curso.tipo_asignatura }}</p>
-      <p><strong>Actividad/Event:</strong> {{ curso.actividad_evento }}</p>
-      <p><strong>Objetivo:</strong> {{ curso.objetivo }}</p>
-      <p><strong>Carreras Atendidas:</strong> {{ curso.carreras_atendidas }}</p>
-      <p><strong>Período:</strong> {{ curso.periodo }}</p>
-      <p><strong>Turno:</strong> {{ curso.turno }}</p>
-      <p><strong>Fecha de Inicio:</strong> {{ curso.fecha_inicio | date }}</p>
-      <p><strong>Fecha de Fin:</strong> {{ curso.fecha_fin | date }}</p>
+  <!-- Lista de cursos propuestos, visible solo si mostrarCursos es true -->
+  <div *ngIf="mostrarCursos" class="cursos-list">
+    <h2>Cursos Propuestos</h2>
+    <ul>
+      <li *ngFor="let curso of cursos" class="curso-card">
+        <h3>{{ curso.nombre_curso }}</h3>
+        <p><strong>Departamentos Relacionados:</strong> {{ curso.departamentos.length > 0 ? curso.departamentos.join(',
+          ') : 'No hay departamentos asociados' }}</p>
+        <p><strong>Asignaturas de Formación:</strong> {{ curso.asignaturas_requeridas }}</p>
+        <p><strong>Estado:</strong> {{ curso.estado }}</p>
+        <p><strong>Asignaturas de Formación:</strong> {{ curso.asignaturas_requeridas }}</p>
+        <p><strong>Contenidos Temáticos:</strong> {{ curso.contenidos_requeridos }}</p>
+        <p><strong>Número de Docentes:</strong> {{ curso.numero_docentes }}</p>
+        <p><strong>Tipo de Asignatura:</strong> {{ curso.tipo_asignatura }}</p>
+        <p><strong>Actividad/Event:</strong> {{ curso.actividad_evento }}</p>
+        <p><strong>Objetivo:</strong> {{ curso.objetivo }}</p>
+        <p><strong>Carreras Atendidas:</strong> {{ curso.carreras_atendidas }}</p>
+        <p><strong>Período:</strong> {{ curso.periodo }}</p>
+        <p><strong>Turno:</strong> {{ curso.turno }}</p>
+        <p><strong>Fecha de Inicio:</strong> {{ curso.fecha_inicio | date }}</p>
+        <p><strong>Fecha de Fin:</strong> {{ curso.fecha_fin | date }}</p>
 
-      <p><strong>Justificación:</strong> {{ curso.justificacion }}</p>
-      <p><strong>Número de Horas:</strong> {{ curso.numero_horas }}</p>
-      <p><strong>Horario:</strong> {{ curso.horario }}</p>
-      <p><strong>Lugar:</strong> {{ curso.lugar }}</p>
-      <p><strong>Requisitos:</strong> {{ curso.requisitos }}</p>
-      <p><strong>Tipo de Curso:</strong> {{ curso.tipo_curso }}</p>
+        <p><strong>Justificación:</strong> {{ curso.justificacion }}</p>
+        <p><strong>Número de Horas:</strong> {{ curso.numero_horas }}</p>
+        <p><strong>Horario:</strong> {{ curso.horario }}</p>
+        <p><strong>Lugar:</strong> {{ curso.lugar }}</p>
+        <p><strong>Requisitos:</strong> {{ curso.requisitos }}</p>
+        <p><strong>Tipo de Curso:</strong> {{ curso.tipo_curso }}</p>
 
-      <p><strong>Nombre del Instructor:</strong> {{ curso.nombre_instructor }} {{ curso.apellidopaterno_instructor }} {{
-        curso.apellidomaterno_instructor }}</p>
-      <p><strong>CURP del Instructor:</strong> {{ curso.curp_instructor }}</p>
-      <p><strong>RFC del Instructor:</strong> {{ curso.rfc_instructor }}</p>
-      <p><strong>Máximo de Estudios del Instructor:</strong> {{ curso.maxestudios_instructor }}</p>
-      <p><strong>Email del Instructor:</strong> {{ curso.email_instructor }}</p>
-      <p><strong>Sexo del Instructor:</strong> {{ curso.sexo_instructor }}</p>
-      <p><strong>Tipo de Contrato del Instructor:</strong> {{ curso.tipo_contrato_instructor }}</p>
+        <p><strong>Nombre del Instructor:</strong> {{ curso.nombre_instructor }} {{ curso.apellidopaterno_instructor }}
+          {{
+          curso.apellidomaterno_instructor }}</p>
+        <p><strong>CURP del Instructor:</strong> {{ curso.curp_instructor }}</p>
+        <p><strong>RFC del Instructor:</strong> {{ curso.rfc_instructor }}</p>
+        <p><strong>Máximo de Estudios del Instructor:</strong> {{ curso.maxestudios_instructor }}</p>
+        <p><strong>Email del Instructor:</strong> {{ curso.email_instructor }}</p>
+        <p><strong>Sexo del Instructor:</strong> {{ curso.sexo_instructor }}</p>
+        <p><strong>Tipo de Contrato del Instructor:</strong> {{ curso.tipo_contrato_instructor }}</p>
+        <button *ngIf="curso.estado === 'pendiente'" (click)="actualizarEstado(curso.id, 'aceptado')"
+          class="accept-button">Aceptar</button>
+        <button *ngIf="curso.estado === 'pendiente'" (click)="actualizarEstado(curso.id, 'rechazado')"
+          class="reject-button">Rechazar</button>
+        <button *ngIf="curso.estado === 'pendiente'" (click)="mostrarCampoComentario(curso)"
+          class="review-button">Solicitar Revisión</button>
+        <div *ngIf="curso.mostrarComentario" class="review-comment">
+          <textarea [(ngModel)]="curso.comentario" placeholder="Escriba el comentario para revisión"></textarea>
+          <button (click)="solicitarRevision(curso.id, curso.comentario)" class="send-comment-button">Enviar
+            Comentario</button>
+        </div>
+      </li>
+    </ul>
+  </div>
 
-      <button *ngIf="curso.estado === 'pendiente'" (click)="actualizarEstado(curso.id, 'aceptado')">Aceptar</button>
-      <button *ngIf="curso.estado === 'pendiente'" (click)="actualizarEstado(curso.id, 'rechazado')">Rechazar</button>
-      <!-- Botón para solicitar revisión, visible solo si el curso está en estado pendiente -->
-      <button *ngIf="curso.estado === 'pendiente'" (click)="mostrarCampoComentario(curso)">Solicitar Revisión</button>
-
-      <!-- Campo de comentario y botón para enviar la solicitud de revisión -->
-      <div *ngIf="curso.mostrarComentario">
-        <textarea [(ngModel)]="curso.comentario" placeholder="Escriba el comentario para revisión"></textarea>
-        <button (click)="solicitarRevision(curso.id, curso.comentario)">Enviar Comentario</button>
-      </div>
-
-    </li>
-  </ul>
-</div>
-<h2 class="form-title">Cursos Aceptados</h2>
-<div *ngIf="cursosAceptados.length > 0">
-  <ul>
-    <li *ngFor="let curso of cursosAceptados">
-      <p><strong>Nombre del Curso:</strong> {{ curso.nombre_curso }}</p>
-      <!-- Aquí puedes añadir más detalles del curso si lo deseas -->
-      <button (click)="irACurso(curso.id)">Ir al curso</button>
-    </li>
-  </ul>
-</div>
-<div *ngIf="cursosAceptados.length === 0">
-  <p>No hay cursos aceptados disponibles.</p>
+  <h2 class="form-title">Cursos Aceptados</h2>
+  <div *ngIf="cursosAceptados.length > 0">
+    <ul>
+      <li *ngFor="let curso of cursosAceptados" class="curso-card">
+        <h3>{{ curso.nombre_curso }}</h3>
+        <button (click)="irACurso(curso.id)" class="go-to-course-button">Ir al curso</button>
+      </li>
+    </ul>
+  </div>
+  <div *ngIf="cursosAceptados.length === 0">
+    <p>No hay cursos aceptados disponibles.</p>
+  </div>
 </div>

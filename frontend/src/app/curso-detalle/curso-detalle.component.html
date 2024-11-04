@@ -1,26 +1,28 @@
 <app-navbar></app-navbar>
+
 <h2 class="form-title">Formación y Actualización Profesional Docente</h2>
 <img src="TecNM.png" alt="Logo de la Institución" class="logo">
-<h2>Detalles del Curso</h2>
-<button (click)="toggleCurso()">
+
+<h2 class="section-title">Detalles del Curso</h2>
+<button (click)="toggleCurso()" class="toggle-button">
   {{ showCurso ? 'Ocultar detalles' : 'Mostrar detalles' }}
 </button>
 
 <!-- Se muestran los detalles del curso solo si showCurso es verdadero -->
-<div *ngIf="showCurso && curso">
+<div *ngIf="showCurso && curso" class="course-details">
   <p><strong>Nombre del curso:</strong> {{ curso.nombre_curso }}</p>
   <p><strong>Periodo:</strong> {{ curso.periodo }}</p>
   <p><strong>Fecha de inicio:</strong> {{ curso.fecha_inicio | date }}</p>
   <p><strong>Fecha de fin:</strong> {{ curso.fecha_fin | date }}</p>
 </div>
 
-<h2>Maestros Inscritos</h2>
-<button (click)="toggleMaestros()">
-  {{ showMaestros ? 'Ocultar pase de lista' : 'Pase de lista ' }}
+<h2 class="section-title">Maestros Inscritos</h2>
+<button (click)="toggleMaestros()" class="toggle-button">
+  {{ showMaestros ? 'Ocultar pase de lista' : 'Pase de lista' }}
 </button>
 
 <!-- Tabla para mostrar maestros solo si showMaestros es verdadero -->
-<div *ngIf="showMaestros">
+<div *ngIf="showMaestros" class="maestros-list">
   <table>
     <thead>
       <tr>
@@ -43,19 +45,20 @@
       </tr>
     </tbody>
   </table>
-  <button (click)="verificarAsistenciaYaPasada()">Guardar Asistencias</button>
+  <button (click)="verificarAsistenciaYaPasada()" class="save-button">Guardar Asistencias</button>
 </div>
 
-<p *ngIf="maestros.length === 0 && showMaestros">No hay maestros inscritos en este curso.</p>
+<p *ngIf="maestros.length === 0 && showMaestros" class="no-maestros">No hay maestros inscritos en este curso.</p>
 <p *ngIf="error" class="error">{{ error }}</p>
+
 <!-- Nuevo botón para mostrar la sección de calificaciones -->
-<button (click)="toggleCalificaciones()">
+<button (click)="toggleCalificaciones()" class="toggle-button">
   {{ showCalificaciones ? 'Ocultar Calificaciones' : 'Agregar Calificaciones' }}
 </button>
 
 <!-- Nueva sección para agregar calificaciones -->
-<div *ngIf="showCalificaciones">
-  <h2>Agregar Calificaciones</h2>
+<div *ngIf="showCalificaciones" class="calificaciones-section">
+  <h2 class="section-title">Agregar Calificaciones</h2>
   <table>
     <thead>
       <tr>
@@ -67,19 +70,22 @@
     <tbody>
       <tr *ngFor="let maestro of maestros">
         <td>{{ maestro.nombre }}</td>
+        <td>{{ maestro.apellidopaterno }}</td>
+        <td>{{ maestro.apellidomaterno }}</td>
         <td>
           <input type="number" [(ngModel)]="maestro.calificacion" placeholder="Calificación" />
         </td>
         <td>
-          <button (click)="guardarCalificacion(maestro.id)">Agregar Calificación</button>
+          <button (click)="guardarCalificacion(maestro.id)" class="add-grade-button">Agregar Calificación</button>
         </td>
       </tr>
     </tbody>
   </table>
 </div>
-<h2>Enviar archivos</h2>
-<form>
+
+<h2 class="section-title">Enviar archivos</h2>
+<form class="file-upload-form">
   <label for="file">Seleccionar archivo:</label>
   <input type="file" (change)="onFileSelected($event)">
-  <button type="button" (click)="onSubmit()">Subir archivo</button>
+  <button type="button" (click)="onSubmit()" class="upload-button">Subir archivo</button>
 </form>

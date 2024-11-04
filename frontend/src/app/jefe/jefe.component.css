@@ -7,7 +7,8 @@ body {
     padding: 0;
 }
 
-h1, h2 {
+h1,
+h2 {
     text-align: center;
     color: #333;
 }
@@ -107,44 +108,142 @@ p {
 /* Estilos del logo */
 .logo {
     display: block;
-    margin: 0 auto 20px;
-    width: 120px;
+    margin: 0 auto;
+    width: 80px;
     height: auto;
+    padding: 5px;
+    margin-bottom: 20px;
 }
 
-/* Estilos para los campos de error */
-.mensaje {
-    color: green;
-    font-weight: bold;
-    margin-top: 10px;
-}
-
-.mensaje.error {
-    color: red;
-}
-
-/* Estilo para organizar los checkboxes en una cuadrícula */
-/* Estilo para organizar los checkboxes en una cuadrícula */
 .checkbox-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: 10px;
-    margin-top: 10px;
 }
 
-/* Alineación y espaciado mejorado */
-.checkbox-grid label {
-    display: flex;
-    align-items: center;  /* Asegura que el checkbox y el texto estén alineados */
-    font-size: 14px;
-    color: #333;
+.section-title {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.curso-card {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+}
+
+.curso-title {
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+
+.btn-modify {
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    padding: 8px 12px;
     cursor: pointer;
-    margin: 0;  /* Elimina cualquier margen innecesario */
+    border-radius: 4px;
 }
 
-/* Ajuste del tamaño del checkbox */
-.checkbox-grid input[type="checkbox"] {
-    margin-right: 8px;  /* Ajusta el espacio entre el checkbox y el texto */
-    transform: scale(1.1);  /* Ajuste de tamaño más moderado */
-    vertical-align: middle;  /* Alinea el checkbox verticalmente con el texto */
+.btn-modify:hover {
+    background-color: #45a049;
+}
+
+/* Título principal de Cursos Propuestos */
+.titulo-principal {
+    font-size: 2em;
+    color: #1a73e8;
+    font-weight: bold;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #1a73e8;
+    padding-bottom: 5px;
+}
+
+/* Contenedor de cada curso */
+.curso-contenedor {
+    margin-bottom: 20px;
+    padding: 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+}
+
+/* Título de cada curso */
+.curso-nombre {
+    font-size: 1.5em;
+    color: #333;
+    font-weight: 600;
+    margin: 10px 0;
+}
+
+/* Botón para mostrar/ocultar la encuesta */
+.boton-encuesta {
+    font-size: 1em;
+    color: #fff;
+    background-color: #1a73e8;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.boton-encuesta:hover {
+    background-color: #155db8;
+}
+
+/* Contenedor de Maestros Inscritos */
+.maestros-listado {
+    margin-top: 15px;
+    padding-left: 10px;
+    border-left: 3px solid #1a73e8;
+}
+
+/* Título de la sección Maestros Inscritos */
+.maestros-titulo {
+    font-size: 1.2em;
+    color: #444;
+    font-weight: 500;
+}
+
+/* Contenedor de cada maestro */
+.maestro-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+/* Nombre de cada maestro */
+.maestro-nombre {
+    font-size: 1em;
+    margin-right: 10px;
+    color: #555;
+}
+
+/* Botón para responder encuesta de cada maestro */
+.boton-responder {
+    font-size: 0.9em;
+    color: #1a73e8;
+    background: none;
+    border: 1px solid #1a73e8;
+    padding: 6px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.boton-responder:hover {
+    color: white;
+    background-color: #1a73e8;
+}
+
+/* EncuestaJefe styling */
+.encuesta-jefe {
+    margin-top: 15px;
+    padding: 10px;
+    background-color: #eef5fc;
+    border-radius: 8px;
+    border: 1px solid #d0e3f5;
 }
