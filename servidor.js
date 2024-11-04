@@ -1137,18 +1137,18 @@ app.post('/api/encuesta/actualizarEncuestaJefes', (req, res) => {
     });
 });
 
-const multer = require('multer'); 
+const multer = require('multer');
 const fs = require('fs');
 const path = require('path');
+const uploadDir = path.join(__dirname, 'uploads');
 
 // Crear la carpeta 'uploads' si no existe
-const uploadDir = path.join(__dirname, 'uploads');
 if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir);
     console.log('Carpeta "uploads" creada');
 }
 
-// Configuración de multer para almacenar archivos en la carpeta "uploads/"
+// Configuración de multer
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, 'uploads/');
@@ -1157,11 +1157,9 @@ const storage = multer.diskStorage({
         cb(null, file.originalname);
     }
 });
-
 const upload = multer({ storage: storage });
 
-
-// Ruta para subir archivos
+// Ruta para subir archivos y actualizar encuestajefes en usuario_requisitos
 app.post('/uploads', upload.single('archivo'), (req, res) => {
     const archivo = req.file;
     const usuarioId = req.body.usuarioId;
@@ -1170,22 +1168,54 @@ app.post('/uploads', upload.single('archivo'), (req, res) => {
     if (!archivo) {
         return res.status(400).json({ error: 'No se ha subido ningún archivo' });
     }
-
     if (!usuarioId || !cursoId) {
         return res.status(400).json({ error: 'ID de usuario o curso no válidos.' });
     }
 
+    // Leer el archivo y guardar en la base de datos
     const archivoData = fs.readFileSync(archivo.path);
-
-    const sql = 'INSERT INTO archivos (nombre_archivo, archivo, curso_id, instructor_id) VALUES (?, ?, ?, ?)';
+    const sqlInsertArchivo = 'INSERT INTO archivos (nombre_archivo, archivo, curso_id, instructor_id) VALUES (?, ?, ?, ?)';
     const values = [archivo.originalname, archivoData, cursoId, usuarioId];
 
-    connection.query(sql, values, (err, result) => {
+    // Insertar archivo y luego actualizar encuestajefes en usuario_requisitos
+    connection.query(sqlInsertArchivo, values, (err, result) => {
         if (err) {
             console.error('Error al guardar el archivo en la base de datos:', err.message);
             return res.status(500).send('Error al guardar el archivo en la base de datos.');
         }
-        res.status(200).send('Archivo subido y guardado exitosamente en la base de datos.');
+
+        // Buscar usuarios asociados al curso y actualizar encuestajefes
+        const sqlObtenerUsuarios = `
+            SELECT ur.usuario_id
+            FROM usuario_requisitos AS ur
+            JOIN instructor_curso AS ic ON ur.curso_id = ic.id_curso_propuesto
+            WHERE ic.id_usuario_instructor = ? AND ur.curso_id = ?`;
+
+        connection.query(sqlObtenerUsuarios, [usuarioId, cursoId], (err, usuarios) => {
+            if (err) {
+                console.error('Error al buscar los usuarios para actualizar encuestajefes:', err.message);
+                return res.status(500).send('Error al buscar los usuarios.');
+            }
+
+            if (usuarios.length === 0) {
+                return res.status(404).json({ error: 'No se encontraron usuarios para actualizar.' });
+            }
+
+            // Actualizar encuestajefes a 1 para cada usuario encontrado
+            const idsUsuarios = usuarios.map(user => user.usuario_id);
+            const sqlActualizarEncuestajefes = `
+                UPDATE usuario_requisitos
+                SET evidencias = 1
+                WHERE curso_id = ? AND usuario_id IN (?)`;
+
+            connection.query(sqlActualizarEncuestajefes, [cursoId, idsUsuarios], (err) => {
+                if (err) {
+                    console.error('Error al actualizar encuestajefes en usuario_requisitos:', err.message);
+                    return res.status(500).send('Error al actualizar encuestajefes.');
+                }
+                res.status(200).send('Archivo subido y encuestajefes actualizado exitosamente.');
+            });
+        });
     });
 });
 

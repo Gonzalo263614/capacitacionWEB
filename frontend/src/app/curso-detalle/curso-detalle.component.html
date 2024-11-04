@@ -19,13 +19,6 @@
   {{ showMaestros ? 'Ocultar pase de lista' : 'Pase de lista ' }}
 </button>
 
-<h2>Enviar archivos</h2>
-<form>
-  <label for="file">Seleccionar archivo:</label>
-  <input type="file" (change)="onFileSelected($event)">
-  <button type="button" (click)="onSubmit()">Subir archivo</button>
-</form>
-
 <!-- Tabla para mostrar maestros solo si showMaestros es verdadero -->
 <div *ngIf="showMaestros">
   <table>
@@ -84,3 +77,9 @@
     </tbody>
   </table>
 </div>
+<h2>Enviar archivos</h2>
+<form>
+  <label for="file">Seleccionar archivo:</label>
+  <input type="file" (change)="onFileSelected($event)">
+  <button type="button" (click)="onSubmit()">Subir archivo</button>
+</form>
