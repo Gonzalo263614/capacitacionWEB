@@ -64,3 +64,16 @@
     </li>
   </ul>
 </div>
+<h2 class="form-title">Cursos Aceptados</h2>
+<div *ngIf="cursosAceptados.length > 0">
+  <ul>
+    <li *ngFor="let curso of cursosAceptados">
+      <p><strong>Nombre del Curso:</strong> {{ curso.nombre_curso }}</p>
+      <!-- Aquí puedes añadir más detalles del curso si lo deseas -->
+      <button (click)="irACurso(curso.id)">Ir al curso</button>
+    </li>
+  </ul>
+</div>
+<div *ngIf="cursosAceptados.length === 0">
+  <p>No hay cursos aceptados disponibles.</p>
+</div>

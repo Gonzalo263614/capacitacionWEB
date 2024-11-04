@@ -1,0 +1,10 @@
+<div *ngIf="curso">
+    <h2>{{ curso.nombre_curso }}</h2>
+    <p><strong>Objetivo:</strong> {{ curso.objetivo }}</p>
+    <p><strong>Fecha de Inicio:</strong> {{ curso.fecha_inicio | date }}</p>
+    <p><strong>Fecha de Fin:</strong> {{ curso.fecha_fin | date }}</p>
+    <!-- Agrega otros detalles del curso aquí -->
+</div>
+<div *ngIf="!curso">
+    <p>Cargando curso...</p>
+</div>

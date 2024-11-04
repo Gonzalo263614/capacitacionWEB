@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-admin',
@@ -9,11 +10,14 @@ import { HttpClient } from '@angular/common/http';
 export class AdminComponent implements OnInit {
   cursos: any[] = [];
   mostrarCursos: boolean = false; // Variable para controlar si se muestran los cursos
+  cursosAceptados: any[] = [];
 
-  constructor(private http: HttpClient) { }
+
+  constructor(private http: HttpClient,private router: Router) { }
 
   ngOnInit(): void {
     this.obtenerCursos();
+    this.obtenerCursosAceptados();
   }
 
   obtenerCursos() {
@@ -114,5 +118,17 @@ export class AdminComponent implements OnInit {
   // Función para alternar la visibilidad de los cursos
   toggleCursos() {
     this.mostrarCursos = !this.mostrarCursos;
+  }
+  obtenerCursosAceptados() {
+    this.http.get('http://localhost:3000/cursos')
+      .subscribe((data: any) => {
+        this.cursosAceptados = data;
+      }, error => {
+        console.error('Error al obtener los cursos aceptados:', error);
+      });
+  }
+
+  irACurso(cursoId: number) {
+    this.router.navigate(['/detallecursoadmin', cursoId]);
   }
 }

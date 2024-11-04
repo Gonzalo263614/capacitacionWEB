@@ -12,6 +12,8 @@ import { CursoDetalleComponent } from './curso-detalle/curso-detalle.component';
 import { CursoComponent } from './curso/curso.component';
 import { EncuestaComponent } from './encuesta/encuesta.component';
 import { EncuestajefeComponent } from './encuestajefe/encuestajefe.component';
+import { DetalleCursoAdminComponent } from './detalle-curso-admin/detalle-curso-admin.component';
+
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'maestro', component: MaestroComponent },
@@ -29,6 +31,7 @@ const routes: Routes = [
   { path: 'curso/:id/asistencias', component: CursoComponent }, 
   { path: 'encuesta', component: EncuestaComponent }, 
   { path: 'encuestajefe', component: EncuestajefeComponent }, 
+  { path: 'detallecursoadmin/:id', component: DetalleCursoAdminComponent },
 ];
 
 
