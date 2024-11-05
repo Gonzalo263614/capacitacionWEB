@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import Swal from 'sweetalert2';
+import { formatDate } from '@angular/common';
 @Component({
   selector: 'app-jefe',
   templateUrl: './jefe.component.html',
@@ -101,8 +102,9 @@ export class JefeComponent {
     this.carrerasAtendidas = curso.carreras_atendidas;
     this.periodo = curso.periodo;
     this.turno = curso.turno;
-    this.fechaInicio = curso.fecha_inicio; // Asegúrate de que el campo sea correcto
-    this.fechaFin = curso.fecha_fin;       // Asegúrate de que el campo sea correcto
+    // Convertir fecha al formato YYYY-MM-DD
+    this.fechaInicio = formatDate(curso.fecha_inicio, 'yyyy-MM-dd', 'en');
+    this.fechaFin = formatDate(curso.fecha_fin, 'yyyy-MM-dd', 'en');
     this.justificacion = curso.justificacion;
     this.numeroHoras = curso.numero_horas;
     this.horario = curso.horario;
@@ -110,8 +112,6 @@ export class JefeComponent {
     this.requisitos = curso.requisitos;
     this.tipoCurso = curso.tipo_curso;
     this.enfoqueCurso = curso.enfoque_curso;
-    
-
     // Instructor
     this.nombreInstructor = curso.nombre_instructor;
     this.apellidopaternoInstructor = curso.apellidopaterno_instructor;
@@ -122,7 +122,15 @@ export class JefeComponent {
     this.emailInstructor = curso.email_instructor;
     this.sexoInstructor = curso.sexo_instructor;
     this.tipoContratoInstructor = curso.tipo_contrato_instructor;
+    // Cargar los departamentos del curso seleccionado
+    if (curso.departamentos && Array.isArray(curso.departamentos)) {
+      this.departamentosSeleccionados = curso.departamentos.map((departamento: any) => departamento.nombre);
+    } else {
+      this.departamentosSeleccionados = [];
+    }
+    console.log('Departamentos seleccionados al abrir formulario:', this.departamentosSeleccionados);
   }
+  
   modificarCursoConfirmado() {
     // Eliminar el curso anterior en el orden especificado
     this.eliminarCurso(this.cursoSeleccionado.id)
@@ -181,7 +189,7 @@ export class JefeComponent {
       lugar: this.lugar,
       requisitos: this.requisitos,
       tipo_curso: this.tipoCurso,
-      enfoque_curso: this.enfoqueCurso, 
+      enfoque_curso: this.enfoqueCurso,
       nombre_instructor: this.nombreInstructor,
       apellidopaterno_instructor: this.apellidopaternoInstructor,
       apellidomaterno_instructor: this.apellidomaternoInstructor,
@@ -283,5 +291,4 @@ export class JefeComponent {
     // Alternar visibilidad: mostrar solo si actualmente está oculto
     this.encuestaVisible[cursoId] = this.encuestaVisible[cursoId] === maestroId ? null : maestroId;
   }
-
 }

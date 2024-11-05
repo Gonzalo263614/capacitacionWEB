@@ -1360,8 +1360,8 @@ app.get('/descargar2-curso/:id', (req, res) => {
             const departamentos = departamentoResults.map(dept => dept.nombre).join(', ');
 
             // Generamos el contenido del CSV incluyendo la columna de departamentos
-            let csv = 'id,nombre_curso,tipo_curso,objetivo,justificacion,fecha_inicio,fecha_fin,numero_horas,horario,lugar,requisitos,nombre_instructor,apellidopaterno_instructor,apellidomaterno_instructor,departamentos\n';
-            csv += `${curso.id},${curso.nombre_curso},${curso.tipo_curso},${curso.objetivo},${curso.justificacion},${curso.fecha_inicio},${curso.fecha_fin},${curso.numero_horas},${curso.horario},${curso.lugar},${curso.requisitos},${curso.nombre_instructor},${curso.apellidopaterno_instructor},${curso.apellidomaterno_instructor},"${departamentos}"\n`;
+            let csv = 'id,nombre_curso,tipo_curso,enfoque_curso,objetivo,justificacion,fecha_inicio,fecha_fin,numero_horas,horario,lugar,requisitos,nombre_instructor,apellidopaterno_instructor,apellidomaterno_instructor,departamentos\n';
+            csv += `${curso.id},${curso.nombre_curso},${curso.tipo_curso},${curso.enfoque_curso},${curso.objetivo},${curso.justificacion},${curso.fecha_inicio},${curso.fecha_fin},${curso.numero_horas},${curso.horario},${curso.lugar},${curso.requisitos},${curso.nombre_instructor},${curso.apellidopaterno_instructor},${curso.apellidomaterno_instructor},"${departamentos}"\n`;
 
             // Configura los encabezados para la descarga del archivo con codificación UTF-8
             res.setHeader('Content-Type', 'text/csv; charset=utf-8');
@@ -1700,6 +1700,26 @@ app.get('/descargar-inscripcion/:id', (req, res) => {
         res.setHeader('Content-Type', 'text/csv; charset=utf-8');
         res.setHeader('Content-Disposition', `attachment; filename="Inscripciones_${results[0].nombre_curso}.csv"`);
         res.status(200).send('\uFEFF' + csv); // Agrega BOM para UTF-8
+    });
+});
+// En tu servidor Express
+app.get('/curso/:cursoId/departamentos', (req, res) => {
+    const cursoId = req.params.cursoId;
+
+    const query = `
+      SELECT d.nombre 
+      FROM departamentos d
+      JOIN departamento_curso dc ON d.id = dc.departamento_id
+      WHERE dc.curso_id = ?
+    `;
+
+    db.query(query, [cursoId], (error, results) => {
+        if (error) {
+            console.error('Error al obtener departamentos:', error);
+            res.status(500).send('Error al obtener departamentos');
+        } else {
+            res.json(results);
+        }
     });
 });
 
