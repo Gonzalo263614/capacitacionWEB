@@ -189,7 +189,7 @@
       <option value="carrera generica">Carrera Genérica</option>
       <option value="modulo especialidad">Módulo de Especialidad</option>
     </select>
-    
+
     <label>Enfoque de Curso</label>
     <select [(ngModel)]="enfoqueCurso" name="enfoqueCurso" required>
       <option value="Reforzamiento">Reforzamiento</option>
@@ -286,7 +286,8 @@
       <option value="honorarios">Honorarios</option>
       <option value="no aplica">No Aplica</option>
     </select>
-
+    <!-- Botón para cerrar el formulario -->
+    <button type="button" class="btn-close" (click)="cerrarFormulario()">Cerrar</button>
     <button type="submit" class="btn-submit">Guardar Cambios</button>
   </form>
 </div>

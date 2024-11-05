@@ -130,7 +130,7 @@ export class JefeComponent {
     }
     console.log('Departamentos seleccionados al abrir formulario:', this.departamentosSeleccionados);
   }
-  
+
   modificarCursoConfirmado() {
     // Eliminar el curso anterior en el orden especificado
     this.eliminarCurso(this.cursoSeleccionado.id)
@@ -291,4 +291,8 @@ export class JefeComponent {
     // Alternar visibilidad: mostrar solo si actualmente está oculto
     this.encuestaVisible[cursoId] = this.encuestaVisible[cursoId] === maestroId ? null : maestroId;
   }
+  cerrarFormulario() {
+    this.mostrarFormularioModificar = false;
+  }
+
 }

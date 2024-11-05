@@ -247,3 +247,29 @@ p {
     border-radius: 8px;
     border: 1px solid #d0e3f5;
 }
+
+.btn-close {
+    background-color: #f44336;
+    /* Color rojo */
+    color: white;
+    /* Texto blanco */
+    border: none;
+    /* Sin borde */
+    border-radius: 4px;
+    /* Bordes redondeados */
+    padding: 10px 20px;
+    /* Espaciado interno */
+    cursor: pointer;
+    /* Cursor de mano */
+    font-size: 16px;
+    /* Tamaño de fuente */
+    margin-top: 15px;
+    /* Espaciado superior */
+    transition: background-color 0.3s;
+    /* Transición suave al pasar el mouse */
+}
+
+.btn-close:hover {
+    background-color: #d32f2f;
+    /* Color rojo más oscuro al pasar el mouse */
+}
