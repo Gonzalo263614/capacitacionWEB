@@ -36,6 +36,9 @@ export class JefeComponent {
   lugar = '';
   requisitos = '';
   tipoCurso = '';
+  // Enfoque de curso
+  enfoqueCurso = '';
+
 
   // Datos del instructor
   nombreInstructor = '';
@@ -106,6 +109,8 @@ export class JefeComponent {
     this.lugar = curso.lugar;
     this.requisitos = curso.requisitos;
     this.tipoCurso = curso.tipo_curso;
+    this.enfoqueCurso = curso.enfoque_curso;
+    
 
     // Instructor
     this.nombreInstructor = curso.nombre_instructor;
@@ -176,6 +181,7 @@ export class JefeComponent {
       lugar: this.lugar,
       requisitos: this.requisitos,
       tipo_curso: this.tipoCurso,
+      enfoque_curso: this.enfoqueCurso, 
       nombre_instructor: this.nombreInstructor,
       apellidopaterno_instructor: this.apellidopaternoInstructor,
       apellidomaterno_instructor: this.apellidomaternoInstructor,
@@ -220,6 +226,7 @@ export class JefeComponent {
     this.lugar = '';
     this.requisitos = '';
     this.tipoCurso = '';
+    this.enfoqueCurso = '';
     this.nombreInstructor = '';
     this.apellidopaternoInstructor = '';
     this.apellidomaternoInstructor = '';

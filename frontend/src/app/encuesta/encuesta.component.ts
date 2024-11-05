@@ -19,7 +19,6 @@ export class EncuestaComponent implements OnInit {
   respuestas2: number[] = Array(7).fill(0);
   respuestas3: number[] = Array(2).fill(0);
   respuestas4: number[] = Array(4).fill(0);
-  respuestas5: number[] = Array(6).fill(0);
   sugerencias: string = '';
   encuestaRespondida: boolean = false; // Nueva propiedad
   private apiUrl = 'http://localhost:3000/api/encuesta';

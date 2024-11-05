@@ -222,7 +222,7 @@ app.post('/proponer-curso', (req, res) => {
     const {
         nombre_curso, asignaturas_requeridas, contenidos_requeridos, numero_docentes, tipo_asignatura, actividad_evento,
         objetivo, carreras_atendidas, periodo, turno, fecha_inicio, fecha_fin, justificacion,
-        numero_horas, horario, lugar, requisitos, tipo_curso, nombre_instructor, apellidopaterno_instructor, apellidomaterno_instructor,
+        numero_horas, horario, lugar, requisitos, tipo_curso, enfoque_curso, nombre_instructor, apellidopaterno_instructor, apellidomaterno_instructor,
         curp_instructor, rfc_instructor, maxestudios_instructor, email_instructor, password_instructor, sexo_instructor, tipo_contrato_instructor,
         departamentosSeleccionados, id_jefe  // <-- Asegúrate de recibir `id_jefe`
     } = req.body;
@@ -230,14 +230,14 @@ app.post('/proponer-curso', (req, res) => {
     const queryInsertCurso = `INSERT INTO cursos_propuestos (
         nombre_curso, asignaturas_requeridas, contenidos_requeridos, numero_docentes, tipo_asignatura, actividad_evento,
         objetivo, carreras_atendidas, periodo, turno, fecha_inicio, fecha_fin, justificacion, numero_horas, horario, lugar, 
-        requisitos, tipo_curso, nombre_instructor, apellidopaterno_instructor, apellidomaterno_instructor, curp_instructor,
+        requisitos, tipo_curso,enfoque_curso, nombre_instructor, apellidopaterno_instructor, apellidomaterno_instructor, curp_instructor,
         rfc_instructor, maxestudios_instructor, email_instructor, password_instructor, sexo_instructor, tipo_contrato_instructor
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
     connection.query(queryInsertCurso, [
         nombre_curso, asignaturas_requeridas, contenidos_requeridos, numero_docentes, tipo_asignatura, actividad_evento,
         objetivo, carreras_atendidas, periodo, turno, fecha_inicio, fecha_fin, justificacion, numero_horas, horario, lugar,
-        requisitos, tipo_curso, nombre_instructor, apellidopaterno_instructor, apellidomaterno_instructor, curp_instructor,
+        requisitos, tipo_curso, enfoque_curso, nombre_instructor, apellidopaterno_instructor, apellidomaterno_instructor, curp_instructor,
         rfc_instructor, maxestudios_instructor, email_instructor, password_instructor, sexo_instructor, tipo_contrato_instructor
     ], (err, result) => {
         if (err) {
@@ -740,12 +740,12 @@ app.get('/asistencias/:cursoId/:usuarioId', (req, res) => {
 
 // Ruta para recibir los datos de la encuesta
 app.post('/api/encuesta', (req, res) => {
-    const { id_inscripcion, respuestas1, respuestas2, respuestas3, respuestas4, respuestas5, sugerencias } = req.body;
+    const { id_inscripcion, respuestas1, respuestas2, respuestas3, respuestas4, sugerencias } = req.body;
 
     // Construir una consulta SQL para insertar los datos
     const query = `
-  INSERT INTO encuestas (id_inscripcion, respuestas_seccion1, respuestas_seccion2, respuestas_seccion3, respuestas_seccion4, respuestas_seccion5, sugerencias)
-  VALUES (?, ?, ?, ?, ?, ?, ?)
+  INSERT INTO encuestas (id_inscripcion, respuestas_seccion1, respuestas_seccion2, respuestas_seccion3, respuestas_seccion4, sugerencias)
+  VALUES (?, ?, ?, ?, ?, ?)
 `;
 
     const values = [
@@ -754,7 +754,6 @@ app.post('/api/encuesta', (req, res) => {
         JSON.stringify(respuestas2),
         JSON.stringify(respuestas3),
         JSON.stringify(respuestas4),
-        JSON.stringify(respuestas5),
         sugerencias
     ];
 
