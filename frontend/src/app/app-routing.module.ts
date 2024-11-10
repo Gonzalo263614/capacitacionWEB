@@ -13,6 +13,7 @@ import { CursoComponent } from './curso/curso.component';
 import { EncuestaComponent } from './encuesta/encuesta.component';
 import { EncuestajefeComponent } from './encuestajefe/encuestajefe.component';
 import { DetalleCursoAdminComponent } from './detalle-curso-admin/detalle-curso-admin.component';
+import { SubdirectorComponent } from './subdirector/subdirector.component';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -23,7 +24,7 @@ const routes: Routes = [
   { path: 'jefe', component: JefeComponent },
   { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },
   { path: '', redirectTo: '/login', pathMatch: 'full' },
-  
+  { path: 'subdirector', component: SubdirectorComponent },
   // Ruta para ver el detalle del curso
   { path: 'curso/:id/detalle', component: CursoDetalleComponent }, 
   

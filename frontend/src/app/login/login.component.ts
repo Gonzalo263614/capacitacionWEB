@@ -37,6 +37,8 @@ export class LoginComponent {
             this.router.navigate(['/instructor']);
           } else if (response.rol === 'jefe') {
             this.router.navigate(['/jefe']);
+          }else if (response.rol === 'subdirector') {
+            this.router.navigate(['/subdirector']);
           }
         },
         error: (err) => {
