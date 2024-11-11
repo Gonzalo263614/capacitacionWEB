@@ -2,6 +2,8 @@ import { Component } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import Swal from 'sweetalert2';
 import { formatDate } from '@angular/common';
+import { ActivatedRoute } from '@angular/router';
+
 @Component({
   selector: 'app-jefe',
   templateUrl: './jefe.component.html',
@@ -56,6 +58,10 @@ export class JefeComponent {
   // Contraseña generada automáticamente
   passwordInstructor = 'contraseña1234';  // Contraseña predeterminada
 
+  selectedFile: File | null = null;
+  uploadSuccess: boolean | null = null;
+  uploadError: boolean | null = null;
+
   departamentosAcademicos = [
     'Ciencias Básicas',
     'Ciencias Económico - Administrativas',
@@ -69,7 +75,7 @@ export class JefeComponent {
   departamentosSeleccionados: string[] = [];
   idJefe = 1;  // Por ejemplo, esto podría provenir del sistema de autenticación
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient,private route: ActivatedRoute) {
     this.obtenerCursosPendientes(); // Llamar a la función al iniciar el componente
   }
   ngOnInit(): void {
@@ -294,5 +300,42 @@ export class JefeComponent {
   cerrarFormulario() {
     this.mostrarFormularioModificar = false;
   }
+  // Manejar la selección del archivo
+  onFileSelected(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
+      this.selectedFile = file;
+    }
+  }
 
+  // Enviar el archivo al servidor
+  onSubmit() {
+    
+    const usuarioId = localStorage.getItem('userId');
+    const formData = new FormData();
+    console.log(usuarioId);
+
+    if (!usuarioId || !cursoId) {
+      console.error('usuarioId o cursoId son null. Asegúrate de que existen en la ruta.');
+      return;
+    }
+
+    if (this.selectedFile) {
+      formData.append('archivo', this.selectedFile);
+      formData.append('usuarioId', usuarioId);
+      formData.append('cursoId', cursoId);
+
+      this.http.post('http://localhost:3000/uploads2', formData, { responseType: 'text' })
+        .subscribe({
+          next: (response) => {
+            console.log('Respuesta del servidor:', response);
+            this.uploadSuccess = true;
+          },
+          error: (error) => {
+            console.error('Error al subir archivo', error);
+            this.uploadError = true;
+          }
+        });
+    }
+  }
 }

@@ -1378,6 +1378,34 @@ app.post('/uploads', upload.single('archivo'), (req, res) => {
         });
     });
 });
+// Ruta para subir archivos a la tabla archivos_curso
+app.post('/uploads2', upload.single('archivo'), (req, res) => {
+    const archivo = req.file;
+    const jefeId = req.body.jefeId;
+    const cursoId = req.body.cursoId;
+
+    if (!archivo) {
+        return res.status(400).json({ error: 'No se ha subido ningún archivo' });
+    }
+    if (!jefeId || !cursoId) {
+        return res.status(400).json({ error: 'ID de jefe o curso no válidos.' });
+    }
+
+    // Leer el archivo y guardar en la base de datos
+    const archivoData = fs.readFileSync(archivo.path);
+    const sqlInsertArchivo = 'INSERT INTO archivos_curso (nombre_archivo, archivo, curso_id, jefe_id) VALUES (?, ?, ?, ?)';
+    const values = [archivo.originalname, archivoData, cursoId, jefeId];
+
+    // Insertar el archivo en la tabla archivos_curso
+    connection.query(sqlInsertArchivo, values, (err) => {
+        if (err) {
+            console.error('Error al guardar el archivo en la base de datos:', err.message);
+            return res.status(500).send('Error al guardar el archivo en la base de datos.');
+        }
+        res.status(200).send('Archivo subido exitosamente.');
+    });
+});
+
 app.get('/asistencias/count/:usuarioId/:cursoId', (req, res) => {
     const { usuarioId, cursoId } = req.params;
     const query = `
@@ -1532,6 +1560,52 @@ app.get('/descargar2-curso/:id', (req, res) => {
     });
 });
 
+app.get('/descargar3-curso/:id', (req, res) => {
+    const cursoId = req.params.id;
+    const cursoQuery = `
+        SELECT id, nombre_curso, tipo_curso, objetivo, periodo, fecha_inicio, fecha_fin, lugar, requisitos
+        FROM cursos_propuestos
+        WHERE id = ?
+    `;
+    const departamentosQuery = `
+        SELECT d.nombre 
+        FROM departamento_curso dc 
+        JOIN departamentos d ON dc.departamento_id = d.id 
+        WHERE dc.curso_id = ?
+    `;
+
+    // Primero obtenemos el curso
+    connection.query(cursoQuery, [cursoId], (error, cursoResults) => {
+        if (error) {
+            return res.status(500).send('Error al consultar la base de datos');
+        }
+
+        if (cursoResults.length === 0) {
+            return res.status(404).send('Curso no encontrado');
+        }
+
+        const curso = cursoResults[0];
+
+        // Luego, obtenemos los departamentos relacionados al curso
+        connection.query(departamentosQuery, [cursoId], (error, departamentoResults) => {
+            if (error) {
+                return res.status(500).send('Error al consultar los departamentos');
+            }
+
+            // Unimos los nombres de los departamentos en una sola cadena, separados por comas
+            const departamentos = departamentoResults.map(dept => dept.nombre).join(', ');
+
+            // Generamos el contenido del CSV incluyendo la columna de departamentos
+            let csv = 'id,nombre_curso,tipo_curso,objetivo,periodo,fecha_inicio,fecha_fin,lugar,departamentos,requisitos\n';
+            csv += `${curso.id},${curso.nombre_curso},${curso.tipo_curso},${curso.objetivo},${curso.periodo},${curso.fecha_inicio},${curso.fecha_fin},${curso.lugar},"${departamentos}",${curso.requisitos}\n`;
+
+            // Configura los encabezados para la descarga del archivo con codificación UTF-8
+            res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+            res.setHeader('Content-Disposition', `attachment; filename="${curso.nombre_curso}_DATOS.csv"`);
+            res.status(200).send('\uFEFF' + csv); // Agrega BOM al inicio para que Excel reconozca UTF-8
+        });
+    });
+});
 
 const { Parser } = require('json2csv'); // Necesario para exportar a CSV
 

@@ -138,6 +138,13 @@
       <option value="no aplica">No Aplica</option>
     </select>
 
+    <h2 class="section-title">Criterios para seleccion del Instructor</h2>
+    <form class="file-upload-form">
+      <label for="file">Seleccionar archivo:</label>
+      <input type="file" (change)="onFileSelected($event)">
+      <button type="button" (click)="onSubmit()" class="upload-button">Subir archivo</button>
+    </form>
+
     <!-- Contraseña generada automáticamente -->
     <label>Contraseña del Instructor (Generada Automáticamente)</label>
     <input [(ngModel)]="passwordInstructor" name="passwordInstructor" readonly>
