@@ -1534,6 +1534,7 @@ app.get('/descargar2-curso/:id', (req, res) => {
 
 
 const { Parser } = require('json2csv'); // Necesario para exportar a CSV
+
 // Preguntas para cada sección
 const preguntasSeccion1 = [
     'PERMITIÓ QUE LOS CONOCIMIENTOS ADQUIRIDOS TENGAN APLICACIÓN EN MI ÁMBITO LABORAL A CORTO Y MEDIANO PLAZO.',
@@ -1588,7 +1589,15 @@ app.get('/descargar-encuestas/:cursoId', (req, res) => {
             return res.status(404).send('No se encontraron inscripciones para este curso.');
         }
 
-        connection.query('SELECT * FROM encuestas WHERE id_inscripcion IN (?)', [idsInscripcion], (err, encuestas) => {
+        // Obtener encuestas con los datos adicionales
+        connection.query(`
+            SELECT e.*, i.id AS inscripcion_id, u.nombre, u.apellidopaterno, u.apellidomaterno, u.curp, c.nombre_curso
+            FROM encuestas e
+            JOIN inscripciones i ON e.id_inscripcion = i.id
+            JOIN usuarios u ON i.usuario_id = u.id
+            JOIN cursos_propuestos c ON i.curso_id = c.id
+            WHERE e.id_inscripcion IN (?)
+        `, [idsInscripcion], (err, encuestas) => {
             if (err) {
                 console.error('Error al obtener encuestas:', err);
                 return res.status(500).send('Error al obtener encuestas.');
@@ -1627,6 +1636,9 @@ app.get('/descargar-encuestas/:cursoId', (req, res) => {
                 return {
                     id: encuesta.id,
                     id_inscripcion: encuesta.id_inscripcion,
+                    nombre_usuario: `${encuesta.nombre} ${encuesta.apellidopaterno} ${encuesta.apellidomaterno}`,
+                    curp_usuario: encuesta.curp,
+                    nombre_curso: encuesta.nombre_curso,
                     seccion1: seccion1,
                     seccion2: seccion2,
                     seccion3: seccion3,
@@ -1640,35 +1652,51 @@ app.get('/descargar-encuestas/:cursoId', (req, res) => {
                 encuesta.seccion1.map(item => ({
                     id: encuesta.id,
                     id_inscripcion: encuesta.id_inscripcion,
+                    nombre_usuario: encuesta.nombre_usuario,
+                    curp_usuario: encuesta.curp_usuario,
+                    nombre_curso: encuesta.nombre_curso,
                     pregunta: item.pregunta,
                     respuesta: item.respuesta,
-                    seccion: 'Sección 1'
+                    seccion: 'Sección 1',
+                    sugerencias: encuesta.sugerencias // Incluir las sugerencias aquí
                 })).concat(
                     encuesta.seccion2.map(item => ({
                         id: encuesta.id,
                         id_inscripcion: encuesta.id_inscripcion,
+                        nombre_usuario: encuesta.nombre_usuario,
+                        curp_usuario: encuesta.curp_usuario,
+                        nombre_curso: encuesta.nombre_curso,
                         pregunta: item.pregunta,
                         respuesta: item.respuesta,
-                        seccion: 'Sección 2'
+                        seccion: 'Sección 2',
+                        sugerencias: encuesta.sugerencias // Incluir las sugerencias aquí
                     })),
                     encuesta.seccion3.map(item => ({
                         id: encuesta.id,
                         id_inscripcion: encuesta.id_inscripcion,
+                        nombre_usuario: encuesta.nombre_usuario,
+                        curp_usuario: encuesta.curp_usuario,
+                        nombre_curso: encuesta.nombre_curso,
                         pregunta: item.pregunta,
                         respuesta: item.respuesta,
-                        seccion: 'Sección 3'
+                        seccion: 'Sección 3',
+                        sugerencias: encuesta.sugerencias // Incluir las sugerencias aquí
                     })),
                     encuesta.seccion4.map(item => ({
                         id: encuesta.id,
                         id_inscripcion: encuesta.id_inscripcion,
+                        nombre_usuario: encuesta.nombre_usuario,
+                        curp_usuario: encuesta.curp_usuario,
+                        nombre_curso: encuesta.nombre_curso,
                         pregunta: item.pregunta,
                         respuesta: item.respuesta,
-                        seccion: 'Sección 4'
+                        seccion: 'Sección 4',
+                        sugerencias: encuesta.sugerencias // Incluir las sugerencias aquí
                     }))
                 )
             );
 
-            const fields = ['id', 'id_inscripcion', 'pregunta', 'respuesta', 'seccion'];
+            const fields = ['id', 'id_inscripcion', 'nombre_usuario', 'curp_usuario', 'nombre_curso', 'pregunta', 'respuesta', 'seccion', 'sugerencias'];
             const json2csvParser = new Parser({ fields });
             const csv = json2csvParser.parse(csvData);
 
@@ -1681,6 +1709,8 @@ app.get('/descargar-encuestas/:cursoId', (req, res) => {
         });
     });
 });
+
+
 // Define las preguntas al inicio del archivo
 const preguntas = [
     'LOS CONOCIMIENTOS QUE ADQUIRIÓ SU COLABORADOR(A) EN EL CURSO TIENE APLICACIÓN EN EL ÁMBITO LABORAL A CORTO Y MEDIANO PLAZO.',
@@ -1703,74 +1733,95 @@ app.get('/descargar-encuestas-jefe/:cursoId', (req, res) => {
     const cursoId = req.params.cursoId;
 
     // Primero, obtenemos las inscripciones para el curso
-    connection.query('SELECT id FROM inscripciones WHERE curso_id = ?', [cursoId], (err, inscripciones) => {
-        if (err) {
-            console.error('Error al obtener inscripciones:', err);
-            return res.status(500).send('Error al obtener inscripciones.');
-        }
-
-        const idsInscripcion = inscripciones.map(inscripcion => inscripcion.id);
-
-        if (!idsInscripcion.length) {
-            return res.status(404).send('No se encontraron inscripciones para este curso.');
-        }
-
-        // Ahora obtenemos las encuestas para esos ids de inscripción
-        connection.query('SELECT * FROM encuesta_jefe WHERE inscripcion_id IN (?)', [idsInscripcion], (err, encuestas) => {
+    connection.query(
+        `SELECT i.id AS inscripcion_id, u.nombre, u.apellidopaterno, u.apellidomaterno, u.curp, c.nombre_curso
+         FROM inscripciones i
+         JOIN usuarios u ON i.usuario_id = u.id
+         JOIN cursos_propuestos c ON i.curso_id = c.id
+         WHERE i.curso_id = ?`,
+        [cursoId],
+        (err, inscripciones) => {
             if (err) {
-                console.error('Error al obtener encuestas de jefe:', err);
-                return res.status(500).send('Error al obtener encuestas de jefe.');
+                console.error('Error al obtener inscripciones:', err);
+                return res.status(500).send('Error al obtener inscripciones.');
             }
 
-            if (!encuestas.length) {
-                return res.status(404).send('No se encontraron encuestas de jefe para estas inscripciones.');
+            if (!inscripciones.length) {
+                return res.status(404).send('No se encontraron inscripciones para este curso.');
             }
 
-            // Transformamos los datos de las encuestas
-            const encuestasTransformadas = encuestas.map(encuesta => {
-                const respuestasSeccion1 = encuesta.respuestas_seccion1 || [];
+            // Ahora obtenemos las encuestas para esos ids de inscripción
+            const inscripcionesIds = inscripciones.map(inscripcion => inscripcion.inscripcion_id);
 
-                // Crear secciones con preguntas y respuestas
-                const seccion1 = respuestasSeccion1.map((respuesta, index) => ({
-                    pregunta: preguntas[index] || `Pregunta ${index + 1}`,
-                    respuesta: respuesta
-                }));
+            connection.query(
+                'SELECT * FROM encuesta_jefe WHERE inscripcion_id IN (?)',
+                [inscripcionesIds],
+                (err, encuestas) => {
+                    if (err) {
+                        console.error('Error al obtener encuestas de jefe:', err);
+                        return res.status(500).send('Error al obtener encuestas de jefe.');
+                    }
 
-                return {
-                    id: encuesta.id,
-                    inscripcion_id: encuesta.inscripcion_id,
-                    seccion1: seccion1,
-                    sugerencias: encuesta.sugerencias,
-                    fecha: encuesta.fecha
-                };
-            });
+                    if (!encuestas.length) {
+                        return res.status(404).send('No se encontraron encuestas de jefe para estas inscripciones.');
+                    }
 
-            // Preparar el CSV
-            const csvData = encuestasTransformadas.flatMap(encuesta =>
-                encuesta.seccion1.map(item => ({
-                    id: encuesta.id,
-                    inscripcion_id: encuesta.inscripcion_id,
-                    pregunta: item.pregunta,
-                    respuesta: item.respuesta,
-                    seccion: 'Sección 1'
-                }))
+                    // Transformamos los datos de las encuestas
+                    const encuestasTransformadas = encuestas.map(encuesta => {
+                        const respuestasSeccion1 = encuesta.respuestas_seccion1 || [];
+
+                        // Crear secciones con preguntas y respuestas
+                        const seccion1 = respuestasSeccion1.map((respuesta, index) => ({
+                            pregunta: preguntas[index] || `Pregunta ${index + 1}`,
+                            respuesta: respuesta
+                        }));
+
+                        return {
+                            id: encuesta.id,
+                            inscripcion_id: encuesta.inscripcion_id,
+                            seccion1: seccion1,
+                            sugerencias: encuesta.sugerencias,
+                            fecha: encuesta.fecha
+                        };
+                    });
+
+                    // Preparar los datos del CSV
+                    const csvData = encuestasTransformadas.flatMap(encuesta => {
+                        // Buscar la inscripción y curso correspondiente
+                        const inscripcion = inscripciones.find(i => i.inscripcion_id === encuesta.inscripcion_id);
+                        const { nombre, apellidopaterno, apellidomaterno, curp, nombre_curso } = inscripcion;
+
+                        return encuesta.seccion1.map(item => ({
+                            id: encuesta.id,
+                            inscripcion_id: encuesta.inscripcion_id,
+                            nombre_completo: `${nombre} ${apellidopaterno} ${apellidomaterno}`,
+                            curp: curp,
+                            curso: nombre_curso,
+                            pregunta: item.pregunta,
+                            respuesta: item.respuesta,
+                            sugerencias: encuesta.sugerencias,
+                            seccion: 'Sección 1'
+                        }));
+                    });
+
+                    const fields = ['id', 'inscripcion_id', 'nombre_completo', 'curp', 'curso', 'pregunta', 'respuesta', 'sugerencias', 'seccion'];
+                    const json2csvParser = new Parser({ fields });
+                    const csv = json2csvParser.parse(csvData);
+
+                    // Agregar BOM para UTF-8
+                    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+                    res.setHeader('Content-Disposition', `attachment; filename="Encuestas_Jefe_${cursoId}.csv"`);
+                    res.send('\uFEFF' + csv); // Enviar CSV con BOM
+                }
             );
-
-            const fields = ['id', 'inscripcion_id', 'pregunta', 'respuesta', 'seccion'];
-            const json2csvParser = new Parser({ fields });
-            const csv = json2csvParser.parse(csvData);
-
-            // Agregar BOM para UTF-8
-            res.setHeader('Content-Type', 'text/csv; charset=utf-8');
-            res.setHeader('Content-Disposition', `attachment; filename="Encuestas_Jefe_${cursoId}.csv"`);
-            res.send('\uFEFF' + csv); // Enviar CSV con BOM
-        });
-    });
+        }
+    );
 });
+
 app.get('/descargar-calificaciones/:id', (req, res) => {
     const cursoId = req.params.id;
     const query = `
-        SELECT c.id AS curso_id, c.nombre_curso, u.nombre, u.apellidopaterno, u.apellidomaterno, cal.calificacion, cal.fecha 
+        SELECT c.id AS curso_id, c.nombre_curso, u.nombre, u.apellidopaterno, u.apellidomaterno, u.curp, u.departamento, cal.calificacion, cal.fecha 
         FROM calificaciones cal 
         JOIN usuarios u ON cal.usuario_id = u.id 
         JOIN cursos_propuestos c ON cal.curso_id = c.id 
@@ -1786,11 +1837,11 @@ app.get('/descargar-calificaciones/:id', (req, res) => {
             return res.status(404).send('No se encontraron calificaciones para este curso');
         }
 
-        // Genera el contenido CSV
-        let csv = 'curso_id,nombre_curso,nombre_usuario,apellidopaterno,apellidomaterno,calificacion,fecha\n';
+        // Genera el contenido CSV con CURP y Departamento
+        let csv = 'curso_id,nombre_curso,nombre_usuario,apellidopaterno,apellidomaterno,curp,departamento,calificacion,fecha\n';
 
         results.forEach(row => {
-            csv += `${row.curso_id},"${row.nombre_curso}","${row.nombre}","${row.apellidopaterno}","${row.apellidomaterno}",${row.calificacion},"${row.fecha}"\n`;
+            csv += `${row.curso_id},"${row.nombre_curso}","${row.nombre}","${row.apellidopaterno}","${row.apellidomaterno}","${row.curp}","${row.departamento}",${row.calificacion},"${row.fecha}"\n`;
         });
 
         // Configura los encabezados para la descarga del archivo con codificación UTF-8
@@ -1799,14 +1850,28 @@ app.get('/descargar-calificaciones/:id', (req, res) => {
         res.status(200).send('\uFEFF' + csv); // Agrega BOM al inicio para UTF-8
     });
 });
+
 app.get('/descargar-asistencias/:id', (req, res) => {
     const cursoId = req.params.id;
     const query = `
-        SELECT a.id AS asistencia_id, c.nombre_curso, u.nombre, u.apellidopaterno, u.apellidomaterno, a.fecha, a.asistencia 
+        SELECT 
+            a.id AS asistencia_id,
+            c.nombre_curso, 
+            u.nombre, 
+            u.apellidopaterno, 
+            u.apellidomaterno, 
+            u.curp, 
+            u.departamento AS usuario_departamento,
+            GROUP_CONCAT(d.nombre) AS curso_departamentos,
+            a.fecha, 
+            a.asistencia
         FROM asistencias a
         JOIN usuarios u ON a.usuario_id = u.id 
         JOIN cursos_propuestos c ON a.curso_id = c.id 
+        LEFT JOIN departamento_curso dc ON c.id = dc.curso_id
+        LEFT JOIN departamentos d ON dc.departamento_id = d.id
         WHERE a.curso_id = ?
+        GROUP BY a.id, c.id, u.id
     `;
 
     connection.query(query, [cursoId], (error, results) => {
@@ -1818,11 +1883,11 @@ app.get('/descargar-asistencias/:id', (req, res) => {
             return res.status(404).send('No se encontraron asistencias para este curso');
         }
 
-        // Genera el contenido CSV
-        let csv = 'asistencia_id,nombre_curso,nombre_usuario,apellidopaterno,apellidomaterno,fecha,asistencia\n';
+        // Genera el contenido CSV con CURP, Departamento del Usuario y Departamentos del Curso
+        let csv = 'asistencia_id,nombre_curso,nombre_usuario,apellidopaterno,apellidomaterno,curp,usuario_departamento,curso_departamentos,fecha,asistencia\n';
 
         results.forEach(row => {
-            csv += `${row.asistencia_id},"${row.nombre_curso}","${row.nombre}","${row.apellidopaterno}","${row.apellidomaterno}","${row.fecha}",${row.asistencia}\n`;
+            csv += `${row.asistencia_id},"${row.nombre_curso}","${row.nombre}","${row.apellidopaterno}","${row.apellidomaterno}","${row.curp}","${row.usuario_departamento}","${row.curso_departamentos}","${row.fecha}",${row.asistencia}\n`;
         });
 
         // Configura los encabezados para la descarga del archivo con codificación UTF-8
@@ -1831,14 +1896,27 @@ app.get('/descargar-asistencias/:id', (req, res) => {
         res.status(200).send('\uFEFF' + csv); // Agrega BOM al inicio para UTF-8
     });
 });
+
 app.get('/descargar-inscripcion/:id', (req, res) => {
     const cursoId = req.params.id;
     const query = `
-        SELECT i.id AS inscripcion_id, c.nombre_curso, u.nombre, u.apellidopaterno, u.apellidomaterno, i.fecha_inscripcion
+        SELECT 
+            i.id AS inscripcion_id, 
+            c.nombre_curso, 
+            u.nombre, 
+            u.apellidopaterno, 
+            u.apellidomaterno, 
+            u.curp AS curp_usuario, 
+            u.departamento AS departamento_usuario, 
+            i.fecha_inscripcion,
+            GROUP_CONCAT(d.nombre ORDER BY d.nombre) AS departamentos_curso
         FROM inscripciones i
         JOIN usuarios u ON i.usuario_id = u.id
         JOIN cursos_propuestos c ON i.curso_id = c.id
+        LEFT JOIN departamento_curso dc ON dc.curso_id = c.id
+        LEFT JOIN departamentos d ON dc.departamento_id = d.id
         WHERE i.curso_id = ?
+        GROUP BY i.id, c.nombre_curso, u.id
     `;
 
     connection.query(query, [cursoId], (error, results) => {
@@ -1851,10 +1929,10 @@ app.get('/descargar-inscripcion/:id', (req, res) => {
         }
 
         // Genera el contenido CSV
-        let csv = 'inscripcion_id,nombre_curso,nombre_usuario,apellidopaterno,apellidomaterno,fecha_inscripcion\n';
+        let csv = 'inscripcion_id,nombre_curso,nombre_usuario,apellidopaterno,apellidomaterno,curp_usuario,departamento_usuario,fecha_inscripcion,departamentos_curso\n';
 
         results.forEach(row => {
-            csv += `${row.inscripcion_id},"${row.nombre_curso}","${row.nombre}","${row.apellidopaterno}","${row.apellidomaterno}","${row.fecha_inscripcion}"\n`;
+            csv += `${row.inscripcion_id},"${row.nombre_curso}","${row.nombre}","${row.apellidopaterno}","${row.apellidomaterno}","${row.curp_usuario}","${row.departamento_usuario}","${row.fecha_inscripcion}","${row.departamentos_curso}"\n`;
         });
 
         // Configura los encabezados para la descarga del archivo con codificación UTF-8
@@ -1863,6 +1941,7 @@ app.get('/descargar-inscripcion/:id', (req, res) => {
         res.status(200).send('\uFEFF' + csv); // Agrega BOM para UTF-8
     });
 });
+
 // En tu servidor Express
 app.get('/curso/:cursoId/departamentos', (req, res) => {
     const cursoId = req.params.cursoId;

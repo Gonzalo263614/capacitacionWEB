@@ -60,11 +60,23 @@ export class EncuestajefeComponent implements OnInit {
   }
 
   enviarEncuesta(): void {
+    // Verificar si todas las preguntas tienen una respuesta seleccionada
+    if (this.respuestas.includes(0)) {
+      alert('Por favor, responde todas las preguntas antes de enviar la encuesta.');
+      return;
+    }
+  
+    // Verificar si las sugerencias han sido proporcionadas
+    if (this.sugerencias.trim() === '') {
+      alert('Por favor, escribe tus sugerencias antes de enviar la encuesta.');
+      return;
+    }
+  
     if (this.cursoId === null) {
       console.error('El ID del curso no está disponible');
       return;
     }
-
+  
     const data = {
       usuarioId: this.usuarioId,
       cursoId: this.cursoId,
@@ -72,12 +84,12 @@ export class EncuestajefeComponent implements OnInit {
       respuestas: this.respuestas,
       sugerencias: this.sugerencias
     };
-
+  
     this.http.post(`${this.apiUrl}/guardar`, data).subscribe(
       response => {
         console.log('Encuesta enviada con éxito:', response);
         this.encuestaRespondida = true;
-
+  
         // Actualizar encuestajefes en la tabla usuario_requisitos
         this.actualizarEncuestaJefes();
       },
@@ -90,6 +102,7 @@ export class EncuestajefeComponent implements OnInit {
       }
     );
   }
+  
 
   actualizarEncuestaJefes(): void {
     const updateData = { idMaestro: this.idMaestro, cursoId: this.cursoId };

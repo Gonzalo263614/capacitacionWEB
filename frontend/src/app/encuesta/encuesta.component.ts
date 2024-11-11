@@ -94,43 +94,59 @@ export class EncuestaComponent implements OnInit {
   }
 
   enviarEncuesta(): void {
+    // Verifica si la encuesta ya ha sido respondida
     if (this.encuestaRespondida) {
       alert('Ya has respondido esta encuesta.');
       return;
     }
 
-    if (!this.idInscripcion) {
-      console.error('No se pudo obtener el id de inscripción');
-      return;
-    }
-
-    const encuestaData = {
-      id_inscripcion: this.idInscripcion,
-      respuestas1: this.respuestas,
-      respuestas2: this.respuestas2,
-      respuestas3: this.respuestas3,
-      respuestas4: this.respuestas4,
-      sugerencias: this.sugerencias
-    };
-
-    this.http.post(this.apiUrl, encuestaData).subscribe(
-      response => {
-        console.log('Encuesta enviada:', response);
-        alert('Encuesta enviada');
-        this.encuestaRespondida = true;
-
-        // Actualizar el campo encuesta1 en usuario_requisitos
-        this.http.post(`http://localhost:3000/api/encuesta/actualizar-encuesta/${this.usuarioId}/${this.cursoId}`, {})
-          .subscribe(
-            () => console.log('Campo encuesta1 actualizado en usuario_requisitos'),
-            err => console.error('Error al actualizar encuesta1 en usuario_requisitos:', err)
-          );
-      },
-      error => {
-        console.error('Error al enviar la encuesta:', error);
-        alert('Error al enviar la encuesta');
+    // Verifica que todas las preguntas hayan sido respondidas
+    if (this.todasLasPreguntasContestadas()) {
+      if (!this.idInscripcion) {
+        console.error('No se pudo obtener el id de inscripción');
+        return;
       }
-    );
+
+      const encuestaData = {
+        id_inscripcion: this.idInscripcion,
+        respuestas1: this.respuestas,
+        respuestas2: this.respuestas2,
+        respuestas3: this.respuestas3,
+        respuestas4: this.respuestas4,
+        sugerencias: this.sugerencias
+      };
+
+      this.http.post(this.apiUrl, encuestaData).subscribe(
+        response => {
+          console.log('Encuesta enviada:', response);
+          alert('Encuesta enviada');
+          this.encuestaRespondida = true;
+
+          // Actualizar el campo encuesta1 en usuario_requisitos
+          this.http.post(`http://localhost:3000/api/encuesta/actualizar-encuesta/${this.usuarioId}/${this.cursoId}`, {})
+            .subscribe(
+              () => console.log('Campo encuesta1 actualizado en usuario_requisitos'),
+              err => console.error('Error al actualizar encuesta1 en usuario_requisitos:', err)
+            );
+        },
+        error => {
+          console.error('Error al enviar la encuesta:', error);
+          alert('Error al enviar la encuesta');
+        }
+      );
+    } else {
+      alert('Faltan respuestas por contestar. Por favor, responde todas las preguntas.');
+    }
   }
 
+  // Función que verifica si todas las preguntas han sido contestadas
+  todasLasPreguntasContestadas(): boolean {
+    // Verifica que todas las respuestas de cada bloque de preguntas no estén vacías
+    return (
+      this.respuestas.every(respuesta => respuesta !== 0) &&
+      this.respuestas2.every(respuesta => respuesta !== 0) &&
+      this.respuestas3.every(respuesta => respuesta !== 0) &&
+      this.respuestas4.every(respuesta => respuesta !== 0)
+    );
+  }
 }
