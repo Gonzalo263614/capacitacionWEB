@@ -63,8 +63,9 @@
     <thead>
       <tr>
         <th>Nombre</th>
+        <th>Apellido Paterno</th>
+        <th>Apellido Materno</th>
         <th>Calificación</th>
-        <th>Acciones</th>
       </tr>
     </thead>
     <tbody>
@@ -75,13 +76,12 @@
         <td>
           <input type="number" [(ngModel)]="maestro.calificacion" placeholder="Calificación" />
         </td>
-        <td>
-          <button (click)="guardarCalificacion(maestro.id)" class="add-grade-button">Agregar Calificación</button>
-        </td>
       </tr>
     </tbody>
   </table>
+  <button (click)="guardarTodasLasCalificaciones()" class="save-button">Enviar Todas las Calificaciones</button>
 </div>
+
 
 <h2 class="section-title">Enviar archivos</h2>
 <form class="file-upload-form">

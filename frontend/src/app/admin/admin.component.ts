@@ -47,18 +47,53 @@ export class AdminComponent implements OnInit {
 
 
   actualizarEstado(id: number, estado: string) {
-    this.http.put(`http://localhost:3000/actualizar-curso/${id}`, { estado })
-      .subscribe(response => {
-        console.log(`Curso ${estado}:`, response);
-        if (estado === 'aceptado') {
-          this.registrarInstructor(id);
-        }
-        this.obtenerCursos();
-      }, error => {
-        console.error('Error al actualizar el curso:', error);
+    if (estado === 'aceptado') {
+      this.actualizarRequisitosCurso(id, 1).subscribe(() => {
+        this.verificarRequisitos(id);
       });
+    } else if (estado === 'rechazado') {
+      // Actualiza el campo orden_admin y el estado del curso a 'rechazado'
+      this.actualizarRequisitosCurso(id, 0).subscribe(() => {
+        this.http.put(`http://localhost:3000/actualizar-curso/${id}`, { estado: 'rechazado' })
+          .subscribe(() => {
+            console.log(`Curso ${id} rechazado y actualizado a 'rechazado'`);
+            this.obtenerCursos(); // Recarga los cursos para reflejar el cambio
+          }, error => {
+            console.error('Error al actualizar el estado del curso a "rechazado":', error);
+          });
+      });
+    }
+  }
+  
+  actualizarRequisitosCurso(cursoId: number, ordenAdmin: number) {
+    return this.http.put(`http://localhost:3000/actualizar-requisitos-curso/${cursoId}`, { orden_admin: ordenAdmin });
   }
 
+  verificarRequisitos(cursoId: number) {
+    // Verifica si ambos campos 'orden_admin' y 'orden_subdirector' son 1
+    this.http.get(`http://localhost:3000/verificar-requisitos-curso/${cursoId}`)
+      .subscribe((data: any) => {
+        if (data.orden_admin === 1 && data.orden_subdirector === 1) {
+          // Si ambos son 1, entonces acepta el curso
+          this.aceptarCurso(cursoId);
+        } else {
+          console.log('El curso aún no puede ser aceptado.');
+        }
+      }, error => {
+        console.error('Error al verificar los requisitos del curso:', error);
+      });
+  }
+  aceptarCurso(cursoId: number) {
+    // Actualiza el estado del curso a 'aceptado'
+    this.http.put(`http://localhost:3000/actualizar-curso/${cursoId}`, { estado: 'aceptado' })
+      .subscribe(response => {
+        console.log('Curso aceptado:', response);
+        this.registrarInstructor(cursoId); // Registra al instructor después de aceptar el curso
+        this.obtenerCursos(); // Recarga los cursos
+      }, error => {
+        console.error('Error al aceptar el curso:', error);
+      });
+  }
   registrarInstructor(cursoId: number) {
     this.http.get(`http://localhost:3000/cursos/${cursoId}`)
       .subscribe((curso: any) => {
@@ -108,15 +143,25 @@ export class AdminComponent implements OnInit {
 
   solicitarRevision(id: number, comentario: string) {
     const data = { estado: 'pendiente_revision', comentario };
-
-    this.http.put(`http://localhost:3000/actualizar-curso/${id}`, data)
-      .subscribe(response => {
-        console.log('Curso enviado para revisión:', response);
-        this.obtenerCursos(); // Vuelve a cargar los cursos para actualizar la lista
+  
+    // Primero, actualizamos la tabla requisitos_curso
+    this.http.put(`http://localhost:3000/actualizar-requisitos-curso/${id}`, { orden_admin: 0 })
+      .subscribe(() => {
+        console.log(`Requisitos del curso ${id} actualizados a 0`);
+  
+        // Luego, actualizamos el estado del curso a 'pendiente_revision'
+        this.http.put(`http://localhost:3000/actualizar-curso/${id}`, data)
+          .subscribe(response => {
+            console.log('Curso enviado para revisión:', response);
+            this.obtenerCursos(); // Vuelve a cargar los cursos para actualizar la lista
+          }, error => {
+            console.error('Error al solicitar revisión del curso:', error);
+          });
       }, error => {
-        console.error('Error al solicitar revisión del curso:', error);
+        console.error('Error al actualizar requisitos del curso:', error);
       });
   }
+  
 
 
   // Función para alternar la visibilidad de los cursos

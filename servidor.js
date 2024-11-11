@@ -224,13 +224,13 @@ app.post('/proponer-curso', (req, res) => {
         objetivo, carreras_atendidas, periodo, turno, fecha_inicio, fecha_fin, justificacion,
         numero_horas, horario, lugar, requisitos, tipo_curso, enfoque_curso, nombre_instructor, apellidopaterno_instructor, apellidomaterno_instructor,
         curp_instructor, rfc_instructor, maxestudios_instructor, email_instructor, password_instructor, sexo_instructor, tipo_contrato_instructor,
-        departamentosSeleccionados, id_jefe  // <-- Asegúrate de recibir `id_jefe`
+        departamentosSeleccionados, id_jefe
     } = req.body;
 
     const queryInsertCurso = `INSERT INTO cursos_propuestos (
         nombre_curso, asignaturas_requeridas, contenidos_requeridos, numero_docentes, tipo_asignatura, actividad_evento,
         objetivo, carreras_atendidas, periodo, turno, fecha_inicio, fecha_fin, justificacion, numero_horas, horario, lugar, 
-        requisitos, tipo_curso,enfoque_curso, nombre_instructor, apellidopaterno_instructor, apellidomaterno_instructor, curp_instructor,
+        requisitos, tipo_curso, enfoque_curso, nombre_instructor, apellidopaterno_instructor, apellidomaterno_instructor, curp_instructor,
         rfc_instructor, maxestudios_instructor, email_instructor, password_instructor, sexo_instructor, tipo_contrato_instructor
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
@@ -247,15 +247,15 @@ app.post('/proponer-curso', (req, res) => {
 
         const nuevoCursoId = result.insertId;
 
-        // Paso adicional: Insertar en jefe_curso
+        // Insertar en jefe_curso
         const queryInsertJefeCurso = 'INSERT INTO jefe_curso (id_curso, id_jefe) VALUES (?, ?)';
-        connection.query(queryInsertJefeCurso, [nuevoCursoId, id_jefe], (err, result) => {
+        connection.query(queryInsertJefeCurso, [nuevoCursoId, id_jefe], (err) => {
             if (err) {
                 console.error('Error al insertar en jefe_curso:', err);
                 return res.status(500).json({ error: 'Error al asociar jefe con el curso' });
             }
 
-            // Insertar los departamentos seleccionados y la relación curso-departamento
+            // Insertar departamentos seleccionados y su relación con el curso
             const queryInsertDeptos = 'INSERT INTO departamentos (nombre) VALUES ?';
             const valoresDepartamento = departamentosSeleccionados.map(dep => [dep]);
 
@@ -275,18 +275,28 @@ app.post('/proponer-curso', (req, res) => {
                 const queryRelacionCursoDepto = 'INSERT INTO departamento_curso (departamento_id, curso_id) VALUES ?';
                 const valoresRelacion = nuevosDeptosIds.map(deptoId => [deptoId, nuevoCursoId]);
 
-                connection.query(queryRelacionCursoDepto, [valoresRelacion], (err, result) => {
+                connection.query(queryRelacionCursoDepto, [valoresRelacion], (err) => {
                     if (err) {
                         console.error('Error al insertar la relación departamento-curso:', err);
                         return res.status(500).json({ error: 'Error al insertar la relación departamento-curso' });
                     }
 
-                    res.status(200).json({ message: 'Curso, jefe, departamentos y relaciones insertados correctamente' });
+                    // Insertar en requisitos_curso con valores iniciales en 0
+                    const queryInsertRequisitosCurso = 'INSERT INTO requisitos_curso (id_curso, orden_admin, orden_subdirector) VALUES (?, 0, 0)';
+                    connection.query(queryInsertRequisitosCurso, [nuevoCursoId], (err) => {
+                        if (err) {
+                            console.error('Error al insertar en requisitos_curso:', err);
+                            return res.status(500).json({ error: 'Error al insertar los requisitos del curso' });
+                        }
+
+                        res.status(200).json({ message: 'Curso, jefe, departamentos, relaciones y requisitos insertados correctamente' });
+                    });
                 });
             });
         });
     });
 });
+
 // Eliminar un curso propuesto
 app.delete('/eliminar-curso/:id', (req, res) => {
     const cursoId = req.params.id;
@@ -401,6 +411,50 @@ app.put('/actualizar-curso/:id', (req, res) => {
     });
 });
 
+app.get('/verificar-requisitos-curso/:cursoId', (req, res) => {
+    const { cursoId } = req.params;
+    const query = `SELECT orden_admin, orden_subdirector FROM requisitos_curso WHERE id_curso = ?`;
+
+    connection.query(query, [cursoId], (err, result) => {
+        if (err) {
+            console.error('Error al verificar requisitos curso:', err);
+            return res.status(500).json({ error: 'Error al verificar requisitos curso' });
+        }
+
+        if (result.length > 0) {
+            const { orden_admin, orden_subdirector } = result[0];
+            res.status(200).json({ orden_admin, orden_subdirector });
+        } else {
+            res.status(404).json({ error: 'Curso no encontrado' });
+        }
+    });
+});
+app.put('/actualizar-requisitos-curso/:cursoId', (req, res) => {
+    const { cursoId } = req.params;
+    const { orden_admin } = req.body;
+    const query = `UPDATE requisitos_curso SET orden_admin = ? WHERE id_curso = ?`;
+
+    connection.query(query, [orden_admin, cursoId], (err, result) => {
+        if (err) {
+            console.error('Error al actualizar requisitos curso:', err);
+            return res.status(500).json({ error: 'Error al actualizar requisitos curso' });
+        }
+        res.status(200).json({ message: 'Requisitos curso actualizados correctamente' });
+    });
+});
+app.put('/actualizar-orden-subdirector/:cursoId', (req, res) => {
+    const { cursoId } = req.params;
+    const { orden_subdirector } = req.body;
+    const query = `UPDATE requisitos_curso SET orden_subdirector = ? WHERE id_curso = ?`;
+
+    connection.query(query, [orden_subdirector, cursoId], (err, result) => {
+        if (err) {
+            console.error('Error al actualizar orden subdirector:', err);
+            return res.status(500).json({ error: 'Error al actualizar orden subdirector' });
+        }
+        res.status(200).json({ message: 'Orden subdirector actualizado correctamente' });
+    });
+});
 
 // Ruta para obtener los cursos propuestos
 app.get('/cursos-propuestos', (req, res) => {
@@ -828,71 +882,178 @@ function verificarEncuestaRespondida(req, res) {
         res.json({ respondida });
     });
 }
-// Ruta para guardar calificaciones
-app.post('/curso/:id/guardar-calificacion', (req, res) => {
-    const cursoId = req.params.id;
-    const { usuario_id, calificacion } = req.body;
+// // Ruta para guardar calificaciones
+// app.post('/curso/:id/guardar-calificacion', (req, res) => {
+//     const cursoId = req.params.id;
+//     const { usuario_id, calificacion } = req.body;
 
-    // Verificar si ya existe una calificación para este usuario en el curso
-    const checkQuery = 'SELECT * FROM calificaciones WHERE curso_id = ? AND usuario_id = ?';
+//     // Verificar si ya existe una calificación para este usuario en el curso
+//     const checkQuery = 'SELECT * FROM calificaciones WHERE curso_id = ? AND usuario_id = ?';
 
-    connection.query(checkQuery, [cursoId, usuario_id], (err, results) => {
+//     connection.query(checkQuery, [cursoId, usuario_id], (err, results) => {
+//         if (err) {
+//             console.error('Error al verificar la calificación existente:', err);
+//             return res.status(500).json({ error: 'Error al verificar la calificación existente.' });
+//         }
+
+//         if (results.length > 0) {
+//             // Si ya existe una calificación
+//             return res.status(400).json({ message: 'El maestro ya tiene una calificación para este curso.' });
+//         }
+
+//         // Insertar la nueva calificación
+//         const insertCalificacionQuery = 'INSERT INTO calificaciones (curso_id, usuario_id, calificacion) VALUES (?, ?, ?)';
+
+//         connection.query(insertCalificacionQuery, [cursoId, usuario_id, calificacion], (err, results) => {
+//             if (err) {
+//                 console.error('Error al guardar la calificación:', err);
+//                 return res.status(500).json({ error: 'Error al guardar la calificación.' });
+//             }
+
+//             // Si la calificación es mayor o igual a 7, actualizar la tabla usuario_requisitos
+//             if (calificacion >= 7) {
+//                 const updateRequisitosQuery = `
+//                     UPDATE usuario_requisitos 
+//                     SET calificacion = 1 
+//                     WHERE curso_id = ? AND usuario_id = ?
+//                 `;
+
+//                 connection.query(updateRequisitosQuery, [cursoId, usuario_id], (err, updateResult) => {
+//                     if (err) {
+//                         console.error('Error al actualizar usuario_requisitos:', err);
+//                         return res.status(500).json({ error: 'Error al actualizar usuario_requisitos.' });
+//                     }
+//                     res.status(200).json({ message: 'Calificación guardada y requisitos actualizados exitosamente.' });
+//                 });
+//             } else {
+//                 // Si la calificación es menor a 7, solo guardar la calificación
+//                 res.status(200).json({ message: 'Calificación guardada exitosamente.' });
+//             }
+//         });
+//     });
+// });
+// Ruta para guardar todas las calificaciones para un curso específico
+app.post('/curso/:cursoId/guardar-calificaciones', (req, res) => {
+    const cursoId = req.params.cursoId;
+    const calificaciones = req.body; // Esperamos que sea un arreglo de calificaciones
+
+    if (!calificaciones || !Array.isArray(calificaciones)) {
+        return res.status(400).json({ message: 'Formato de datos inválido. Se espera un arreglo de calificaciones.' });
+    }
+
+    // Comenzamos una transacción para manejar múltiples inserciones de manera segura
+    connection.beginTransaction((err) => {
         if (err) {
-            console.error('Error al verificar la calificación existente:', err);
-            return res.status(500).json({ error: 'Error al verificar la calificación existente.' });
+            console.error('Error al iniciar la transacción:', err);
+            return res.status(500).json({ error: 'Error al iniciar la transacción.' });
+        }
+
+        // Iteramos sobre cada calificación para procesarlas individualmente
+        const promises = calificaciones.map((calificacion) => {
+            return new Promise((resolve, reject) => {
+                const { usuario_id, calificacion: calificacionValor } = calificacion;
+
+                // Verificar si ya existe una calificación para este usuario en el curso
+                const checkQuery = 'SELECT * FROM calificaciones WHERE curso_id = ? AND usuario_id = ?';
+                connection.query(checkQuery, [cursoId, usuario_id], (err, results) => {
+                    if (err) {
+                        console.error('Error al verificar la calificación existente:', err);
+                        return reject('Error al verificar la calificación existente.');
+                    }
+
+                    if (results.length > 0) {
+                        // Si ya existe una calificación, rechazamos la promesa con el mensaje
+                        return reject('El maestro ya tiene una calificación para este curso.');
+                    }
+
+                    // Insertar la nueva calificación
+                    const insertCalificacionQuery = 'INSERT INTO calificaciones (curso_id, usuario_id, calificacion) VALUES (?, ?, ?)';
+                    connection.query(insertCalificacionQuery, [cursoId, usuario_id, calificacionValor], (err, results) => {
+                        if (err) {
+                            console.error('Error al guardar la calificación:', err);
+                            return reject('Error al guardar la calificación.');
+                        }
+
+                        // Si la calificación es mayor o igual a 7, actualizar la tabla usuario_requisitos
+                        if (calificacionValor >= 7) {
+                            const updateRequisitosQuery = `
+                                UPDATE usuario_requisitos 
+                                SET calificacion = 1 
+                                WHERE curso_id = ? AND usuario_id = ?`;
+                            connection.query(updateRequisitosQuery, [cursoId, usuario_id], (err, updateResult) => {
+                                if (err) {
+                                    console.error('Error al actualizar usuario_requisitos:', err);
+                                    return reject('Error al actualizar usuario_requisitos.');
+                                }
+                                resolve('Calificación guardada y requisitos actualizados exitosamente.');
+                            });
+                        } else {
+                            resolve('Calificación guardada exitosamente.');
+                        }
+                    });
+                });
+            });
+        });
+
+        // Ejecutar todas las promesas
+        Promise.all(promises)
+            .then((messages) => {
+                // Si todas las promesas se resuelven correctamente, hacemos commit de la transacción
+                connection.commit((err) => {
+                    if (err) {
+                        console.error('Error al hacer commit de la transacción:', err);
+                        return res.status(500).json({ error: 'Error al hacer commit de la transacción.' });
+                    }
+                    res.status(200).json({ message: 'Todas las calificaciones se guardaron correctamente.' });
+                });
+            })
+            .catch((error) => {
+                // Si alguna promesa falla, hacemos rollback de la transacción
+                connection.rollback(() => {
+                    console.error('Error en la transacción:', error);
+                    res.status(400).json({ error: error });
+                });
+            });
+    });
+});
+// Ruta para verificar si ya existen calificaciones para un curso
+app.get('/curso/:cursoId/calificaciones', (req, res) => {
+    const cursoId = req.params.cursoId;
+
+    // Aquí, deberás adaptar esta consulta dependiendo de tu estructura de base de datos
+    const query = `
+      SELECT * FROM calificaciones WHERE curso_id = ?;
+    `;
+
+    connection.query(query, [cursoId], (err, results) => {
+        if (err) {
+            console.error('Error al verificar calificaciones:', err);
+            return res.status(500).json({ message: 'Error al verificar calificaciones.' });
         }
 
         if (results.length > 0) {
-            // Si ya existe una calificación
-            return res.status(400).json({ message: 'El maestro ya tiene una calificación para este curso.' });
+            return res.status(400).json({ message: 'Ya se han registrado calificaciones para este curso.' });
         }
 
-        // Insertar la nueva calificación
-        const insertCalificacionQuery = 'INSERT INTO calificaciones (curso_id, usuario_id, calificacion) VALUES (?, ?, ?)';
-
-        connection.query(insertCalificacionQuery, [cursoId, usuario_id, calificacion], (err, results) => {
-            if (err) {
-                console.error('Error al guardar la calificación:', err);
-                return res.status(500).json({ error: 'Error al guardar la calificación.' });
-            }
-
-            // Si la calificación es mayor o igual a 7, actualizar la tabla usuario_requisitos
-            if (calificacion >= 7) {
-                const updateRequisitosQuery = `
-                    UPDATE usuario_requisitos 
-                    SET calificacion = 1 
-                    WHERE curso_id = ? AND usuario_id = ?
-                `;
-
-                connection.query(updateRequisitosQuery, [cursoId, usuario_id], (err, updateResult) => {
-                    if (err) {
-                        console.error('Error al actualizar usuario_requisitos:', err);
-                        return res.status(500).json({ error: 'Error al actualizar usuario_requisitos.' });
-                    }
-                    res.status(200).json({ message: 'Calificación guardada y requisitos actualizados exitosamente.' });
-                });
-            } else {
-                // Si la calificación es menor a 7, solo guardar la calificación
-                res.status(200).json({ message: 'Calificación guardada exitosamente.' });
-            }
-        });
+        res.status(200).json({ message: 'No hay calificaciones registradas.' });
     });
 });
 
-// Ruta para verificar si ya existe una calificación
-app.get('/curso/:id/calificaciones', (req, res) => {
-    const cursoId = req.params.id;
-    const usuarioId = req.query.usuario_id;
 
-    const query = 'SELECT * FROM calificaciones WHERE curso_id = ? AND usuario_id = ?';
-    connection.query(query, [cursoId, usuarioId], (err, results) => {
-        if (err) {
-            console.error('Error al verificar la calificación:', err);
-            return res.status(500).json({ error: 'Error al verificar la calificación.' });
-        }
-        res.status(200).json({ existe: results.length > 0 });
-    });
-});
+// // Ruta para verificar si ya existe una calificación
+// app.get('/curso/:id/calificaciones', (req, res) => {
+//     const cursoId = req.params.id;
+//     const usuarioId = req.query.usuario_id;
+
+//     const query = 'SELECT * FROM calificaciones WHERE curso_id = ? AND usuario_id = ?';
+//     connection.query(query, [cursoId, usuarioId], (err, results) => {
+//         if (err) {
+//             console.error('Error al verificar la calificación:', err);
+//             return res.status(500).json({ error: 'Error al verificar la calificación.' });
+//         }
+//         res.status(200).json({ existe: results.length > 0 });
+//     });
+// });
 app.get('/curso/:cursoId/calificacion/:usuarioId', (req, res) => {
     const { cursoId, usuarioId } = req.params;
 

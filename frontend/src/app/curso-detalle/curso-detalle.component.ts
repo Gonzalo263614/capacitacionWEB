@@ -124,49 +124,6 @@ export class CursoDetalleComponent implements OnInit {
   toggleCalificaciones(): void {
     this.showCalificaciones = !this.showCalificaciones;
   }
-
-  // Método para guardar la calificación de un maestro
-  guardarCalificacion(maestroId: number): void {
-    const cursoId = this.route.snapshot.paramMap.get('id');
-    const maestro = this.maestros.find(m => m.id === maestroId); // Encuentra el maestro correspondiente
-
-    if (maestro && maestro.calificacion != null) { // Verifica que la calificación no sea nula
-      // Verificar si ya existe una calificación
-      this.http.get<any>(`http://localhost:3000/curso/${cursoId}/calificaciones?usuario_id=${maestro.id}`)
-        .subscribe({
-          next: (response) => {
-            if (response.existe) {
-              alert('El maestro ya tiene una calificación para este curso.');
-            } else {
-              const calificacionData = {
-                curso_id: cursoId,
-                usuario_id: maestro.id,
-                calificacion: maestro.calificacion
-              };
-
-              // Realiza la solicitud para guardar la calificación
-              this.http.post(`http://localhost:3000/curso/${cursoId}/guardar-calificacion`, calificacionData)
-                .subscribe({
-                  next: () => {
-                    alert('Calificación guardada exitosamente');
-                  },
-                  error: (err) => {
-                    console.error('Error al guardar la calificación:', err);
-                    alert('Error al guardar la calificación. Inténtalo de nuevo más tarde.');
-                  }
-                });
-            }
-          },
-          error: (err) => {
-            console.error('Error al verificar calificación existente:', err);
-            alert('Error al verificar calificación. Inténtalo de nuevo más tarde.');
-          }
-        });
-    } else {
-      alert('Por favor, ingresa una calificación válida.');
-    }
-  }
-
   // Método para verificar y actualizar asistencias en usuario_requisitos
   verificarYActualizarAsistencias(maestroId: number): void {
     const cursoId = this.route.snapshot.paramMap.get('id');
@@ -224,5 +181,47 @@ export class CursoDetalleComponent implements OnInit {
           }
         });
     }
+  }
+  guardarTodasLasCalificaciones(): void {
+    const cursoId = this.route.snapshot.paramMap.get('id');
+
+    // Primero, verificamos si ya existen calificaciones
+    this.http.get<any>(`http://localhost:3000/curso/${cursoId}/calificaciones`)
+      .subscribe({
+        next: (response) => {
+          // Si no hay calificaciones, las guardamos
+          if (response.message === 'No hay calificaciones registradas.') {
+            const calificaciones = this.maestros.map(maestro => ({
+              curso_id: cursoId,
+              usuario_id: maestro.id,
+              calificacion: maestro.calificacion
+            }));
+
+            // Hacer la solicitud para guardar las calificaciones
+            this.http.post(`http://localhost:3000/curso/${cursoId}/guardar-calificaciones`, calificaciones)
+              .subscribe({
+                next: () => {
+                  alert('Calificaciones guardadas exitosamente');
+                },
+                error: (err) => {
+                  // Aquí capturamos el error y mostramos el mensaje
+                  if (err.error && err.error.message) {
+                    alert(err.error.message);  // Muestra el mensaje de error desde el backend
+                  } else {
+                    console.error('Error al guardar las calificaciones:', err);
+                    alert('Error al guardar las calificaciones. Inténtalo de nuevo más tarde.');
+                  }
+                }
+              });
+          } else {
+            // Si ya existen calificaciones, mostramos un mensaje
+            alert(response.message);  // Muestra el mensaje de error que viene del backend
+          }
+        },
+        error: (err) => {
+          console.error('Erro Calificaciones:', err);
+          alert('Ya se ha asignado las calificaciones.');
+        }
+      });
   }
 }
