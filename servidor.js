@@ -1378,33 +1378,66 @@ app.post('/uploads', upload.single('archivo'), (req, res) => {
         });
     });
 });
-// Ruta para subir archivos a la tabla archivos_curso
+// Ruta para subir archivos y datos a la tabla archivos_curso
 app.post('/uploads2', upload.single('archivo'), (req, res) => {
     const archivo = req.file;
-    const jefeId = req.body.jefeId;
-    const cursoId = req.body.cursoId;
+    const {
+        jefe_id,
+        nombre_instructor,
+        apellido_paterno_instructor,
+        apellido_materno_instructor,
+        curp_instructor,
+        nombre_curso,
+        fecha_inicio,
+        fecha_fin
+    } = req.body;
 
+    // Validar la existencia del archivo y datos obligatorios
     if (!archivo) {
         return res.status(400).json({ error: 'No se ha subido ningún archivo' });
     }
-    if (!jefeId || !cursoId) {
-        return res.status(400).json({ error: 'ID de jefe o curso no válidos.' });
+    if (!jefe_id || !nombre_instructor || !nombre_curso || !fecha_inicio || !fecha_fin) {
+        return res.status(400).json({ error: 'Faltan datos obligatorios.' });
     }
 
-    // Leer el archivo y guardar en la base de datos
+    // Leer el archivo y prepararlo para la inserción
     const archivoData = fs.readFileSync(archivo.path);
-    const sqlInsertArchivo = 'INSERT INTO archivos_curso (nombre_archivo, archivo, curso_id, jefe_id) VALUES (?, ?, ?, ?)';
-    const values = [archivo.originalname, archivoData, cursoId, jefeId];
 
-    // Insertar el archivo en la tabla archivos_curso
+    // Consulta SQL para insertar en la tabla archivos_curso
+    const sqlInsertArchivo = `
+        INSERT INTO archivos_curso_criterios
+        (jefe_id, nombre_instructor, apellido_paterno_instructor, apellido_materno_instructor, 
+         curp_instructor, nombre_curso, fecha_inicio, fecha_fin, nombre_archivo, archivo, fecha_subida) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
+    `;
+    const values = [
+        jefe_id,
+        nombre_instructor,
+        apellido_paterno_instructor || null,
+        apellido_materno_instructor || null,
+        curp_instructor || null,
+        nombre_curso,
+        fecha_inicio,
+        fecha_fin,
+        archivo.originalname,
+        archivoData
+    ];
+
+    // Ejecutar la consulta
     connection.query(sqlInsertArchivo, values, (err) => {
         if (err) {
             console.error('Error al guardar el archivo en la base de datos:', err.message);
-            return res.status(500).send('Error al guardar el archivo en la base de datos.');
+            return res.status(500).json({ error: 'Error al guardar el archivo en la base de datos.' });
         }
-        res.status(200).send('Archivo subido exitosamente.');
+
+        // Eliminar el archivo temporal para liberar espacio
+        fs.unlinkSync(archivo.path);
+
+        // Respuesta exitosa como JSON
+        res.status(200).json({ message: 'Archivo y datos subidos exitosamente.' });
     });
 });
+
 
 app.get('/asistencias/count/:usuarioId/:cursoId', (req, res) => {
     const { usuarioId, cursoId } = req.params;

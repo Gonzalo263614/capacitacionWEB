@@ -59,6 +59,7 @@ export class JefeComponent {
   passwordInstructor = 'contraseña1234';  // Contraseña predeterminada
 
   selectedFile: File | null = null;
+  selectedFile2: File | null = null;
   uploadSuccess: boolean | null = null;
   uploadError: boolean | null = null;
 
@@ -75,7 +76,7 @@ export class JefeComponent {
   departamentosSeleccionados: string[] = [];
   idJefe = 1;  // Por ejemplo, esto podría provenir del sistema de autenticación
 
-  constructor(private http: HttpClient,private route: ActivatedRoute) {
+  constructor(private http: HttpClient, private route: ActivatedRoute) {
     this.obtenerCursosPendientes(); // Llamar a la función al iniciar el componente
   }
   ngOnInit(): void {
@@ -213,6 +214,7 @@ export class JefeComponent {
     this.http.post('http://localhost:3000/proponer-curso', curso)
       .subscribe(response => {
         console.log('Curso propuesto:', response);
+        this.onSubmit();
         this.mostrarFormulario = false;
         this.limpiarFormulario();
       }, error => {
@@ -307,35 +309,57 @@ export class JefeComponent {
       this.selectedFile = file;
     }
   }
-
   // Enviar el archivo al servidor
   onSubmit() {
-    
-    const usuarioId = localStorage.getItem('userId');
-    const formData = new FormData();
-    console.log(usuarioId);
-
-    if (!usuarioId || !cursoId) {
-      console.error('usuarioId o cursoId son null. Asegúrate de que existen en la ruta.');
+    // Verificar que haya un archivo seleccionado
+    if (!this.selectedFile) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Por favor, selecciona un archivo antes de enviar.',
+        confirmButtonText: 'Aceptar',
+      });
       return;
     }
 
-    if (this.selectedFile) {
-      formData.append('archivo', this.selectedFile);
-      formData.append('usuarioId', usuarioId);
-      formData.append('cursoId', cursoId);
+    // Preparar los datos del formulario
+    const formData = new FormData();
+    formData.append('jefe_id', this.idJefe.toString()); // ID del jefe
+    formData.append('nombre_instructor', this.nombreInstructor);
+    formData.append('apellido_paterno_instructor', this.apellidopaternoInstructor);
+    formData.append('apellido_materno_instructor', this.apellidomaternoInstructor);
+    formData.append('curp_instructor', this.curpInstructor);
+    formData.append('nombre_curso', this.nombreCurso);
+    formData.append('fecha_inicio', this.fechaInicio);
+    formData.append('fecha_fin', this.fechaFin);
+    formData.append('nombre_archivo', this.selectedFile.name); // Nombre del archivo
+    formData.append('archivo', this.selectedFile); // Archivo como BLOB
 
-      this.http.post('http://localhost:3000/uploads2', formData, { responseType: 'text' })
-        .subscribe({
-          next: (response) => {
-            console.log('Respuesta del servidor:', response);
-            this.uploadSuccess = true;
-          },
-          error: (error) => {
-            console.error('Error al subir archivo', error);
-            this.uploadError = true;
-          }
+    // Enviar la solicitud POST
+    this.http.post('http://localhost:3000/uploads2', formData).subscribe({
+      next: (response) => {
+        console.log('Archivo enviado con éxito:', response);
+        Swal.fire({
+          icon: 'success',
+          title: 'Éxito',
+          text: 'El archivo ha sido subido correctamente.',
+          confirmButtonText: 'Aceptar',
         });
-    }
+
+        // Limpiar el formulario y estado del archivo
+        this.selectedFile = null;
+        this.limpiarFormulario();
+      },
+      error: (err) => {
+        console.error('Error al enviar el archivo:', err);
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Hubo un problema al subir el archivo. Por favor, intenta nuevamente.',
+          confirmButtonText: 'Aceptar',
+        });
+      },
+    });
   }
+
 }
