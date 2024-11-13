@@ -306,7 +306,12 @@ export class JefeComponent {
   onFileSelected(event: any): void {
     const file = event.target.files[0];
     if (file) {
-      this.selectedFile = file;
+      if (file.type === "application/pdf") {
+        this.selectedFile = file;
+      } else {
+        alert("Por favor, selecciona un archivo en formato PDF.");
+        event.target.value = ""; // Limpiar la selección
+      }
     }
   }
   // Enviar el archivo al servidor

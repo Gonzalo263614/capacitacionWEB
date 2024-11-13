@@ -1332,52 +1332,67 @@ app.post('/uploads', upload.single('archivo'), (req, res) => {
         return res.status(400).json({ error: 'ID de usuario o curso no válidos.' });
     }
 
-    // Leer el archivo y guardar en la base de datos
-    const archivoData = fs.readFileSync(archivo.path);
-    const sqlInsertArchivo = 'INSERT INTO archivos (nombre_archivo, archivo, curso_id, instructor_id) VALUES (?, ?, ?, ?)';
-    const values = [archivo.originalname, archivoData, cursoId, usuarioId];
-
-    // Insertar archivo y luego actualizar encuestajefes en usuario_requisitos
-    connection.query(sqlInsertArchivo, values, (err, result) => {
+    // Verificar si ya existe un archivo para este curso y usuario
+    const sqlVerificarArchivo = 'SELECT * FROM archivos WHERE curso_id = ? AND instructor_id = ?';
+    connection.query(sqlVerificarArchivo, [cursoId, usuarioId], (err, results) => {
         if (err) {
-            console.error('Error al guardar el archivo en la base de datos:', err.message);
-            return res.status(500).send('Error al guardar el archivo en la base de datos.');
+            console.error('Error al verificar el archivo:', err.message);
+            return res.status(500).send('Error al verificar si ya existe un archivo.');
         }
 
-        // Buscar usuarios asociados al curso y actualizar encuestajefes
-        const sqlObtenerUsuarios = `
-            SELECT ur.usuario_id
-            FROM usuario_requisitos AS ur
-            JOIN instructor_curso AS ic ON ur.curso_id = ic.id_curso_propuesto
-            WHERE ic.id_usuario_instructor = ? AND ur.curso_id = ?`;
+        // Si ya existe un archivo, evitar que suba otro
+        if (results.length > 0) {
+            return res.status(400).json({ error: 'Ya has subido un archivo para este curso.' });
+        }
 
-        connection.query(sqlObtenerUsuarios, [usuarioId, cursoId], (err, usuarios) => {
+        // Si no existe, proceder a guardar el archivo en la base de datos
+        const archivoData = fs.readFileSync(archivo.path);
+        const sqlInsertArchivo = 'INSERT INTO archivos (nombre_archivo, archivo, curso_id, instructor_id) VALUES (?, ?, ?, ?)';
+        const values = [archivo.originalname, archivoData, cursoId, usuarioId];
+
+        // Insertar archivo y luego actualizar encuestajefes en usuario_requisitos
+        connection.query(sqlInsertArchivo, values, (err, result) => {
             if (err) {
-                console.error('Error al buscar los usuarios para actualizar encuestajefes:', err.message);
-                return res.status(500).send('Error al buscar los usuarios.');
+                console.error('Error al guardar el archivo en la base de datos:', err.message);
+                return res.status(500).send('Error al guardar el archivo en la base de datos.');
             }
 
-            if (usuarios.length === 0) {
-                return res.status(404).json({ error: 'No se encontraron usuarios para actualizar.' });
-            }
+            // Buscar usuarios asociados al curso y actualizar encuestajefes
+            const sqlObtenerUsuarios = `
+                SELECT ur.usuario_id
+                FROM usuario_requisitos AS ur
+                JOIN instructor_curso AS ic ON ur.curso_id = ic.id_curso_propuesto
+                WHERE ic.id_usuario_instructor = ? AND ur.curso_id = ?`;
 
-            // Actualizar encuestajefes a 1 para cada usuario encontrado
-            const idsUsuarios = usuarios.map(user => user.usuario_id);
-            const sqlActualizarEncuestajefes = `
-                UPDATE usuario_requisitos
-                SET evidencias = 1
-                WHERE curso_id = ? AND usuario_id IN (?)`;
-
-            connection.query(sqlActualizarEncuestajefes, [cursoId, idsUsuarios], (err) => {
+            connection.query(sqlObtenerUsuarios, [usuarioId, cursoId], (err, usuarios) => {
                 if (err) {
-                    console.error('Error al actualizar encuestajefes en usuario_requisitos:', err.message);
-                    return res.status(500).send('Error al actualizar encuestajefes.');
+                    console.error('Error al buscar los usuarios para actualizar encuestajefes:', err.message);
+                    return res.status(500).send('Error al buscar los usuarios.');
                 }
-                res.status(200).send('Archivo subido y encuestajefes actualizado exitosamente.');
+
+                if (usuarios.length === 0) {
+                    return res.status(404).json({ error: 'No se encontraron usuarios para actualizar.' });
+                }
+
+                // Actualizar encuestajefes a 1 para cada usuario encontrado
+                const idsUsuarios = usuarios.map(user => user.usuario_id);
+                const sqlActualizarEncuestajefes = `
+                    UPDATE usuario_requisitos
+                    SET evidencias = 1
+                    WHERE curso_id = ? AND usuario_id IN (?)`;
+
+                connection.query(sqlActualizarEncuestajefes, [cursoId, idsUsuarios], (err) => {
+                    if (err) {
+                        console.error('Error al actualizar encuestajefes en usuario_requisitos:', err.message);
+                        return res.status(500).send('Error al actualizar encuestajefes.');
+                    }
+                    res.status(200).send('Archivo subido y encuestajefes actualizado exitosamente.');
+                });
             });
         });
     });
 });
+
 // Ruta para subir archivos y datos a la tabla archivos_curso
 app.post('/uploads2', upload.single('archivo'), (req, res) => {
     const archivo = req.file;
@@ -1472,7 +1487,65 @@ app.put('/usuario_requisitos/:usuarioId/:cursoId', (req, res) => {
         res.json({ message: 'Requisitos actualizados correctamente' });
     });
 });
+// Ruta para subir archivos de contenidos temáticos
+app.post('/contenidos-tematicos/uploads', upload.single('archivoTematico'), (req, res) => {
+    const archivo = req.file;
+    const cursoId = req.body.cursoId;
+    const instructorId = req.body.instructorId;
 
+    if (!archivo) {
+        return res.status(400).json({ error: 'No se ha subido ningún archivo.' });
+    }
+
+    if (!cursoId || !instructorId) {
+        return res.status(400).json({ error: 'ID de curso o instructor no válidos.' });
+    }
+
+    // Verificar si ya existe un archivo para este curso e instructor
+    const sqlVerificarArchivo = `
+        SELECT * 
+        FROM archivos_contenidos_tematicos 
+        WHERE curso_id = ? AND instructor_id = ?`;
+
+    connection.query(sqlVerificarArchivo, [cursoId, instructorId], (err, results) => {
+        if (err) {
+            console.error('Error al verificar el archivo:', err.message);
+            return res.status(500).send('Error al verificar si ya existe un archivo.');
+        }
+
+        // Si ya existe un archivo, evitar que suba otro
+        if (results.length > 0) {
+            return res.status(400).json({ error: 'Ya has subido un archivo para este curso.' });
+        }
+
+        // Leer el archivo temporal y preparar datos para la base de datos
+        const archivoData = fs.readFileSync(archivo.path);
+        const sqlInsertArchivo = `
+            INSERT INTO archivos_contenidos_tematicos 
+            (curso_id, instructor_id, nombre_archivo, archivo, fecha_subida) 
+            VALUES (?, ?, ?, ?, NOW())`;
+
+        const values = [
+            cursoId,
+            instructorId,
+            archivo.originalname,
+            archivoData
+        ];
+
+        // Guardar archivo en la base de datos
+        connection.query(sqlInsertArchivo, values, (err, result) => {
+            // Eliminar el archivo temporal después de usarlo
+            fs.unlinkSync(archivo.path);
+
+            if (err) {
+                console.error('Error al guardar el archivo en la base de datos:', err.message);
+                return res.status(500).send('Error al guardar el archivo en la base de datos.');
+            }
+
+            res.status(200).send('Archivo subido exitosamente.');
+        });
+    });
+});
 // Ruta para obtener archivos por curso_id
 app.get('/archivos/curso/:cursoId', (req, res) => {
     const cursoId = req.params.cursoId;

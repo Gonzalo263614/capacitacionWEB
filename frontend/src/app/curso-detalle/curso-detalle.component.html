@@ -82,10 +82,31 @@
   <button (click)="guardarTodasLasCalificaciones()" class="save-button">Enviar Todas las Calificaciones</button>
 </div>
 
+<h2 class="section-title">Subir Contenidos Temáticos</h2>
+<div class="file-upload">
+  <input type="file" (change)="onFileSelectedTematico($event)" id="fileInputTematico" />
+  <button (click)="onSubmitTematico()" [disabled]="!selectedFileTematico" class="upload-button">Subir Archivo</button>
+</div>
+<p *ngIf="uploadSuccessTematico === true" class="success-message">Archivo subido con éxito.</p>
+<p *ngIf="uploadErrorTematico === true" class="error-message">Error al subir el archivo. Ya has subido los contenidos temáticos de este curso.</p>
 
-<h2 class="section-title">Enviar archivos</h2>
-<form class="file-upload-form">
-  <label for="file">Seleccionar archivo:</label>
-  <input type="file" (change)="onFileSelected($event)">
-  <button type="button" (click)="onSubmit()" class="upload-button">Subir archivo</button>
+
+<h2 class="section-title">Subir archivo de Evidencias</h2>
+
+<!-- Mensaje de éxito al subir archivo -->
+<div *ngIf="uploadSuccess" class="success-message">
+  <p>¡Archivo cargado correctamente!</p>
+</div>
+
+<!-- Mensaje de error al intentar subir archivo -->
+<div *ngIf="uploadError" class="error-message">
+  <p>Hubo un error al intentar cargar el archivo. Ya has subido el archivo para este Curso.</p>
+</div>
+
+<!-- Formulario de carga de archivo -->
+<form (ngSubmit)="onSubmit()" class="upload-form">
+  <div class="file-input-container">
+    <input type="file" (change)="onFileSelected($event)" class="file-input" />
+  </div>
+  <button type="submit" [disabled]="!selectedFile" class="submit-button">Subir Archivo</button>
 </form>

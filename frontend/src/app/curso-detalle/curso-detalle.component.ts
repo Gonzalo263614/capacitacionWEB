@@ -19,6 +19,10 @@ export class CursoDetalleComponent implements OnInit {
   selectedFile: File | null = null;
   uploadSuccess: boolean | null = null;
   uploadError: boolean | null = null;
+
+  selectedFileTematico: File | null = null;
+  uploadSuccessTematico: boolean | null = null;
+  uploadErrorTematico: boolean | null = null;
   constructor(
     private route: ActivatedRoute,
     private http: HttpClient
@@ -149,12 +153,17 @@ export class CursoDetalleComponent implements OnInit {
   onFileSelected(event: any): void {
     const file = event.target.files[0];
     if (file) {
-      this.selectedFile = file;
+      if (file.type === "application/pdf") {
+        this.selectedFile = file;
+      } else {
+        alert("Por favor, selecciona un archivo en formato PDF.");
+        event.target.value = ""; // Limpiar la selección
+      }
     }
   }
 
   // Enviar el archivo al servidor
-  onSubmit() {
+  onSubmit(): void {
     const cursoId = this.route.snapshot.paramMap.get('id');
     const usuarioId = localStorage.getItem('userId');
     const formData = new FormData();
@@ -169,19 +178,69 @@ export class CursoDetalleComponent implements OnInit {
       formData.append('usuarioId', usuarioId);
       formData.append('cursoId', cursoId);
 
+      // Realizar la solicitud de carga
       this.http.post('http://localhost:3000/uploads', formData, { responseType: 'text' })
         .subscribe({
           next: (response) => {
             console.log('Respuesta del servidor:', response);
-            this.uploadSuccess = true;
+            this.uploadSuccess = true;  // Marca como éxito
+            this.uploadError = false;  // Desactiva el error
           },
           error: (error) => {
             console.error('Error al subir archivo', error);
-            this.uploadError = true;
+            this.uploadError = true;  // Marca como error
+            this.uploadSuccess = false;  // Desactiva el éxito
           }
         });
     }
   }
+
+  // Manejar la selección del archivo para contenidos temáticos
+  onFileSelectedTematico(event: any): void {
+    const fileTematico = event.target.files[0];
+    if (fileTematico) {
+      if (fileTematico.type === "application/pdf") {
+        this.selectedFileTematico = fileTematico; // Variable específica para contenidos temáticos
+      } else {
+        alert("Por favor, selecciona un archivo en formato PDF.");
+        event.target.value = ""; // Limpiar la selección
+      }
+    }
+  }
+
+  // Enviar el archivo al servidor para contenidos temáticos
+  onSubmitTematico(): void {
+    const cursoIdTematico = this.route.snapshot.paramMap.get('id'); // ID del curso
+    const instructorIdTematico = localStorage.getItem('userId'); // ID del instructor
+    const formDataTematico = new FormData();
+
+    if (!cursoIdTematico || !instructorIdTematico) {
+      console.error('cursoIdTematico o instructorIdTematico son null. Verifica que existan.');
+      return;
+    }
+
+    if (this.selectedFileTematico) {
+      formDataTematico.append('archivoTematico', this.selectedFileTematico); // Nuevo nombre para evitar conflictos
+      formDataTematico.append('cursoId', cursoIdTematico);
+      formDataTematico.append('instructorId', instructorIdTematico);
+
+      // Realizar la solicitud de carga
+      this.http.post('http://localhost:3000/contenidos-tematicos/uploads', formDataTematico, { responseType: 'text' })
+        .subscribe({
+          next: (response) => {
+            console.log('Respuesta del servidor:', response);
+            this.uploadSuccessTematico = true;  // Marca como éxito
+            this.uploadErrorTematico = false;  // Desactiva el error
+          },
+          error: (error) => {
+            console.error('Error al subir archivo temático', error);
+            this.uploadErrorTematico = true;  // Marca como error
+            this.uploadSuccessTematico = false;  // Desactiva el éxito
+          }
+        });
+    }
+  }
+
   guardarTodasLasCalificaciones(): void {
     const cursoId = this.route.snapshot.paramMap.get('id');
 
