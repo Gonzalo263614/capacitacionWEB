@@ -10,6 +10,7 @@ import { ActivatedRoute } from '@angular/router';
 export class DetalleCursoAdminComponent {
   curso: any;
   archivos: any[] = []; // Arreglo para almacenar los archivos
+  contenidos: any[] = []; // Archivos contenidos temáticos
 
   constructor(private route: ActivatedRoute, private http: HttpClient) { }
 
@@ -17,6 +18,7 @@ export class DetalleCursoAdminComponent {
     const cursoId = this.route.snapshot.paramMap.get('id');
     this.obtenerDetalleCurso(cursoId);
     this.obtenerArchivos(cursoId); // Llamar a la función para obtener archivos
+    this.obtenerContenidos(cursoId); // Archivos contenidos temáticos
   }
 
   obtenerDetalleCurso(id: string | null) {
@@ -36,7 +38,14 @@ export class DetalleCursoAdminComponent {
         console.error('Error al obtener los archivos:', error);
       });
   }
-
+  obtenerContenidos(cursoId: string | null) {
+    this.http.get(`http://localhost:3000/archivosContenidos/curso/${cursoId}`)
+      .subscribe((data: any) => {
+        this.contenidos = data;
+      }, error => {
+        console.error('Error al obtener los contenidos:', error);
+      });
+  }
   descargarCurso() {
     const cursoId = this.curso?.id; // Obtén el ID del curso actual
     if (!cursoId) {
@@ -87,6 +96,25 @@ export class DetalleCursoAdminComponent {
       const a = document.createElement('a');
       a.href = url;
       a.download = `Programa institucional de formacion docente y actualizacion profesional_${this.curso.nombre_curso}.csv`; // Nombre del archivo
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }, error => {
+      console.error('Error al descargar el archivo:', error);
+    });
+  }
+  descargarCriterios() {
+    const cursoId = this.curso?.id; // Obtén el ID del curso actual
+    if (!cursoId) {
+      console.error('No se encontró el ID del curso.');
+      return;
+    }
+
+    this.http.get(`http://localhost:3000/descargarCriterios-curso/${cursoId}`, { responseType: 'blob' }).subscribe((response: Blob) => {
+      const url = window.URL.createObjectURL(response);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Criterios Para la seleccion del Instructor_${this.curso.nombre_curso}.pdf`; // Nombre del archivo
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -194,5 +222,4 @@ export class DetalleCursoAdminComponent {
         console.error('Error al descargar el archivo de inscripciones:', error);
       });
   }
-
 }

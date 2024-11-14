@@ -48,6 +48,13 @@
       <option value="Actualización">Actualización</option>
     </select>
 
+    <label>Modalidad del Curso</label>
+    <select [(ngModel)]="modalidadCurso" name="modalidadCurso" required>
+      <option value="Presencial">Presencial</option>
+      <option value="Semipresencial">Semipresencial</option>
+      <option value="Virtual">Virtual</option>
+    </select>
+
     <label>Actividad/Evento</label>
     <input [(ngModel)]="actividadEvento" name="actividadEvento">
 
@@ -203,6 +210,14 @@
       <option value="Nivelación">Nivelación</option>
       <option value="Actualización">Actualización</option>
     </select>
+    
+    <label>Modalidad del Curso</label>
+    <select [(ngModel)]="modalidadCurso" name="modalidadCurso" required>
+      <option value="Presencial">Presencial</option>
+      <option value="Semipresencial">Semipresencial</option>
+      <option value="Virtual">Virtual</option>
+    </select>
+
     <label>Actividad/Evento</label>
     <input [(ngModel)]="actividadEvento" name="actividadEvento">
 

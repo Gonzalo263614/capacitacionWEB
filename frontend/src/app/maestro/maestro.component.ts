@@ -74,12 +74,18 @@ export class MaestroComponent implements OnInit {
 
           // Verificar si el curso tiene departamentos
           const curso = this.cursos.find(c => c.id === cursoId);
-          if (curso.departamentos && !curso.departamentos.includes(departamentoMaestro)) {
-            alert('No puedes inscribirte en este curso porque tu departamento no corresponde.');
-            return;
+          if (curso.departamentos) {
+            // Permitir inscripción si uno de los departamentos es "Desarrollo Académico"
+            const desarrolloAcademico = curso.departamentos.includes('Desarrollo Académico');
+            const departamentoCoincide = curso.departamentos.includes(departamentoMaestro);
+
+            if (!desarrolloAcademico && !departamentoCoincide) {
+              alert('No puedes inscribirte en este curso porque tu departamento no corresponde.');
+              return;
+            }
           }
 
-          // Proceder con la inscripción si el departamento es válido
+          // Proceder con la inscripción si el departamento es válido o es Desarrollo Académico
           this.http.post(`http://localhost:3000/inscribir/${cursoId}`, {}, {
             headers: {
               Authorization: `Bearer ${token}` // Enviar el token en el header
@@ -106,5 +112,6 @@ export class MaestroComponent implements OnInit {
       }
     }
   }
+
 
 }

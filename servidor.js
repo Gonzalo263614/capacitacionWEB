@@ -222,7 +222,7 @@ app.post('/proponer-curso', (req, res) => {
     const {
         nombre_curso, asignaturas_requeridas, contenidos_requeridos, numero_docentes, tipo_asignatura, actividad_evento,
         objetivo, carreras_atendidas, periodo, turno, fecha_inicio, fecha_fin, justificacion,
-        numero_horas, horario, lugar, requisitos, tipo_curso, enfoque_curso, nombre_instructor, apellidopaterno_instructor, apellidomaterno_instructor,
+        numero_horas, horario, lugar, requisitos, tipo_curso, enfoque_curso, modalidad_curso, nombre_instructor, apellidopaterno_instructor, apellidomaterno_instructor,
         curp_instructor, rfc_instructor, maxestudios_instructor, email_instructor, password_instructor, sexo_instructor, tipo_contrato_instructor,
         departamentosSeleccionados, id_jefe
     } = req.body;
@@ -230,14 +230,14 @@ app.post('/proponer-curso', (req, res) => {
     const queryInsertCurso = `INSERT INTO cursos_propuestos (
         nombre_curso, asignaturas_requeridas, contenidos_requeridos, numero_docentes, tipo_asignatura, actividad_evento,
         objetivo, carreras_atendidas, periodo, turno, fecha_inicio, fecha_fin, justificacion, numero_horas, horario, lugar, 
-        requisitos, tipo_curso, enfoque_curso, nombre_instructor, apellidopaterno_instructor, apellidomaterno_instructor, curp_instructor,
+        requisitos, tipo_curso, enfoque_curso, modalidad_curso, nombre_instructor, apellidopaterno_instructor, apellidomaterno_instructor, curp_instructor,
         rfc_instructor, maxestudios_instructor, email_instructor, password_instructor, sexo_instructor, tipo_contrato_instructor
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
     connection.query(queryInsertCurso, [
         nombre_curso, asignaturas_requeridas, contenidos_requeridos, numero_docentes, tipo_asignatura, actividad_evento,
         objetivo, carreras_atendidas, periodo, turno, fecha_inicio, fecha_fin, justificacion, numero_horas, horario, lugar,
-        requisitos, tipo_curso, enfoque_curso, nombre_instructor, apellidopaterno_instructor, apellidomaterno_instructor, curp_instructor,
+        requisitos, tipo_curso, enfoque_curso, modalidad_curso, nombre_instructor, apellidopaterno_instructor, apellidomaterno_instructor, curp_instructor,
         rfc_instructor, maxestudios_instructor, email_instructor, password_instructor, sexo_instructor, tipo_contrato_instructor
     ], (err, result) => {
         if (err) {
@@ -1583,6 +1583,44 @@ app.get('/archivos/download/:id', (req, res) => {
         res.send(archivo.archivo);
     });
 });
+
+app.get('/archivosContenidos/curso/:cursoId', (req, res) => {
+    const cursoId = req.params.cursoId;
+    const sql = 'SELECT * FROM archivos_contenidos_tematicos WHERE curso_id = ?';
+
+    connection.query(sql, [cursoId], (error, results) => {
+        if (error) {
+            return res.status(500).json({ error: 'Error al obtener archivos' });
+        }
+        res.json(results);
+    });
+});
+// Ruta para descargar un archivo por su ID
+app.get('/archivosContenidos/download/:id', (req, res) => {
+    const id = req.params.id;
+
+    const query = 'SELECT nombre_archivo, archivo FROM archivos_contenidos_tematicos WHERE id = ?';
+
+    connection.query(query, [id], (error, results) => {
+        if (error) {
+            return res.status(500).send('Error al obtener el archivo');
+        }
+
+        if (results.length === 0) {
+            return res.status(404).send('Archivo no encontrado');
+        }
+
+        const archivo = results[0];
+
+        // Asegúrate de que solo se envíen los encabezados una vez
+        res.setHeader('Content-Disposition', `attachment; filename="${archivo.nombre_archivo}"`);
+        res.setHeader('Content-Type', 'application/octet-stream');
+
+        // Envío del archivo
+        res.send(archivo.archivo);
+    });
+});
+
 app.get('/descargar-curso/:id', (req, res) => {
     const cursoId = req.params.id;
     const cursoQuery = 'SELECT * FROM cursos_propuestos WHERE id = ?';
@@ -1611,8 +1649,8 @@ app.get('/descargar-curso/:id', (req, res) => {
 
             const departamentos = departamentoResults.map(dept => dept.nombre).join(', ');
 
-            let csv = 'id,nombre_curso,asignaturas_requeridas,contenidos_requeridos,numero_docentes,tipo_asignatura,actividad_evento,objetivo,carreras_atendidas,periodo,fecha_inicio,fecha_final,turno,nombre_instructor,apellidopaterno_instructor,apellidomaterno_instructor,departamentos\n';
-            csv += `${curso.id},${curso.nombre_curso},${curso.asignaturas_requeridas},${curso.contenidos_requeridos},${curso.numero_docentes},${curso.tipo_asignatura},${curso.actividad_evento},${curso.objetivo},${curso.carreras_atendidas},${curso.periodo},${curso.fecha_inicio},${curso.fecha_fin},${curso.turno},${curso.nombre_instructor},${curso.apellidopaterno_instructor},${curso.apellidomaterno_instructor},"${departamentos}"\n`;
+            let csv = 'id,nombre_curso,asignaturas_requeridas,contenidos_requeridos,numero_docentes,tipo_asignatura,modalidad_curso,actividad_evento,objetivo,carreras_atendidas,periodo,fecha_inicio,fecha_final,turno,nombre_instructor,apellidopaterno_instructor,apellidomaterno_instructor,departamentos\n';
+            csv += `${curso.id},${curso.nombre_curso},${curso.asignaturas_requeridas},${curso.contenidos_requeridos},${curso.numero_docentes},${curso.tipo_asignatura},${curso.modalidad_curso},${curso.actividad_evento},${curso.objetivo},${curso.carreras_atendidas},${curso.periodo},${curso.fecha_inicio},${curso.fecha_fin},${curso.turno},${curso.nombre_instructor},${curso.apellidopaterno_instructor},${curso.apellidomaterno_instructor},"${departamentos}"\n`;
 
             // Configura los encabezados para la descarga del archivo con codificación UTF-8
             res.setHeader('Content-Type', 'text/csv; charset=utf-8');
@@ -1655,8 +1693,8 @@ app.get('/descargar2-curso/:id', (req, res) => {
             const departamentos = departamentoResults.map(dept => dept.nombre).join(', ');
 
             // Generamos el contenido del CSV incluyendo la columna de departamentos
-            let csv = 'id,nombre_curso,tipo_curso,enfoque_curso,objetivo,justificacion,fecha_inicio,fecha_fin,numero_horas,horario,lugar,requisitos,nombre_instructor,apellidopaterno_instructor,apellidomaterno_instructor,departamentos\n';
-            csv += `${curso.id},${curso.nombre_curso},${curso.tipo_curso},${curso.enfoque_curso},${curso.objetivo},${curso.justificacion},${curso.fecha_inicio},${curso.fecha_fin},${curso.numero_horas},${curso.horario},${curso.lugar},${curso.requisitos},${curso.nombre_instructor},${curso.apellidopaterno_instructor},${curso.apellidomaterno_instructor},"${departamentos}"\n`;
+            let csv = 'id,nombre_curso,tipo_curso,enfoque_curso,objetivo,justificacion,modalidad_curso,fecha_inicio,fecha_fin,numero_horas,horario,lugar,requisitos,nombre_instructor,apellidopaterno_instructor,apellidomaterno_instructor,departamentos\n';
+            csv += `${curso.id},${curso.nombre_curso},${curso.tipo_curso},${curso.enfoque_curso},${curso.objetivo},${curso.justificacion},${curso.modalidad_curso},${curso.fecha_inicio},${curso.fecha_fin},${curso.numero_horas},${curso.horario},${curso.lugar},${curso.requisitos},${curso.nombre_instructor},${curso.apellidopaterno_instructor},${curso.apellidomaterno_instructor},"${departamentos}"\n`;
 
             // Configura los encabezados para la descarga del archivo con codificación UTF-8
             res.setHeader('Content-Type', 'text/csv; charset=utf-8');
@@ -1669,7 +1707,7 @@ app.get('/descargar2-curso/:id', (req, res) => {
 app.get('/descargar3-curso/:id', (req, res) => {
     const cursoId = req.params.id;
     const cursoQuery = `
-        SELECT id, nombre_curso, tipo_curso, objetivo, periodo, fecha_inicio, fecha_fin, lugar, requisitos
+        SELECT id, nombre_curso, tipo_curso, modalidad_curso, objetivo, periodo, fecha_inicio, fecha_fin, lugar, requisitos
         FROM cursos_propuestos
         WHERE id = ?
     `;
@@ -1701,14 +1739,64 @@ app.get('/descargar3-curso/:id', (req, res) => {
             // Unimos los nombres de los departamentos en una sola cadena, separados por comas
             const departamentos = departamentoResults.map(dept => dept.nombre).join(', ');
 
-            // Generamos el contenido del CSV incluyendo la columna de departamentos
-            let csv = 'id,nombre_curso,tipo_curso,objetivo,periodo,fecha_inicio,fecha_fin,lugar,departamentos,requisitos\n';
-            csv += `${curso.id},${curso.nombre_curso},${curso.tipo_curso},${curso.objetivo},${curso.periodo},${curso.fecha_inicio},${curso.fecha_fin},${curso.lugar},"${departamentos}",${curso.requisitos}\n`;
+            // Generamos el contenido del CSV incluyendo la columna de modalidad_curso y departamentos
+            let csv = 'id,nombre_curso,tipo_curso,modalidad_curso,objetivo,periodo,fecha_inicio,fecha_fin,lugar,departamentos,requisitos\n';
+            csv += `${curso.id},${curso.nombre_curso},${curso.tipo_curso},${curso.modalidad_curso},${curso.objetivo},${curso.periodo},${curso.fecha_inicio},${curso.fecha_fin},${curso.lugar},"${departamentos}",${curso.requisitos}\n`;
 
             // Configura los encabezados para la descarga del archivo con codificación UTF-8
             res.setHeader('Content-Type', 'text/csv; charset=utf-8');
             res.setHeader('Content-Disposition', `attachment; filename="${curso.nombre_curso}_DATOS.csv"`);
             res.status(200).send('\uFEFF' + csv); // Agrega BOM al inicio para que Excel reconozca UTF-8
+        });
+    });
+});
+app.get('/descargarCriterios-curso/:id', (req, res) => {
+    const cursoId = req.params.id;
+
+    // Consulta para obtener datos del curso
+    const cursoQuery = `
+        SELECT nombre_curso, fecha_inicio, fecha_fin
+        FROM cursos_propuestos
+        WHERE id = ?
+    `;
+
+    // Consulta para obtener el archivo relacionado
+    const archivoQuery = `
+        SELECT nombre_archivo, archivo
+        FROM archivos_curso_criterios
+        WHERE nombre_curso = ? AND fecha_inicio = ? AND fecha_fin = ?
+    `;
+
+    // Primero obtenemos los datos del curso
+    connection.query(cursoQuery, [cursoId], (error, cursoResults) => {
+        if (error) {
+            return res.status(500).send('Error al consultar los datos del curso');
+        }
+
+        if (cursoResults.length === 0) {
+            return res.status(404).send('Curso no encontrado');
+        }
+
+        const curso = cursoResults[0]; // Datos del curso
+
+        // Ahora obtenemos el archivo relacionado
+        connection.query(archivoQuery, [curso.nombre_curso, curso.fecha_inicio, curso.fecha_fin], (error, archivoResults) => {
+            if (error) {
+                return res.status(500).send('Error al consultar el archivo');
+            }
+
+            if (archivoResults.length === 0) {
+                return res.status(404).send('Archivo no encontrado para este curso');
+            }
+
+            const archivo = archivoResults[0]; // Datos del archivo
+
+            // Configuración de encabezados para la descarga del archivo
+            res.setHeader('Content-Type', 'application/octet-stream');
+            res.setHeader('Content-Disposition', `attachment; filename="${archivo.nombre_archivo}"`);
+
+            // Enviar el archivo al cliente
+            res.status(200).send(archivo.archivo);
         });
     });
 });

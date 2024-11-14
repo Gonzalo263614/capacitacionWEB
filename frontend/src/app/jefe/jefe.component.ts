@@ -41,7 +41,7 @@ export class JefeComponent {
   tipoCurso = '';
   // Enfoque de curso
   enfoqueCurso = '';
-
+  modalidadCurso = '';
 
   // Datos del instructor
   nombreInstructor = '';
@@ -119,6 +119,7 @@ export class JefeComponent {
     this.requisitos = curso.requisitos;
     this.tipoCurso = curso.tipo_curso;
     this.enfoqueCurso = curso.enfoque_curso;
+    this.modalidadCurso = curso.modalidad_curso;
     // Instructor
     this.nombreInstructor = curso.nombre_instructor;
     this.apellidopaternoInstructor = curso.apellidopaterno_instructor;
@@ -197,6 +198,7 @@ export class JefeComponent {
       requisitos: this.requisitos,
       tipo_curso: this.tipoCurso,
       enfoque_curso: this.enfoqueCurso,
+      modalidad_curso: this.modalidadCurso,
       nombre_instructor: this.nombreInstructor,
       apellidopaterno_instructor: this.apellidopaternoInstructor,
       apellidomaterno_instructor: this.apellidomaternoInstructor,
@@ -243,6 +245,7 @@ export class JefeComponent {
     this.requisitos = '';
     this.tipoCurso = '';
     this.enfoqueCurso = '';
+    this.modalidadCurso = '';
     this.nombreInstructor = '';
     this.apellidopaternoInstructor = '';
     this.apellidomaternoInstructor = '';
