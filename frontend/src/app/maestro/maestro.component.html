@@ -19,6 +19,7 @@
       </p>
       <p><strong>Fecha de Inicio:</strong> {{ curso.fecha_inicio | date }}</p>
       <p><strong>Fecha Final:</strong> {{ curso.fecha_fin | date }}</p>
+      <p><strong>Cupo:</strong> {{ curso.cupo_actual }}</p>
       <button class="btn-details" (click)="toggleDetails(curso.id)">
         {{ curso.mostrarDetalles ? 'Ocultar' : 'Ver Más' }}
       </button>
