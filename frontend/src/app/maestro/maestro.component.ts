@@ -62,20 +62,75 @@ export class MaestroComponent implements OnInit {
     }
   }
 
+  darseDeBaja(cursoId: number) {
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('token');
+      if (token) {
+        // Buscar el curso correspondiente
+        const curso = this.cursos.find(c => c.id === cursoId);
+        if (!curso) {
+          alert('Curso no encontrado.');
+          return;
+        }
+
+        // Validar la fecha actual contra la fecha de inicio del curso
+        const fechaInicio = new Date(curso.fecha_inicio); // Convertir la fecha de inicio del curso a un objeto Date
+        const fechaActual = new Date(); // Obtener la fecha actual
+        const unDiaDespues = new Date(fechaInicio);
+        unDiaDespues.setDate(fechaInicio.getDate() + 1); // Incrementar un día después del inicio
+
+        if (fechaActual >= unDiaDespues) {
+          alert('Ya no puedes darte de baja de este curso porque la fecha límite ha pasado.');
+          return;
+        }
+
+        // Realizar la solicitud HTTP para darse de baja
+        this.http.delete(`http://localhost:3000/baja/${cursoId}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        }).subscribe(
+          (response: any) => {
+            console.log('Baja exitosa:', response);
+            alert('Te has dado de baja del curso con éxito');
+            this.obtenerCursos(); // Actualizar la lista de cursos
+          },
+          error => {
+            console.error('Error al darse de baja del curso:', error);
+            alert('Hubo un error al intentar darte de baja. Por favor, intenta nuevamente.');
+          }
+        );
+      }
+    }
+  }
+
   inscribir(cursoId: number) {
     if (typeof window !== 'undefined') { // Verificar si estamos en el navegador
       const token = localStorage.getItem('token'); // Obtener el token del localStorage
       if (token) {
-        // Primero, obtener el departamento del maestro
+        // Primero, obtener la información del curso
+        const curso = this.cursos.find(c => c.id === cursoId);
+        if (!curso) {
+          alert('Curso no encontrado.');
+          return;
+        }
+
+        // Validar la fecha actual contra la fecha de inicio del curso
+        const fechaInicio = new Date(curso.fecha_inicio); // Convertir la fecha de inicio del curso a objeto Date
+        const fechaActual = new Date(); // Obtener la fecha actual
+        const unDiaDespues = new Date(fechaInicio);
+        unDiaDespues.setDate(fechaInicio.getDate() + 1); // Incrementar un día después del inicio
+
+        if (fechaActual > unDiaDespues) {
+          alert('Ya no puedes inscribirte en este curso porque la fecha límite ha pasado.');
+          return;
+        }
+
+        // Si la fecha es válida, continuar con la inscripción
         this.http.get('http://localhost:3000/mi-perfil', {
           headers: { Authorization: `Bearer ${token}` }
         }).subscribe((usuario: any) => {
           const departamentoMaestro = usuario.departamento;
 
-          // Verificar si el curso tiene departamentos
-          const curso = this.cursos.find(c => c.id === cursoId);
           if (curso.departamentos) {
-            // Permitir inscripción si uno de los departamentos es "Desarrollo Académico"
             const desarrolloAcademico = curso.departamentos.includes('Desarrollo Académico');
             const departamentoCoincide = curso.departamentos.includes(departamentoMaestro);
 
@@ -85,7 +140,6 @@ export class MaestroComponent implements OnInit {
             }
           }
 
-          // Proceder con la inscripción si el departamento es válido o es Desarrollo Académico
           this.http.post(`http://localhost:3000/inscribir/${cursoId}`, {}, {
             headers: {
               Authorization: `Bearer ${token}` // Enviar el token en el header
@@ -112,6 +166,7 @@ export class MaestroComponent implements OnInit {
       }
     }
   }
+
 
 
 }

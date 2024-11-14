@@ -586,6 +586,57 @@ app.post('/inscribir/:id', (req, res) => {
         });
     });
 });
+app.delete('/baja/:cursoId', (req, res) => {
+    const { cursoId } = req.params;
+    const token = req.headers.authorization?.split(' ')[1]; // Obtener el token del header
+
+    if (!token) return res.status(401).json({ error: 'No token provided' });
+
+    jwt.verify(token, secretKey, (err, decoded) => {
+        if (err) return res.status(401).json({ error: 'Invalid token' });
+
+        const userId = decoded.id; // Obtener el ID del usuario del token
+
+        // Primero, eliminar de la tabla usuario_requisitos
+        const deleteUsuarioRequisitosQuery = `
+        DELETE FROM usuario_requisitos 
+        WHERE usuario_id = ? AND curso_id = ?
+      `;
+        connection.query(deleteUsuarioRequisitosQuery, [userId, cursoId], (err, result) => {
+            if (err) {
+                console.error('Error deleting from usuario_requisitos:', err);
+                return res.status(500).json({ error: 'Error deleting from usuario_requisitos' });
+            }
+
+            // Después, eliminar de la tabla inscripciones
+            const deleteInscripcionesQuery = `
+          DELETE FROM inscripciones 
+          WHERE usuario_id = ? AND curso_id = ?
+        `;
+            connection.query(deleteInscripcionesQuery, [userId, cursoId], (err, result) => {
+                if (err) {
+                    console.error('Error deleting from inscripciones:', err);
+                    return res.status(500).json({ error: 'Error deleting from inscripciones' });
+                }
+
+                // Finalmente, actualizar el cupo en cursos_propuestos
+                const updateCupoQuery = `
+            UPDATE cursos_propuestos 
+            SET cupo_actual = cupo_actual - 1 
+            WHERE id = ?
+          `;
+                connection.query(updateCupoQuery, [cursoId], (err, result) => {
+                    if (err) {
+                        console.error('Error updating course capacity:', err);
+                        return res.status(500).json({ error: 'Error updating course capacity' });
+                    }
+
+                    res.status(200).json({ message: 'Te has dado de baja del curso con éxito' });
+                });
+            });
+        });
+    });
+});
 
 
 app.get('/mi-perfil', (req, res) => {
@@ -2230,6 +2281,35 @@ app.get('/curso/:cursoId/departamentos', (req, res) => {
         }
     });
 });
+app.put('/usuarios/:id/cambiar-contrasena', (req, res) => {
+    const { id } = req.params;  // ID del usuario a cambiar la contraseña
+    const { nuevaContrasena } = req.body;  // Nueva contraseña enviada desde el frontend
+
+    console.log('Recibido ID:', id);  // Log para verificar el ID recibido
+    console.log('Recibida nueva contraseña:', nuevaContrasena);  // Log para verificar la nueva contraseña
+
+    // Cifrar la nueva contraseña
+    bcrypt.hash(nuevaContrasena, 10, (err, hash) => {
+        if (err) {
+            console.error('Error hashing password:', err);
+            return res.status(500).json({ error: 'Error cifrando la contraseña' });
+        }
+
+        // Actualizar la contraseña en la base de datos
+        const query = 'UPDATE usuarios SET password = ? WHERE id = ?';
+        connection.query(query, [hash, id], (err, results) => {
+            if (err) {
+                console.error('Error updating password:', err);
+                return res.status(500).json({ error: 'Error actualizando la contraseña' });
+            }
+            if (results.affectedRows === 0) {
+                return res.status(404).json({ error: 'Usuario no encontrado' });
+            }
+            res.json({ message: 'Contraseña cambiada exitosamente' });
+        });
+    });
+});
+
 
 // Iniciar el servidor en el puerto 3000
 const PORT = 3000;

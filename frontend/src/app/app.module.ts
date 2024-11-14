@@ -20,6 +20,7 @@ import { EncuestaComponent } from './encuesta/encuesta.component';
 import { EncuestajefeComponent } from './encuestajefe/encuestajefe.component';
 import { DetalleCursoAdminComponent } from './detalle-curso-admin/detalle-curso-admin.component';
 import { SubdirectorComponent } from './subdirector/subdirector.component';
+import { ChangePasswordComponent } from './change-password/change-password.component';
 
 @NgModule({
   declarations: [
@@ -37,7 +38,8 @@ import { SubdirectorComponent } from './subdirector/subdirector.component';
     EncuestaComponent,
     EncuestajefeComponent,
     DetalleCursoAdminComponent,
-    SubdirectorComponent
+    SubdirectorComponent,
+    ChangePasswordComponent
   ],
   imports: [
     BrowserModule,

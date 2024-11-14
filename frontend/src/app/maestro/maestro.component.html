@@ -53,6 +53,10 @@
       <!-- Botón de inscripción -->
       <button class="btn-inscribe" (click)="inscribir(curso.id)" [disabled]="curso.inscrito">Inscribirse</button>
       <span *ngIf="curso.inscrito" class="inscrito-text">Inscrito</span>
+      <!-- Botón para darse de baja -->
+      <button class="btn-baja" *ngIf="curso.inscrito" (click)="darseDeBaja(curso.id)">
+        Darse de Baja
+      </button>
       <!-- Agregar botón 'Ir' si el maestro está inscrito -->
       <button class="btn-ir" *ngIf="curso.inscrito" (click)="irACurso(curso.id)">
         Ir al Curso

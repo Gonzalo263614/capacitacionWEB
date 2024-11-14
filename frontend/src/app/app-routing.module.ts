@@ -14,6 +14,7 @@ import { EncuestaComponent } from './encuesta/encuesta.component';
 import { EncuestajefeComponent } from './encuestajefe/encuestajefe.component';
 import { DetalleCursoAdminComponent } from './detalle-curso-admin/detalle-curso-admin.component';
 import { SubdirectorComponent } from './subdirector/subdirector.component';
+import { ChangePasswordComponent } from './change-password/change-password.component';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -33,6 +34,7 @@ const routes: Routes = [
   { path: 'encuesta', component: EncuestaComponent }, 
   { path: 'encuestajefe', component: EncuestajefeComponent }, 
   { path: 'detallecursoadmin/:id', component: DetalleCursoAdminComponent },
+  { path: 'change-password/:userId', component: ChangePasswordComponent },
 ];
 
 

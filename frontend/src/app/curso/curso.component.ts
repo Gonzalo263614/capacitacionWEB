@@ -97,61 +97,72 @@ export class CursoComponent implements OnInit {
   }
 
   // Método para descargar la constancia
-  // Método para descargar la constancia
   descargarConstancia(): void {
     // Primero, realizar la consulta para contar las asistencias
     this.http.get<any>(`http://localhost:3000/asistencias/count/${this.usuarioId}/${this.cursoId}`)
       .subscribe({
         next: (asistenciasResponse) => {
           const totalAsistencias = asistenciasResponse.totalAsistencias;
-          const asistenciasCompletas = asistenciasResponse.asistenciasCompletas; // Sumar todos los 1's para obtener asistencias completas
-
+          const asistenciasCompletas = asistenciasResponse.asistenciasCompletas;
+  
           // Calcular el porcentaje de asistencia
           const porcentajeAsistencia = (asistenciasCompletas / totalAsistencias) * 100;
-
-          // Verificar si cumple con el 80%
-          if (porcentajeAsistencia >= 80) {
-            // Actualizar la tabla usuario_requisitos a 1
-            this.http.put<any>(`http://localhost:3000/usuario_requisitos/${this.usuarioId}/${this.cursoId}`, { asistencias: 1 })
-              .subscribe({
-                next: (updateResponse) => {
-                  // Continuar con la verificación de requisitos después de la actualización
-                  this.http.get<any>(`http://localhost:3000/requisitos/${this.usuarioId}/${this.cursoId}`)
-                    .subscribe({
-                      next: (response) => {
-                        const { asistencias, calificacion, evidencias, encuesta1, encuestajefes } = response;
-
-                        if (asistencias === 1 && calificacion === 1 && evidencias === 1 && encuesta1 === 1 && encuestajefes === 1) {
-                          console.log('Descargar'); // Simulación de descarga de constancia
-                        } else {
-                          console.warn('No se cumplen todos los requisitos para descargar la constancia');
+  
+          // Primero, verificamos los requisitos sin importar las asistencias
+          this.http.get<any>(`http://localhost:3000/requisitos/${this.usuarioId}/${this.cursoId}`)
+            .subscribe({
+              next: (response) => {
+                const { asistencias, calificacion, evidencias, encuesta1, encuestajefes } = response;
+                let requisitosFaltantes: string[] = [];
+  
+                // Verificar los requisitos faltantes
+                if (asistencias !== 1) requisitosFaltantes.push('Asistencias');
+                if (calificacion !== 1) requisitosFaltantes.push('Calificación');
+                if (evidencias !== 1) requisitosFaltantes.push('Evidencias');
+                if (encuesta1 !== 1) requisitosFaltantes.push('Encuesta 1');
+                if (encuestajefes !== 1) requisitosFaltantes.push('Encuesta Jefes');
+  
+                // Si faltan requisitos, mostrar alerta
+                if (requisitosFaltantes.length > 0) {
+                  alert(`No se cumplen los siguientes requisitos: ${requisitosFaltantes.join(', ')}`);
+                } else {
+                  // Si se cumplen todos los requisitos, permitir la descarga
+                  if (porcentajeAsistencia >= 80) {
+                    // Actualizar la tabla usuario_requisitos a 1 (asistencias)
+                    this.http.put<any>(`http://localhost:3000/usuario_requisitos/${this.usuarioId}/${this.cursoId}`, { asistencias: 1 })
+                      .subscribe({
+                        next: () => {
+                          console.log('Se cumple con los requisitos y el 80% de asistencias.');
+                          // Aquí puedes agregar el código para descargar la constancia
+                        },
+                        error: (err) => {
+                          console.error('Error al actualizar usuario_requisitos:', err);
                         }
-                      },
-                      error: (err) => {
-                        console.error('Error al verificar los requisitos:', err);
-                      }
-                    });
-                },
-                error: (err) => {
-                  console.error('Error al actualizar usuario_requisitos:', err);
+                      });
+                  } else {
+                    // Si el porcentaje de asistencias es insuficiente, mostrar mensaje
+                    alert('El usuario no cumple con el 80% de asistencias. Se ha registrado un 0.');
+                    this.http.put<any>(`http://localhost:3000/usuario_requisitos/${this.usuarioId}/${this.cursoId}`, { asistencias: 0 })
+                      .subscribe({
+                        next: () => {
+                          console.log('Asistencias insuficientes, se ha registrado un 0.');
+                        },
+                        error: (err) => {
+                          console.error('Error al actualizar usuario_requisitos:', err);
+                        }
+                      });
+                  }
                 }
-              });
-          } else {
-            // Actualizar la tabla usuario_requisitos a 0
-            this.http.put<any>(`http://localhost:3000/usuario_requisitos/${this.usuarioId}/${this.cursoId}`, { asistencias: 0 })
-              .subscribe({
-                next: (updateResponse) => {
-                  console.warn('El usuario no cumple con el 80% de asistencias. Se ha registrado un 0.');
-                },
-                error: (err) => {
-                  console.error('Error al actualizar usuario_requisitos:', err);
-                }
-              });
-          }
+              },
+              error: (err) => {
+                console.error('Error al verificar los requisitos:', err);
+              }
+            });
         },
         error: (err) => {
           console.error('Error al contar las asistencias:', err);
         }
       });
   }
+  
 }

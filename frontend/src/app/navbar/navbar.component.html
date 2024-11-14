@@ -8,6 +8,12 @@
       </a>
     </li>
     <li>
+      <a [routerLink]="['/change-password', userId]"
+         [routerLinkActive]="['active']">
+         Cambiar Contraseña
+      </a>
+    </li>
+    <li>
       <a routerLink="/logout" 
          (click)="logout()">
          Logout
