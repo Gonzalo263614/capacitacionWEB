@@ -2309,6 +2309,34 @@ app.put('/usuarios/:id/cambiar-contrasena', (req, res) => {
         });
     });
 });
+app.get('/usuarioConstancia/:id', (req, res) => {
+    const usuarioId = req.params.id;
+
+    // Consulta para obtener el nombre completo
+    const query = 'SELECT nombre, apellidopaterno, apellidomaterno FROM usuarios WHERE id = ?';
+
+    connection.query(query, [usuarioId], (err, results) => {
+        if (err) {
+            console.error('Error al obtener el usuario:', err);
+            return res.status(500).json({ error: 'Error al obtener el usuario' });
+        }
+
+        // Verificar si el usuario existe
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'Usuario no encontrado' });
+        }
+
+        // Obtener el primer usuario de los resultados
+        const usuario = results[0];
+
+        // Concatenar el nombre completo
+        const nombreCompleto = `${usuario.nombre} ${usuario.apellidopaterno} ${usuario.apellidomaterno}`;
+
+        // Enviar la respuesta con el nombre completo
+        res.json({ nombreCompleto });
+    });
+});
+
 
 
 // Iniciar el servidor en el puerto 3000

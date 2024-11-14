@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
+import { jsPDF } from 'jspdf';
 
 @Component({
   selector: 'app-curso',
@@ -17,6 +18,7 @@ export class CursoComponent implements OnInit {
   usuarioId: number = 0;  // ID del usuario, en este caso, lo puedes obtener dinámicamente
   cursoId: string | null = '';
   showEncuesta: boolean = false; // Controla la visibilidad de la encuesta
+  nombreCompleto: string = ''; // Propiedad para almacenar el nombre completo
 
   constructor(
     private route: ActivatedRoute,
@@ -96,73 +98,142 @@ export class CursoComponent implements OnInit {
     }
   }
 
-  // Método para descargar la constancia
   descargarConstancia(): void {
-    // Primero, realizar la consulta para contar las asistencias
-    this.http.get<any>(`http://localhost:3000/asistencias/count/${this.usuarioId}/${this.cursoId}`)
+    // Obtener el nombre completo del maestro antes de continuar
+    this.http.get<any>(`http://localhost:3000/usuarioConstancia/${this.usuarioId}`)
       .subscribe({
-        next: (asistenciasResponse) => {
-          const totalAsistencias = asistenciasResponse.totalAsistencias;
-          const asistenciasCompletas = asistenciasResponse.asistenciasCompletas;
-  
-          // Calcular el porcentaje de asistencia
-          const porcentajeAsistencia = (asistenciasCompletas / totalAsistencias) * 100;
-  
-          // Primero, verificamos los requisitos sin importar las asistencias
-          this.http.get<any>(`http://localhost:3000/requisitos/${this.usuarioId}/${this.cursoId}`)
+        next: (response) => {
+          this.nombreCompleto = response.nombreCompleto;  // Usar 'nombreCompleto' directamente
+
+          // Realizar la consulta para contar las asistencias
+          this.http.get<any>(`http://localhost:3000/asistencias/count/${this.usuarioId}/${this.cursoId}`)
             .subscribe({
-              next: (response) => {
-                const { asistencias, calificacion, evidencias, encuesta1, encuestajefes } = response;
-                let requisitosFaltantes: string[] = [];
-  
-                // Verificar los requisitos faltantes
-                if (asistencias !== 1) requisitosFaltantes.push('Asistencias');
-                if (calificacion !== 1) requisitosFaltantes.push('Calificación');
-                if (evidencias !== 1) requisitosFaltantes.push('Evidencias');
-                if (encuesta1 !== 1) requisitosFaltantes.push('Encuesta 1');
-                if (encuestajefes !== 1) requisitosFaltantes.push('Encuesta Jefes');
-  
-                // Si faltan requisitos, mostrar alerta
-                if (requisitosFaltantes.length > 0) {
-                  alert(`No se cumplen los siguientes requisitos: ${requisitosFaltantes.join(', ')}`);
-                } else {
-                  // Si se cumplen todos los requisitos, permitir la descarga
-                  if (porcentajeAsistencia >= 80) {
-                    // Actualizar la tabla usuario_requisitos a 1 (asistencias)
-                    this.http.put<any>(`http://localhost:3000/usuario_requisitos/${this.usuarioId}/${this.cursoId}`, { asistencias: 1 })
-                      .subscribe({
-                        next: () => {
-                          console.log('Se cumple con los requisitos y el 80% de asistencias.');
-                          // Aquí puedes agregar el código para descargar la constancia
-                        },
-                        error: (err) => {
-                          console.error('Error al actualizar usuario_requisitos:', err);
+              next: (asistenciasResponse) => {
+                const totalAsistencias = asistenciasResponse.totalAsistencias;
+                const asistenciasCompletas = asistenciasResponse.asistenciasCompletas;
+                const porcentajeAsistencia = (asistenciasCompletas / totalAsistencias) * 100;
+
+                // Verificar los requisitos del curso
+                this.http.get<any>(`http://localhost:3000/requisitos/${this.usuarioId}/${this.cursoId}`)
+                  .subscribe({
+                    next: (requisitosResponse) => {
+                      const { asistencias, calificacion, evidencias, encuesta1, encuestajefes } = requisitosResponse;
+                      let requisitosFaltantes: string[] = [];
+
+                      if (asistencias !== 1) requisitosFaltantes.push('Asistencias');
+                      if (calificacion !== 1) requisitosFaltantes.push('Calificación');
+                      if (evidencias !== 1) requisitosFaltantes.push('Evidencias');
+                      if (encuesta1 !== 1) requisitosFaltantes.push('Encuesta 1');
+                      if (encuestajefes !== 1) requisitosFaltantes.push('Encuesta Jefes');
+
+                      if (requisitosFaltantes.length > 0) {
+                        alert(`No se cumplen los siguientes requisitos: ${requisitosFaltantes.join(', ')}`);
+                      } else {
+                        if (porcentajeAsistencia >= 80) {
+                          this.http.put<any>(`http://localhost:3000/usuario_requisitos/${this.usuarioId}/${this.cursoId}`, { asistencias: 1 })
+                            .subscribe({
+                              next: () => {
+                                console.log('Requisitos cumplidos. Generando constancia...');
+
+                                // Crear el PDF
+                                const doc = new jsPDF({
+                                  orientation: 'portrait',
+                                  unit: 'px',
+                                  format: 'a4',
+                                });
+
+                                // Dimensiones de la página
+                                const pageWidth = doc.internal.pageSize.getWidth();
+                                const pageHeight = doc.internal.pageSize.getHeight();
+
+                                // Cargar la imagen de fondo
+                                const img = new Image();
+                                img.src = 'ilustracion_constancia.png'; // Ruta de la imagen
+
+                                img.onload = () => {
+                                  // Agregar la imagen como fondo
+                                  doc.addImage(img, 'PNG', 0, 0, pageWidth, pageHeight);
+
+                                  // Obtener las fechas de inicio y fin del curso
+                                  const fechaInicio = new Date(this.curso.fecha_inicio);
+                                  const fechaFin = new Date(this.curso.fecha_fin);
+
+                                  // Función para obtener el nombre del mes
+                                  const obtenerMes = (mes: number) => {
+                                    const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+                                    return meses[mes];
+                                  };
+
+                                  // Formatear las fechas para que se muestren en el formato '08 al 12 de enero 2024'
+                                  const diaInicio = fechaInicio.getDate().toString().padStart(2, '0');
+                                  const diaFin = fechaFin.getDate().toString().padStart(2, '0');
+                                  const mesInicio = obtenerMes(fechaInicio.getMonth());
+                                  const mesFin = obtenerMes(fechaFin.getMonth());
+                                  const añoInicio = fechaInicio.getFullYear();
+                                  const añoFin = fechaFin.getFullYear();
+
+                                  // Crear el formato de fecha
+                                  const duracionCurso = `del ${diaInicio} al ${diaFin} de ${mesInicio} ${añoInicio}`;
+
+                                  // Agregar texto dinámico al PDF
+                                  doc.setFont('helvetica', 'normal');
+                                  doc.setFontSize(14);
+                                  doc.text(`${this.nombreCompleto}`, 180, 300); // Nombre del maestro
+                                  doc.text(`Curso: ${this.curso.nombre_curso}`, 195, 320);
+                                  doc.text(`Por haber participado en el curso de ${this.curso.tipo_curso}`, 80, 340);
+                                  doc.text(`"${this.curso.nombre_curso}"`, 200, 360);
+                                  doc.text(`Con el registro ${asistenciasCompletas} y ${this.curso.numero_horas} horas. de duración realizado ${duracionCurso}`, 10, 380);
+                                  doc.text(`Dentro de las instalaciones del instituto en modalidad ${this.curso.modalidad_curso}`, 75, 400);
+                                  doc.text(`Aguascalientes, Ags ., a ${new Date().toLocaleDateString()}`, 125, 420);
+
+                                  // Descargar el archivo PDF
+                                  doc.save('constancia.pdf');
+                                };
+                              },
+                              error: (err) => {
+                                console.error('Error al actualizar usuario_requisitos:', err);
+                              }
+                            });
+                        } else {
+                          alert('El usuario no cumple con el 80% de asistencias.');
+                          this.http.put<any>(`http://localhost:3000/usuario_requisitos/${this.usuarioId}/${this.cursoId}`, { asistencias: 0 })
+                            .subscribe({
+                              next: () => {
+                                console.log('Asistencias insuficientes, se ha registrado un 0.');
+                              },
+                              error: (err) => {
+                                console.error('Error al actualizar usuario_requisitos:', err);
+                              }
+                            });
                         }
-                      });
-                  } else {
-                    // Si el porcentaje de asistencias es insuficiente, mostrar mensaje
-                    alert('El usuario no cumple con el 80% de asistencias. Se ha registrado un 0.');
-                    this.http.put<any>(`http://localhost:3000/usuario_requisitos/${this.usuarioId}/${this.cursoId}`, { asistencias: 0 })
-                      .subscribe({
-                        next: () => {
-                          console.log('Asistencias insuficientes, se ha registrado un 0.');
-                        },
-                        error: (err) => {
-                          console.error('Error al actualizar usuario_requisitos:', err);
-                        }
-                      });
-                  }
-                }
+                      }
+                    },
+                    error: (err) => {
+                      console.error('Error al verificar los requisitos:', err);
+                    }
+                  });
               },
               error: (err) => {
-                console.error('Error al verificar los requisitos:', err);
+                console.error('Error al contar las asistencias:', err);
               }
             });
         },
         error: (err) => {
-          console.error('Error al contar las asistencias:', err);
+          console.error('Error al obtener el nombre del maestro:', err);
         }
       });
   }
-  
+
+  obtenerNombreCompleto(): void {
+    this.http.get<any>(`http://localhost:3000/usuarioConstancia/${this.usuarioId}`)
+      .subscribe({
+        next: (response) => {
+          this.nombreCompleto = response.nombreCompleto;  // Usar 'nombreCompleto' directamente
+        },
+        error: (err) => {
+          console.error('Error al obtener el nombre del maestro:', err);
+        }
+      });
+  }
+
 }
