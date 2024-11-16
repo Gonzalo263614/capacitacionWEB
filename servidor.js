@@ -513,8 +513,9 @@ app.get('/cursos/:id', (req, res) => {
     });
 });
 // Ruta para inscribir a un maestro en un curso
+// Ruta para inscribir a un maestro en un curso 
 app.post('/inscribir/:id', (req, res) => {
-    const { id } = req.params;  // ID del curso
+    const { id } = req.params; // ID del curso
     const token = req.headers.authorization?.split(' ')[1]; // Obtener el token del header
 
     if (!token) return res.status(401).json({ error: 'No token provided' });
@@ -524,68 +525,134 @@ app.post('/inscribir/:id', (req, res) => {
 
         const userId = decoded.id; // Obtener el ID del usuario del token
 
-        // Verificar el cupo del curso
-        const cupoQuery = `
-            SELECT cupo_actual, numero_docentes 
-            FROM cursos_propuestos 
-            WHERE id = ?
-        `;
-
-        connection.query(cupoQuery, [id], (err, result) => {
+        // Iniciar una transacción para garantizar que todas las operaciones se completen correctamente
+        connection.beginTransaction((err) => {
             if (err) {
-                console.error('Error querying course capacity:', err);
-                return res.status(500).json({ error: 'Error querying course capacity' });
+                console.error('Error starting transaction:', err);
+                return res.status(500).json({ error: 'Error starting transaction' });
             }
 
-            const { cupo_actual, numero_docentes } = result[0];
-
-            // Verificar si hay cupo
-            if (cupo_actual >= numero_docentes) {
-                return res.status(400).json({ error: 'Cupo lleno, no se puede inscribir' });
-            }
-
-            // Si hay cupo, insertar la inscripción en la tabla inscripciones
-            const inscripcionQuery = `
-                INSERT INTO inscripciones (usuario_id, curso_id) 
-                VALUES (?, ?)
+            // Verificar el cupo del curso
+            const cupoQuery = `
+                SELECT cupo_actual, numero_docentes 
+                FROM cursos_propuestos 
+                WHERE id = ?
             `;
-            connection.query(inscripcionQuery, [userId, id], (err, result) => {
+
+            connection.query(cupoQuery, [id], (err, result) => {
                 if (err) {
-                    console.error('Error inscribing in course:', err);
-                    return res.status(500).json({ error: 'Error inscribing in course' });
+                    console.error('Error querying course capacity:', err);
+                    return connection.rollback(() => {
+                        res.status(500).json({ error: 'Error querying course capacity' });
+                    });
                 }
 
-                // Insertar en la tabla usuario_requisitos
-                const usuarioRequisitosQuery = `
-                    INSERT INTO usuario_requisitos 
-                    (usuario_id, curso_id, asistencias, calificacion, evidencias, encuesta1, encuestajefes) 
-                    VALUES (?, ?, 0, 0, 0, 0, 0)
+                const { cupo_actual, numero_docentes } = result[0];
+
+                // Verificar si hay cupo
+                if (cupo_actual >= numero_docentes) {
+                    return connection.rollback(() => {
+                        res.status(400).json({ error: 'Cupo lleno, no se puede inscribir' });
+                    });
+                }
+
+                // Consultar el código base en codigocurso
+                const codigoCursoQuery = `
+                    SELECT codigo 
+                    FROM codigocurso 
+                    WHERE curso_id = ?
                 `;
-                connection.query(usuarioRequisitosQuery, [userId, id], (err, result) => {
-                    if (err) {
-                        console.error('Error inserting into usuario_requisitos:', err);
-                        return res.status(500).json({ error: 'Error inserting into usuario_requisitos' });
+                connection.query(codigoCursoQuery, [id], (err, result) => {
+                    if (err || result.length === 0) {
+                        console.error('Error querying course code:', err);
+                        return connection.rollback(() => {
+                            res.status(500).json({ error: 'Error querying course code' });
+                        });
                     }
 
-                    // Actualizar el cupo en la tabla cursos_propuestos
-                    const actualizarCupoQuery = `
-                        UPDATE cursos_propuestos 
-                        SET cupo_actual = cupo_actual + 1 
-                        WHERE id = ?
+                    const codigoBase = result[0].codigo;
+
+                    // Consultar cuántos inscritos hay en la tabla inscripciones para generar el nuevo código
+                    const inscripcionesQuery = `
+                        SELECT COUNT(*) AS inscritos 
+                        FROM inscripciones 
+                        WHERE curso_id = ?
                     `;
-                    connection.query(actualizarCupoQuery, [id], (err, result) => {
+                    connection.query(inscripcionesQuery, [id], (err, result) => {
                         if (err) {
-                            console.error('Error updating course capacity:', err);
-                            return res.status(500).json({ error: 'Error updating course capacity' });
+                            console.error('Error querying inscriptions:', err);
+                            return connection.rollback(() => {
+                                res.status(500).json({ error: 'Error querying inscriptions' });
+                            });
                         }
 
-                        res.status(200).json({ message: 'Inscripción exitosa' });
+                        const inscritos = result[0].inscritos + 1;
+                        const nuevoCodigo = `${codigoBase}-${String(inscritos).padStart(2, '0')}`;
+
+                        // Insertar en la tabla codigomaestrocurso
+                        const codigomaestrocursoQuery = `
+                            INSERT INTO codigomaestrocurso (curso_id, usuario_id, codigo)
+                            VALUES (?, ?, ?)
+                        `;
+                        connection.query(codigomaestrocursoQuery, [id, userId, nuevoCodigo], (err, result) => {
+                            if (err) {
+                                console.error('Error inserting into codigomaestrocurso:', err);
+                                return connection.rollback(() => {
+                                    res.status(500).json({ error: 'Error inserting into codigomaestrocurso' });
+                                });
+                            }
+
+                            // Insertar en la tabla inscripciones
+                            const inscripcionQuery = `
+                                INSERT INTO inscripciones (usuario_id, curso_id) 
+                                VALUES (?, ?)
+                            `;
+                            connection.query(inscripcionQuery, [userId, id], (err, result) => {
+                                if (err) {
+                                    console.error('Error inscribing in course:', err);
+                                    return connection.rollback(() => {
+                                        res.status(500).json({ error: 'Error inscribing in course' });
+                                    });
+                                }
+
+                                // Actualizar el cupo en la tabla cursos_propuestos
+                                const actualizarCupoQuery = `
+                                    UPDATE cursos_propuestos 
+                                    SET cupo_actual = cupo_actual + 1 
+                                    WHERE id = ?
+                                `;
+                                connection.query(actualizarCupoQuery, [id], (err, result) => {
+                                    if (err) {
+                                        console.error('Error updating course capacity:', err);
+                                        return connection.rollback(() => {
+                                            res.status(500).json({ error: 'Error updating course capacity' });
+                                        });
+                                    }
+
+                                    // Confirmar la transacción
+                                    connection.commit((err) => {
+                                        if (err) {
+                                            console.error('Error committing transaction:', err);
+                                            return connection.rollback(() => {
+                                                res.status(500).json({ error: 'Error committing transaction' });
+                                            });
+                                        }
+
+                                        res.status(200).json({
+                                            message: 'Inscripción exitosa',
+                                            codigo: nuevoCodigo
+                                        });
+                                    });
+                                });
+                            });
+                        });
                     });
                 });
             });
         });
     });
 });
+
 app.delete('/baja/:cursoId', (req, res) => {
     const { cursoId } = req.params;
     const token = req.headers.authorization?.split(' ')[1]; // Obtener el token del header
@@ -690,15 +757,76 @@ app.get('/inscripciones/:cursoId', (req, res) => {
 app.post('/instructor-curso', (req, res) => {
     const { id_usuario_instructor, id_curso_propuesto } = req.body;
 
-    const query = 'INSERT INTO instructor_curso (id_usuario_instructor, id_curso_propuesto) VALUES (?, ?)';
-    connection.query(query, [id_usuario_instructor, id_curso_propuesto], (err, results) => {
+    // Iniciar una transacción para garantizar que todas las operaciones se realicen correctamente
+    connection.beginTransaction((err) => {
         if (err) {
-            console.error('Error inserting instructor-course record:', err);
-            return res.status(500).json({ error: 'Error inserting instructor-course record' });
+            console.error('Error starting transaction:', err);
+            return res.status(500).json({ error: 'Error starting transaction' });
         }
-        res.status(201).json({ message: 'Instructor-course record created successfully' });
+
+        // Primera consulta: insertar en instructor_curso
+        const query1 = `
+            INSERT INTO instructor_curso (id_usuario_instructor, id_curso_propuesto) 
+            VALUES (?, ?)
+        `;
+        connection.query(query1, [id_usuario_instructor, id_curso_propuesto], (err, results1) => {
+            if (err) {
+                console.error('Error inserting instructor-course record:', err);
+                return connection.rollback(() => {
+                    res.status(500).json({ error: 'Error inserting instructor-course record' });
+                });
+            }
+
+            // Segunda consulta: contar el total de cursos en codigocurso
+            const query2 = `
+                SELECT COUNT(*) AS total_cursos 
+                FROM codigocurso
+            `;
+            connection.query(query2, (err, results2) => {
+                if (err) {
+                    console.error('Error retrieving total courses:', err);
+                    return connection.rollback(() => {
+                        res.status(500).json({ error: 'Error retrieving total courses' });
+                    });
+                }
+
+                const consecutivo = String(results2[0].total_cursos + 1).padStart(2, '0'); // Consecutivo en 2 dígitos
+                const codigo = `TNM-001-${consecutivo}-2025`; // Generar el código
+
+                // Tercera consulta: insertar en codigocurso
+                const query3 = `
+                    INSERT INTO codigocurso (curso_id, instructor_id, codigo) 
+                    VALUES (?, ?, ?)
+                `;
+                connection.query(query3, [id_curso_propuesto, id_usuario_instructor, codigo], (err, results3) => {
+                    if (err) {
+                        console.error('Error inserting course code:', err);
+                        return connection.rollback(() => {
+                            res.status(500).json({ error: 'Error inserting course code' });
+                        });
+                    }
+
+                    // Confirmar la transacción si todo fue exitoso
+                    connection.commit((err) => {
+                        if (err) {
+                            console.error('Error committing transaction:', err);
+                            return connection.rollback(() => {
+                                res.status(500).json({ error: 'Error committing transaction' });
+                            });
+                        }
+
+                        res.status(201).json({
+                            message: 'Instructor-course record and course code created successfully',
+                            codigo: codigo
+                        });
+                    });
+                });
+            });
+        });
     });
 });
+
+
 app.get('/instructor/curso/:id', (req, res) => {
     const idInstructor = req.params.id;
 
