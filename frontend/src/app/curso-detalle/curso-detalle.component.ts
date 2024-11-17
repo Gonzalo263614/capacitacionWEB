@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
+import { jsPDF } from 'jspdf';
 
 @Component({
   selector: 'app-curso-detalle',
@@ -23,6 +24,8 @@ export class CursoDetalleComponent implements OnInit {
   selectedFileTematico: File | null = null;
   uploadSuccessTematico: boolean | null = null;
   uploadErrorTematico: boolean | null = null;
+  usuario: any = {}; // Información del usuario
+  nombreCompleto: string = ''; // Propiedad para almacenar el nombre completo
   constructor(
     private route: ActivatedRoute,
     private http: HttpClient
@@ -59,6 +62,7 @@ export class CursoDetalleComponent implements OnInit {
           this.error = 'Error al obtener los detalles del curso. Inténtalo de nuevo más tarde.';
         }
       });
+    // Obtener los datos del usuario
   }
 
   // Método para alternar la visibilidad de los detalles del curso
@@ -283,4 +287,96 @@ export class CursoDetalleComponent implements OnInit {
         }
       });
   }
+
+  generateConstancia(): void {
+    // Obtener el ID del curso y el ID del instructor
+    const cursoId = this.route.snapshot.paramMap.get('id');
+    const instructorId = localStorage.getItem('userId'); // ID del instructor
+    console.log('Curso ID:', cursoId);
+    console.log('Instructor ID:', instructorId);
+  
+    if (!cursoId || !instructorId) {
+      alert('Error al obtener los datos necesarios para generar la constancia.');
+      return;
+    }
+  
+    // Primero, obtenemos el nombre completo del usuario
+    this.http.get<any>(`http://localhost:3000/usuarioConstancia/${instructorId}`)
+      .subscribe({
+        next: (usuarioResponse) => {
+          this.nombreCompleto = usuarioResponse.nombreCompleto;
+          console.log(this.nombreCompleto);
+          // Después, obtenemos el número de registro
+          this.http.get<any>(`http://localhost:3000/codigocurso/${cursoId}/${instructorId}`)
+            .subscribe({
+              next: (codigoResponse) => {
+                const numeroRegistro = codigoResponse.codigo;
+                console.log(numeroRegistro);
+                // Crear el PDF con los datos obtenidos
+                const doc = new jsPDF({
+                  orientation: 'portrait',
+                  unit: 'px',
+                  format: 'a4',
+                });
+  
+                const pageWidth = doc.internal.pageSize.getWidth();
+                const pageHeight = doc.internal.pageSize.getHeight();
+  
+                // Verificar que las dimensiones de la página sean correctas
+                console.log('pageWidth:', pageWidth, 'pageHeight:', pageHeight);
+  
+                const img = new Image();
+                img.src = 'ilustracion_constancia.png'; // Ruta de la imagen
+  
+                img.onload = () => {
+                  const fechaInicio = new Date(this.curso.fecha_inicio);
+                  const fechaFin = new Date(this.curso.fecha_fin);
+      
+                  const obtenerMes = (mes: number) => {
+                    const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+                    return meses[mes];
+                  };
+      
+                  const diaInicio = fechaInicio.getDate().toString().padStart(2, '0');
+                  const diaFin = fechaFin.getDate().toString().padStart(2, '0');
+                  const mesInicio = obtenerMes(fechaInicio.getMonth());
+                  const mesFin = obtenerMes(fechaFin.getMonth());
+                  const añoInicio = fechaInicio.getFullYear();
+      
+                  const duracionCurso = `del ${diaInicio} al ${diaFin} de ${mesInicio} ${añoInicio}`;
+                  doc.addImage(img, 'PNG', 0, 0, pageWidth, pageHeight);
+  
+                  // Agregar texto personalizado
+                  doc.setFontSize(16);
+                  doc.setFont('Helvetica', 'bold');
+                  doc.text('CONSTANCIA', pageWidth / 2, 100, { align: 'center' });
+  
+                  doc.setFont('helvetica', 'normal');
+                  doc.setFontSize(14);
+                  doc.text(`${this.nombreCompleto}`, 180, 300);
+                  doc.text(`Curso: ${this.curso.nombre_curso}`, 195, 320);
+                  doc.text(`Por haber impartido en el curso de ${this.curso.tipo_curso}`, 80, 340);
+                  doc.text(`"${this.curso.nombre_curso}"`, 200, 360);
+                  doc.text(`Con el número de registro ${numeroRegistro} y ${this.curso.numero_horas}hrs. de duracion`, 80, 380);
+                  doc.text(`Realizado ${duracionCurso}`, 120, 400);
+                  doc.text(`Dentro de las instalaciones del instituto en modalidad ${this.curso.modalidad_curso}`, 75, 420);
+                  doc.text(`Aguascalientes, Ags., a ${new Date().toLocaleDateString()}`, 125, 440);
+
+                  // Guardar el PDF
+                  doc.save(`Constancia_${this.nombreCompleto}.pdf`);
+                };
+              },
+              error: (err) => {
+                console.error('Error al obtener el número de registro:', err);
+                alert('Error al generar la constancia. Inténtalo de nuevo más tarde.');
+              }
+            });
+        },
+        error: (err) => {
+          console.error('Error al obtener los datos del usuario:', err);
+          alert('Error al obtener el nombre del usuario. Inténtalo de nuevo más tarde.');
+        }
+      });
+  }
+  
 }

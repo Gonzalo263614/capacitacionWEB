@@ -513,7 +513,7 @@ app.get('/cursos/:id', (req, res) => {
     });
 });
 // Ruta para inscribir a un maestro en un curso
-// Ruta para inscribir a un maestro en un curso 
+// Ruta para inscribir a un maestro en un curso
 app.post('/inscribir/:id', (req, res) => {
     const { id } = req.params; // ID del curso
     const token = req.headers.authorization?.split(' ')[1]; // Obtener el token del header
@@ -525,7 +525,7 @@ app.post('/inscribir/:id', (req, res) => {
 
         const userId = decoded.id; // Obtener el ID del usuario del token
 
-        // Iniciar una transacción para garantizar que todas las operaciones se completen correctamente
+        // Iniciar una transacción para garantizar consistencia
         connection.beginTransaction((err) => {
             if (err) {
                 console.error('Error starting transaction:', err);
@@ -538,7 +538,6 @@ app.post('/inscribir/:id', (req, res) => {
                 FROM cursos_propuestos 
                 WHERE id = ?
             `;
-
             connection.query(cupoQuery, [id], (err, result) => {
                 if (err) {
                     console.error('Error querying course capacity:', err);
@@ -556,7 +555,7 @@ app.post('/inscribir/:id', (req, res) => {
                     });
                 }
 
-                // Consultar el código base en codigocurso
+                // Consultar el código base en la tabla codigocurso
                 const codigoCursoQuery = `
                     SELECT codigo 
                     FROM codigocurso 
@@ -572,7 +571,7 @@ app.post('/inscribir/:id', (req, res) => {
 
                     const codigoBase = result[0].codigo;
 
-                    // Consultar cuántos inscritos hay en la tabla inscripciones para generar el nuevo código
+                    // Consultar cuántos inscritos hay en el curso para generar el nuevo código
                     const inscripcionesQuery = `
                         SELECT COUNT(*) AS inscritos 
                         FROM inscripciones 
@@ -609,38 +608,53 @@ app.post('/inscribir/:id', (req, res) => {
                             `;
                             connection.query(inscripcionQuery, [userId, id], (err, result) => {
                                 if (err) {
-                                    console.error('Error inscribing in course:', err);
+                                    console.error('Error inserting into inscripciones:', err);
                                     return connection.rollback(() => {
-                                        res.status(500).json({ error: 'Error inscribing in course' });
+                                        res.status(500).json({ error: 'Error inserting into inscripciones' });
                                     });
                                 }
 
-                                // Actualizar el cupo en la tabla cursos_propuestos
-                                const actualizarCupoQuery = `
-                                    UPDATE cursos_propuestos 
-                                    SET cupo_actual = cupo_actual + 1 
-                                    WHERE id = ?
+                                // Insertar en la tabla usuario_requisitos
+                                const usuarioRequisitosQuery = `
+                                    INSERT INTO usuario_requisitos 
+                                    (usuario_id, curso_id, asistencias, calificacion, evidencias, encuesta1, encuestajefes) 
+                                    VALUES (?, ?, 0, 0, 0, 0, 0)
                                 `;
-                                connection.query(actualizarCupoQuery, [id], (err, result) => {
+                                connection.query(usuarioRequisitosQuery, [userId, id], (err, result) => {
                                     if (err) {
-                                        console.error('Error updating course capacity:', err);
+                                        console.error('Error inserting into usuario_requisitos:', err);
                                         return connection.rollback(() => {
-                                            res.status(500).json({ error: 'Error updating course capacity' });
+                                            res.status(500).json({ error: 'Error inserting into usuario_requisitos' });
                                         });
                                     }
 
-                                    // Confirmar la transacción
-                                    connection.commit((err) => {
+                                    // Actualizar el cupo en la tabla cursos_propuestos
+                                    const actualizarCupoQuery = `
+                                        UPDATE cursos_propuestos 
+                                        SET cupo_actual = cupo_actual + 1 
+                                        WHERE id = ?
+                                    `;
+                                    connection.query(actualizarCupoQuery, [id], (err, result) => {
                                         if (err) {
-                                            console.error('Error committing transaction:', err);
+                                            console.error('Error updating course capacity:', err);
                                             return connection.rollback(() => {
-                                                res.status(500).json({ error: 'Error committing transaction' });
+                                                res.status(500).json({ error: 'Error updating course capacity' });
                                             });
                                         }
 
-                                        res.status(200).json({
-                                            message: 'Inscripción exitosa',
-                                            codigo: nuevoCodigo
+                                        // Confirmar la transacción si todo fue exitoso
+                                        connection.commit((err) => {
+                                            if (err) {
+                                                console.error('Error committing transaction:', err);
+                                                return connection.rollback(() => {
+                                                    res.status(500).json({ error: 'Error committing transaction' });
+                                                });
+                                            }
+
+                                            res.status(200).json({
+                                                message: 'Inscripción exitosa',
+                                                codigo: nuevoCodigo
+                                            });
                                         });
                                     });
                                 });
@@ -1653,6 +1667,9 @@ app.get('/asistencias/count/:usuarioId/:cursoId', (req, res) => {
 app.put('/usuario_requisitos/:usuarioId/:cursoId', (req, res) => {
     const { usuarioId, cursoId } = req.params;
     const { asistencias } = req.body;
+
+    console.log(`Datos recibidos: usuarioId=${usuarioId}, cursoId=${cursoId}, asistencias=${asistencias}`);
+
     const query = `
       UPDATE usuario_requisitos 
       SET asistencias = ? 
@@ -1661,11 +1678,19 @@ app.put('/usuario_requisitos/:usuarioId/:cursoId', (req, res) => {
 
     connection.query(query, [asistencias, usuarioId, cursoId], (error, results) => {
         if (error) {
+            console.error('Error al ejecutar la consulta:', error);
             return res.status(500).json({ error: 'Error al actualizar los requisitos' });
         }
-        res.json({ message: 'Requisitos actualizados correctamente' });
+
+        console.log('Resultado de la consulta:', results);
+        if (results.affectedRows > 0) {
+            res.json({ message: 'Requisitos actualizados correctamente' });
+        } else {
+            res.status(404).json({ message: 'No se encontró el registro correspondiente' });
+        }
     });
 });
+
 // Ruta para subir archivos de contenidos temáticos
 app.post('/contenidos-tematicos/uploads', upload.single('archivoTematico'), (req, res) => {
     const archivo = req.file;
@@ -2459,13 +2484,48 @@ app.get('/usuarioConstancia/:id', (req, res) => {
 
         // Concatenar el nombre completo
         const nombreCompleto = `${usuario.nombre} ${usuario.apellidopaterno} ${usuario.apellidomaterno}`;
-
+        console.log(nombreCompleto);
         // Enviar la respuesta con el nombre completo
         res.json({ nombreCompleto });
     });
 });
 
 
+app.get('/codigo/:cursoId/:usuarioId', (req, res) => {
+    const { cursoId, usuarioId } = req.params;
+    const query = 'SELECT codigo FROM codigomaestrocurso WHERE curso_id = ? AND usuario_id = ?';
+
+    connection.query(query, [cursoId, usuarioId], (err, results) => {
+        if (err) {
+            console.error('Error al obtener el código:', err);
+            res.status(500).send('Error al obtener el código');
+        } else if (results.length > 0) {
+            res.json({ codigo: results[0].codigo });
+        } else {
+            res.status(404).send('No se encontró el código para este usuario y curso');
+        }
+    });
+});
+app.get('/codigocurso/:cursoId/:instructorId', (req, res) => {
+    const { cursoId, instructorId } = req.params;
+    const query = `
+      SELECT codigo 
+      FROM codigocurso 
+      WHERE curso_id = ? AND instructor_id = ?
+      LIMIT 1
+    `;
+
+    connection.query(query, [cursoId, instructorId], (err, results) => {
+        if (err) {
+            console.error('Error al obtener el código:', err);
+            res.status(500).send({ error: 'Error al obtener el código' });
+        } else if (results.length === 0) {
+            res.status(404).send({ error: 'Código no encontrado' });
+        } else {
+            res.send({ codigo: results[0].codigo });
+        }
+    });
+});
 
 // Iniciar el servidor en el puerto 3000
 const PORT = 3000;

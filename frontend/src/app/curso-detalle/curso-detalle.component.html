@@ -90,7 +90,6 @@
 <p *ngIf="uploadSuccessTematico === true" class="success-message">Archivo subido con éxito.</p>
 <p *ngIf="uploadErrorTematico === true" class="error-message">Error al subir el archivo. Ya has subido los contenidos temáticos de este curso.</p>
 
-
 <h2 class="section-title">Subir archivo de Evidencias</h2>
 
 <!-- Mensaje de éxito al subir archivo -->
@@ -110,3 +109,7 @@
   </div>
   <button type="submit" [disabled]="!selectedFile" class="submit-button">Subir Archivo</button>
 </form>
+
+<!-- Nuevo botón para descargar constancia -->
+<h2 class="section-title">Descargar Constancia</h2>
+<button (click)="generateConstancia()" class="download-button">Descargar Constancia</button>
