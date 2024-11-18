@@ -820,18 +820,32 @@ app.post('/instructor-curso', (req, res) => {
                         });
                     }
 
-                    // Confirmar la transacción si todo fue exitoso
-                    connection.commit((err) => {
+                    // Cuarta consulta: insertar en instructor_requisitos
+                    const query4 = `
+                        INSERT INTO instructor_requisitos (usuario_id, curso_id, calificaciones, contenidos, evidencias)
+                        VALUES (?, ?, 0, 0, 0)
+                    `;
+                    connection.query(query4, [id_usuario_instructor, id_curso_propuesto], (err, results4) => {
                         if (err) {
-                            console.error('Error committing transaction:', err);
+                            console.error('Error inserting instructor requirements:', err);
                             return connection.rollback(() => {
-                                res.status(500).json({ error: 'Error committing transaction' });
+                                res.status(500).json({ error: 'Error inserting instructor requirements' });
                             });
                         }
 
-                        res.status(201).json({
-                            message: 'Instructor-course record and course code created successfully',
-                            codigo: codigo
+                        // Confirmar la transacción si todo fue exitoso
+                        connection.commit((err) => {
+                            if (err) {
+                                console.error('Error committing transaction:', err);
+                                return connection.rollback(() => {
+                                    res.status(500).json({ error: 'Error committing transaction' });
+                                });
+                            }
+
+                            res.status(201).json({
+                                message: 'Instructor-course record, course code, and instructor requirements created successfully',
+                                codigo: codigo
+                            });
                         });
                     });
                 });
@@ -2524,6 +2538,101 @@ app.get('/codigocurso/:cursoId/:instructorId', (req, res) => {
         } else {
             res.send({ codigo: results[0].codigo });
         }
+    });
+});
+// Ruta para actualizar calificaciones en la tabla instructor_requisitos
+app.put('/instructor-requisitos/:cursoId/:usuarioId/actualizar-calificaciones', (req, res) => {
+    const { cursoId, usuarioId } = req.params;
+    const { calificaciones } = req.body;
+
+    const query = `
+        UPDATE instructor_requisitos 
+        SET calificaciones = ? 
+        WHERE curso_id = ? AND usuario_id = ?
+    `;
+
+    connection.query(query, [calificaciones, cursoId, usuarioId], (err, results) => {
+        if (err) {
+            console.error('Error al actualizar calificaciones:', err);
+            return res.status(500).json({ error: 'Error al actualizar calificaciones' });
+        }
+
+        if (results.affectedRows === 0) {
+            return res.status(404).json({ message: 'No se encontró el registro para actualizar' });
+        }
+
+        res.status(200).json({ message: 'Calificaciones actualizadas exitosamente' });
+    });
+});
+// Ruta para actualizar contenidos en la tabla instructor_requisitos
+app.put('/instructor-requisitos/:cursoId/:usuarioId/actualizar-contenidos', (req, res) => {
+    const { cursoId, usuarioId } = req.params;
+    const { contenidos } = req.body;
+
+    const query = `
+        UPDATE instructor_requisitos 
+        SET contenidos = ? 
+        WHERE curso_id = ? AND usuario_id = ?
+    `;
+
+    connection.query(query, [contenidos, cursoId, usuarioId], (err, results) => {
+        if (err) {
+            console.error('Error al actualizar contenidos:', err);
+            return res.status(500).json({ error: 'Error al actualizar contenidos' });
+        }
+
+        if (results.affectedRows === 0) {
+            return res.status(404).json({ message: 'No se encontró el registro para actualizar' });
+        }
+
+        res.status(200).json({ message: 'Contenidos actualizados exitosamente' });
+    });
+});
+// Ruta para actualizar evidencias en la tabla instructor_requisitos
+app.put('/instructor-requisitos/:cursoId/:usuarioId/actualizar-evidencias', (req, res) => {
+    const { cursoId, usuarioId } = req.params;
+    const { evidencias } = req.body;
+
+    const query = `
+        UPDATE instructor_requisitos 
+        SET evidencias = ? 
+        WHERE curso_id = ? AND usuario_id = ?
+    `;
+
+    connection.query(query, [evidencias, cursoId, usuarioId], (err, results) => {
+        if (err) {
+            console.error('Error al actualizar evidencias:', err);
+            return res.status(500).json({ error: 'Error al actualizar evidencias' });
+        }
+
+        if (results.affectedRows === 0) {
+            return res.status(404).json({ message: 'No se encontró el registro para actualizar' });
+        }
+
+        res.status(200).json({ message: 'Evidencias actualizadas exitosamente' });
+    });
+});
+// Ruta para validar los requisitos en la tabla instructor_requisitos
+app.get('/validar-requisitos/:cursoId/:instructorId', (req, res) => {
+    const { cursoId, instructorId } = req.params;
+
+    const query = `
+      SELECT calificaciones, contenidos, evidencias 
+      FROM instructor_requisitos 
+      WHERE curso_id = ? AND usuario_id = ?
+    `;
+
+    connection.query(query, [cursoId, instructorId], (err, results) => {
+        if (err) {
+            console.error('Error al consultar los requisitos:', err);
+            return res.status(500).json({ error: 'Error al consultar los requisitos' });
+        }
+
+        if (results.length === 0) {
+            return res.status(404).json({ message: 'No se encontraron registros para este curso y usuario' });
+        }
+
+        res.status(200).json(results[0]); // Enviar los datos de la consulta
     });
 });
 

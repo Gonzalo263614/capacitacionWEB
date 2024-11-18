@@ -189,6 +189,8 @@ export class CursoDetalleComponent implements OnInit {
             console.log('Respuesta del servidor:', response);
             this.uploadSuccess = true;  // Marca como éxito
             this.uploadError = false;  // Desactiva el error
+            // Llamar a la función para actualizar la tabla instructor_requisitos
+            this.actualizarTablaInstructorrequisitos(3); // Mandar 3 para actualizar evidencias
           },
           error: (error) => {
             console.error('Error al subir archivo', error);
@@ -235,6 +237,8 @@ export class CursoDetalleComponent implements OnInit {
             console.log('Respuesta del servidor:', response);
             this.uploadSuccessTematico = true;  // Marca como éxito
             this.uploadErrorTematico = false;  // Desactiva el error
+            // Llamar a la función para actualizar la tabla
+            this.actualizarTablaInstructorrequisitos(2); // Mandar 2 para actualizar `contenidos`
           },
           error: (error) => {
             console.error('Error al subir archivo temático', error);
@@ -265,6 +269,7 @@ export class CursoDetalleComponent implements OnInit {
               .subscribe({
                 next: () => {
                   alert('Calificaciones guardadas exitosamente');
+                  this.actualizarTablaInstructorrequisitos(1);
                 },
                 error: (err) => {
                   // Aquí capturamos el error y mostramos el mensaje
@@ -287,19 +292,96 @@ export class CursoDetalleComponent implements OnInit {
         }
       });
   }
-
-  generateConstancia(): void {
-    // Obtener el ID del curso y el ID del instructor
+  actualizarTablaInstructorrequisitos(accion: number): void {
     const cursoId = this.route.snapshot.paramMap.get('id');
+    const instructorId = localStorage.getItem('userId'); // ID del instructor
+    if (!cursoId || !instructorId) {
+      console.error('Curso ID o Instructor ID son null. Verifica que existan.');
+      return;
+    }
+    // Dependiendo de la acción, hacemos algo diferente
+    if (accion === 1) {
+      // Actualizar calificaciones en instructor_requisitos
+      this.http.put(`http://localhost:3000/instructor-requisitos/${cursoId}/${instructorId}/actualizar-calificaciones`, { calificaciones: 1 })
+        .subscribe({
+          next: () => {
+            console.log('Calificaciones actualizadas a 1 en instructor_requisitos.');
+          },
+          error: (err) => {
+            console.error('Error al actualizar calificaciones en instructor_requisitos:', err);
+          }
+        });
+    } else if (accion === 2) {
+      // Actualizar contenidos en instructor_requisitos
+      this.http.put(`http://localhost:3000/instructor-requisitos/${cursoId}/${instructorId}/actualizar-contenidos`, { contenidos: 1 })
+        .subscribe({
+          next: () => {
+            console.log('Contenidos actualizados a 1 en instructor_requisitos.');
+          },
+          error: (err) => {
+            console.error('Error al actualizar contenidos en instructor_requisitos:', err);
+          }
+        });
+    } else if (accion === 3) {
+      // Actualizar evidencias en instructor_requisitos
+      this.http.put(`http://localhost:3000/instructor-requisitos/${cursoId}/${instructorId}/actualizar-evidencias`, { evidencias: 1 })
+        .subscribe({
+          next: () => {
+            console.log('Evidencias actualizadas a 1 en instructor_requisitos.');
+          },
+          error: (err) => {
+            console.error('Error al actualizar evidencias en instructor_requisitos:', err);
+          }
+        });
+    }
+  }
+  generateConstancia(): void {
+    const cursoId = this.route.snapshot.paramMap.get('id'); // ID del curso
     const instructorId = localStorage.getItem('userId'); // ID del instructor
     console.log('Curso ID:', cursoId);
     console.log('Instructor ID:', instructorId);
-  
+
     if (!cursoId || !instructorId) {
       alert('Error al obtener los datos necesarios para generar la constancia.');
       return;
     }
-  
+
+    // Verificar requisitos en la tabla instructor_requisitos
+    this.http.get<any>(`http://localhost:3000/validar-requisitos/${cursoId}/${instructorId}`)
+      .subscribe({
+        next: (response) => {
+          const { calificaciones, contenidos, evidencias } = response;
+
+          // Validar si todos los campos son 1
+          if (calificaciones === 1 && contenidos === 1 && evidencias === 1) {
+            // Continuar con la generación de la constancia
+            this.generarPDF(cursoId, instructorId);
+          } else {
+            // Mostrar mensaje con los campos faltantes
+            const faltantes = [];
+            if (calificaciones !== 1) faltantes.push('calificaciones');
+            if (contenidos !== 1) faltantes.push('contenidos');
+            if (evidencias !== 1) faltantes.push('evidencias');
+            alert(`No se puede generar la constancia. Los siguientes campos están incompletos: ${faltantes.join(', ')}`);
+          }
+        },
+        error: (err) => {
+          console.error('Error al validar requisitos:', err);
+          alert('Error al validar los requisitos. Inténtalo de nuevo más tarde.');
+        }
+      });
+  }
+
+  // Generar el PDF (mismo código que ya tienes para la generación de la constancia)
+  private generarPDF(cursoId: string, instructorId: string): void {
+    console.log('Curso ID:', cursoId);
+    console.log('Instructor ID:', instructorId);
+
+    if (!cursoId || !instructorId) {
+      alert('Error al obtener los datos necesarios para generar la constancia.');
+      return;
+    }
+
     // Primero, obtenemos el nombre completo del usuario
     this.http.get<any>(`http://localhost:3000/usuarioConstancia/${instructorId}`)
       .subscribe({
@@ -318,49 +400,48 @@ export class CursoDetalleComponent implements OnInit {
                   unit: 'px',
                   format: 'a4',
                 });
-  
+
                 const pageWidth = doc.internal.pageSize.getWidth();
                 const pageHeight = doc.internal.pageSize.getHeight();
-  
+
                 // Verificar que las dimensiones de la página sean correctas
                 console.log('pageWidth:', pageWidth, 'pageHeight:', pageHeight);
-  
+
                 const img = new Image();
                 img.src = 'ilustracion_constancia.png'; // Ruta de la imagen
-  
+
                 img.onload = () => {
                   const fechaInicio = new Date(this.curso.fecha_inicio);
                   const fechaFin = new Date(this.curso.fecha_fin);
-      
+
                   const obtenerMes = (mes: number) => {
                     const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
                     return meses[mes];
                   };
-      
+
                   const diaInicio = fechaInicio.getDate().toString().padStart(2, '0');
                   const diaFin = fechaFin.getDate().toString().padStart(2, '0');
                   const mesInicio = obtenerMes(fechaInicio.getMonth());
                   const mesFin = obtenerMes(fechaFin.getMonth());
                   const añoInicio = fechaInicio.getFullYear();
-      
+
                   const duracionCurso = `del ${diaInicio} al ${diaFin} de ${mesInicio} ${añoInicio}`;
                   doc.addImage(img, 'PNG', 0, 0, pageWidth, pageHeight);
-  
+
                   // Agregar texto personalizado
                   doc.setFontSize(16);
                   doc.setFont('Helvetica', 'bold');
                   doc.text('CONSTANCIA', pageWidth / 2, 100, { align: 'center' });
-  
+
                   doc.setFont('helvetica', 'normal');
                   doc.setFontSize(14);
                   doc.text(`${this.nombreCompleto}`, 180, 300);
-                  doc.text(`Curso: ${this.curso.nombre_curso}`, 195, 320);
-                  doc.text(`Por haber impartido en el curso de ${this.curso.tipo_curso}`, 80, 340);
-                  doc.text(`"${this.curso.nombre_curso}"`, 200, 360);
-                  doc.text(`Con el número de registro ${numeroRegistro} y ${this.curso.numero_horas}hrs. de duracion`, 80, 380);
-                  doc.text(`Realizado ${duracionCurso}`, 120, 400);
-                  doc.text(`Dentro de las instalaciones del instituto en modalidad ${this.curso.modalidad_curso}`, 75, 420);
-                  doc.text(`Aguascalientes, Ags., a ${new Date().toLocaleDateString()}`, 125, 440);
+                  doc.text(`Por haber impartido en el curso de ${this.curso.tipo_curso}`, 80, 320);
+                  doc.text(`"${this.curso.nombre_curso}"`, 200, 340);
+                  doc.text(`Con el número de registro ${numeroRegistro} y ${this.curso.numero_horas}hrs. de duracion`, 80, 360);
+                  doc.text(`Realizado ${duracionCurso}`, 120, 380);
+                  doc.text(`Dentro de las instalaciones del instituto en modalidad ${this.curso.modalidad_curso}`, 75, 400);
+                  doc.text(`Aguascalientes, Ags., a ${new Date().toLocaleDateString()}`, 125, 420);
 
                   // Guardar el PDF
                   doc.save(`Constancia_${this.nombreCompleto}.pdf`);
@@ -378,5 +459,5 @@ export class CursoDetalleComponent implements OnInit {
         }
       });
   }
-  
+
 }
