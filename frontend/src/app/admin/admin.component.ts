@@ -180,4 +180,8 @@ export class AdminComponent implements OnInit {
   irACurso(cursoId: number) {
     this.router.navigate(['/detallecursoadmin', cursoId]);
   }
+
+  irARegistro() {
+    this.router.navigate(['/registro2']);
+  }
 }

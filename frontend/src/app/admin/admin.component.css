@@ -47,25 +47,30 @@ button {
 }
 
 .accept-button {
-    background-color: #4CAF50; /* Verde */
+    background-color: #4CAF50;
+    /* Verde */
     color: white;
 }
 
 .reject-button {
-    background-color: #f44336; /* Rojo */
+    background-color: #f44336;
+    /* Rojo */
 }
 
 .review-button {
-    background-color: #ffc107; /* Amarillo */
+    background-color: #ffc107;
+    /* Amarillo */
 }
 
 .send-comment-button {
-    background-color: #007bff; /* Azul */
+    background-color: #007bff;
+    /* Azul */
     color: white;
 }
 
 button:hover {
-    background-color: #0056b3; /* Azul oscuro */
+    background-color: #0056b3;
+    /* Azul oscuro */
 }
 
 /* Estilos para el campo de comentario */
@@ -101,4 +106,19 @@ textarea {
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     background: linear-gradient(90deg, #eff1f5, #ccc8c8);
     text-align: center;
+}
+
+.register-button {
+    margin-bottom: 20px;
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.register-button:hover {
+    background-color: #0056b3;
 }

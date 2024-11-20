@@ -21,6 +21,7 @@ import { EncuestajefeComponent } from './encuestajefe/encuestajefe.component';
 import { DetalleCursoAdminComponent } from './detalle-curso-admin/detalle-curso-admin.component';
 import { SubdirectorComponent } from './subdirector/subdirector.component';
 import { ChangePasswordComponent } from './change-password/change-password.component';
+import { Registro2Component } from './registro2/registro2.component';
 
 @NgModule({
   declarations: [
@@ -39,7 +40,8 @@ import { ChangePasswordComponent } from './change-password/change-password.compo
     EncuestajefeComponent,
     DetalleCursoAdminComponent,
     SubdirectorComponent,
-    ChangePasswordComponent
+    ChangePasswordComponent,
+    Registro2Component
   ],
   imports: [
     BrowserModule,

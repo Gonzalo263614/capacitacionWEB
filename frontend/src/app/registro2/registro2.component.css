@@ -1,0 +1,97 @@
+/* Estilos generales para el formulario */
+.register-form {
+    width: 400px;
+    margin: 20px auto;
+    padding: 20px;
+    border-radius: 10px;
+    background-color: #ffffff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    font-family: 'Arial', sans-serif;
+}
+
+/* Título del formulario */
+.form-title2 {
+    text-align: center;
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+/* Estilos para los grupos de formulario */
+.form-group {
+    margin-bottom: 15px;
+}
+
+/* Etiquetas */
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #333;
+}
+
+/* Campos de entrada */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #bdc3c7;
+    border-radius: 5px;
+    box-sizing: border-box;
+    font-size: 16px;
+    transition: border-color 0.3s ease;
+}
+
+/* Estilos de enfoque para los campos de entrada */
+input:focus,
+select:focus {
+    border-color: #3498db;
+    outline: none;
+}
+
+/* Botón de envío */
+.btn {
+    width: 100%;
+    padding: 12px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+.btn:hover {
+    background-color: #2980b9;
+}
+/* Título con fondo degradado y sombra */
+.form-title {
+    text-align: center;
+    font-size: 28px; /* Aumentar tamaño */
+    font-weight: 700; /* Hacerlo más grueso */
+    color: white; /* Cambiar color a blanco */
+    margin-bottom: 25px;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    /*background: linear-gradient(90deg, #2980b9, #6dd5ed); /* Degradado */
+    background: linear-gradient(90deg, #093f63, #093f63); /* Degradado */
+    padding: 20px; /* Espaciado alrededor del texto */
+    border-radius: 8px; /* Bordes redondeados */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Sombra */
+    transition: transform 0.3s ease;
+}
+.logo {
+    display: block;
+    margin: 0 auto 20px; /* Centrar y agregar margen inferior */
+    width: 120px; /* Ajusta el tamaño del logo aquí */
+    height: auto; /* Mantener proporciones del logo */
+}
+/* Responsividad */
+@media (max-width: 400px) {
+    .register-form {
+        width: 100%;
+        padding: 15px;
+    }
+}

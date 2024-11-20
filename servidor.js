@@ -2636,6 +2636,26 @@ app.get('/validar-requisitos/:cursoId/:instructorId', (req, res) => {
     });
 });
 
+app.put('/cursos/:id/terminar', (req, res) => {
+    const cursoId = req.params.id;
+
+    const query = "UPDATE cursos_propuestos SET estado = 'terminado' WHERE id = ?";
+    connection.query(query, [cursoId], (err, result) => {
+        if (err) {
+            console.error('Error al actualizar el estado del curso:', err);
+            // Respuesta con un mensaje de error detallado en formato JSON
+            res.status(500).json({ error: 'Error interno del servidor' });
+        } else if (result.affectedRows === 0) {
+            // Respuesta cuando no se encuentra el curso
+            res.status(404).json({ error: 'Curso no encontrado' });
+        } else {
+            // Respuesta exitosa en formato JSON
+            res.status(200).json({ message: `Estado del curso con ID ${cursoId} actualizado a "terminado"` });
+        }
+    });
+});
+
+
 // Iniciar el servidor en el puerto 3000
 const PORT = 3000;
 app.listen(PORT, () => {

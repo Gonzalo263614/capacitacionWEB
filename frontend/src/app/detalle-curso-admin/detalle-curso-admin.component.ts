@@ -222,4 +222,31 @@ export class DetalleCursoAdminComponent {
         console.error('Error al descargar el archivo de inscripciones:', error);
       });
   }
+  confirmarTerminarCurso() {
+    const confirmacion = window.confirm("¿Estás seguro de que deseas marcar este curso como 'terminado'?");
+    if (confirmacion) {
+      this.terminarCurso();
+    }
+  }
+
+  terminarCurso() {
+    if (!this.curso || !this.curso.id) {
+      console.error("No se encontró el ID del curso.");
+      return;
+    }
+
+    const cursoId = this.curso.id;
+    this.http.put(`http://localhost:3000/cursos/${cursoId}/terminar`, {})
+      .subscribe(
+        () => {
+          alert("El curso se ha marcado como 'terminado'.");
+          this.curso.estado = 'terminado'; // Actualiza el estado localmente
+        },
+        (error) => {
+          console.error("Error al terminar el curso:", error);
+          alert("Hubo un error al marcar el curso como 'terminado'. Intenta de nuevo.");
+        }
+      );
+  }
+
 }

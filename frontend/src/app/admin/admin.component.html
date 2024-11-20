@@ -3,7 +3,8 @@
   <h2 class="form-title">Formación y Actualización Profesional Docente</h2>
   <img src="TecNM.png" alt="Logo de la Institución" class="logo">
   <h1>Bienvenido, Administrador</h1>
-
+  <!-- Botón para redirigir al registro -->
+  <button (click)="irARegistro()" class="register-button">Registrar Usuario</button>
   <!-- Botón para mostrar/ocultar los cursos -->
   <button class="toggle-button" (click)="toggleCursos()">
     {{ mostrarCursos ? 'Ocultar Cursos Propuestos' : 'Mostrar Cursos Propuestos' }}

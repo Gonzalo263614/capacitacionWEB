@@ -15,12 +15,14 @@ import { EncuestajefeComponent } from './encuestajefe/encuestajefe.component';
 import { DetalleCursoAdminComponent } from './detalle-curso-admin/detalle-curso-admin.component';
 import { SubdirectorComponent } from './subdirector/subdirector.component';
 import { ChangePasswordComponent } from './change-password/change-password.component';
+import { Registro2Component } from './registro2/registro2.component';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'maestro', component: MaestroComponent },
   { path: 'admin', component: AdminComponent },
   { path: 'register', component: RegisterComponent },
+  { path: 'registro2', component: Registro2Component },
   { path: 'instructor', component: InstructorComponent },
   { path: 'jefe', component: JefeComponent },
   { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },

@@ -15,7 +15,7 @@
     <div *ngIf="!curso" class="loading">
         <p>Cargando curso...</p>
     </div>
-
+    <br><button class="download-button" (click)="confirmarTerminarCurso()">Terminar Curso</button>
     <div *ngIf="archivos.length > 0" class="files-uploaded">
         <h3>Archivo Evidencias:</h3>
         <ul>
