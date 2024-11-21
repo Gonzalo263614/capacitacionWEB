@@ -44,16 +44,16 @@
     <label>Enfoque de Curso</label>
     <select [(ngModel)]="enfoqueCurso" name="enfoqueCurso" required>
       <option value="Reforzamiento">Reforzamiento</option>
-      <option value="Nivelación">Nivelación</option>
-      <option value="Actualización">Actualización</option>
+      <option value="Nivelación">Nivelacion</option>
+      <option value="Actualización">Actualizacion</option>
     </select>
-
+    
     <label>Modalidad del Curso</label>
     <select [(ngModel)]="modalidadCurso" name="modalidadCurso" required>
-      <option value="Presencial">Presencial</option>
-      <option value="Semipresencial">Semipresencial</option>
-      <option value="Virtual">Virtual</option>
-    </select>
+      <option value="Presencial">presencial</option>
+      <option value="Semipresencial">semipresencial</option>
+      <option value="Virtual">virtual</option>
+    </select>    
 
     <label>Actividad/Evento</label>
     <input [(ngModel)]="actividadEvento" name="actividadEvento">
@@ -164,7 +164,7 @@
 <h2 class="section-title">Cursos Pendientes de Revisión</h2>
 <div *ngFor="let curso of cursosPendientes" class="curso-card">
   <h3 class="curso-title">{{ curso.nombre_curso }}</h3>
-  <p><strong>Volver a colocar departamentos y Revisar</strong>: {{ curso.comentario_revision }}
+  <p><strong> De rutina volver a colocar departamentos, enfoque, modalidad., y favor de REVISAR</strong>: {{ curso.comentario_revision }}
   </p>
   <button class="boton-encuesta" (click)="abrirFormularioModificar(curso)">Modificar</button>
 </div>
@@ -207,15 +207,15 @@
     <label>Enfoque de Curso</label>
     <select [(ngModel)]="enfoqueCurso" name="enfoqueCurso" required>
       <option value="Reforzamiento">Reforzamiento</option>
-      <option value="Nivelación">Nivelación</option>
-      <option value="Actualización">Actualización</option>
+      <option value="Nivelación">Nivelacion</option>
+      <option value="Actualización">Actualizacion</option>
     </select>
     
     <label>Modalidad del Curso</label>
     <select [(ngModel)]="modalidadCurso" name="modalidadCurso" required>
-      <option value="Presencial">Presencial</option>
-      <option value="Semipresencial">Semipresencial</option>
-      <option value="Virtual">Virtual</option>
+      <option value="Presencial">presencial</option>
+      <option value="Semipresencial">semipresencial</option>
+      <option value="Virtual">virtual</option>
     </select>
 
     <label>Actividad/Evento</label>

@@ -16,7 +16,7 @@ const connection = mysql.createConnection({
     host: 'localhost',
     user: 'root',
     password: 'Contraseña2190.', // Usa tu contraseña
-    database: 'capacitacionDB'
+    database: 'capacitacionDB2'
 });
 
 // CONEXION BASE DE DATOS
@@ -301,40 +301,49 @@ app.post('/proponer-curso', (req, res) => {
 app.delete('/eliminar-curso/:id', (req, res) => {
     const cursoId = req.params.id;
 
-    // Paso 1: Eliminar relaciones con jefe en la tabla `jefe_curso`
-    const queryEliminarJefeCurso = `
-        DELETE FROM jefe_curso WHERE id_curso = ?
-    `;
+    // Paso 0: Eliminar relaciones con requisitos_curso
+    const queryEliminarRequisitosCurso = `
+    DELETE FROM requisitos_curso WHERE id_curso = ?
+`;
 
-    connection.query(queryEliminarJefeCurso, [cursoId], (err, result) => {
+    connection.query(queryEliminarRequisitosCurso, [cursoId], (err, result) => {
         if (err) {
-            console.error('Error al eliminar relación jefe-curso:', err);
-            return res.status(500).json({ error: 'Error al eliminar relación jefe-curso' });
+            console.error('Error al eliminar relación curso-requisitos_curso:', err);
+            return res.status(500).json({ error: 'Error al eliminar relación curso-requisitos_curso' });
         }
 
-        // Paso 2: Eliminar relaciones con departamentos en la tabla `departamento_curso`
-        const queryEliminarRelaciones = `
-            DELETE FROM departamento_curso WHERE curso_id = ?
-        `;
-
-        connection.query(queryEliminarRelaciones, [cursoId], (err, result) => {
+        // Paso 1: Eliminar relaciones con jefe en la tabla `jefe_curso`
+        const queryEliminarJefeCurso = `
+        DELETE FROM jefe_curso WHERE id_curso = ?
+    `;
+        connection.query(queryEliminarJefeCurso, [cursoId], (err, result) => {
             if (err) {
-                console.error('Error al eliminar relación curso-departamento:', err);
-                return res.status(500).json({ error: 'Error al eliminar relación curso-departamento' });
+                console.error('Error al eliminar relación jefe-curso:', err);
+                return res.status(500).json({ error: 'Error al eliminar relación jefe-curso' });
             }
 
-            // Paso 3: Eliminar el curso de la tabla `cursos_propuestos`
-            const queryEliminarCurso = `
-                DELETE FROM cursos_propuestos WHERE id = ?
-            `;
-
-            connection.query(queryEliminarCurso, [cursoId], (err, result) => {
+            // Paso 2: Eliminar relaciones con departamentos en la tabla `departamento_curso`
+            const queryEliminarRelaciones = `
+            DELETE FROM departamento_curso WHERE curso_id = ?
+        `;
+            connection.query(queryEliminarRelaciones, [cursoId], (err, result) => {
                 if (err) {
-                    console.error('Error al eliminar el curso:', err);
-                    return res.status(500).json({ error: 'Error al eliminar el curso' });
+                    console.error('Error al eliminar relación curso-departamento:', err);
+                    return res.status(500).json({ error: 'Error al eliminar relación curso-departamento' });
                 }
 
-                res.status(200).json({ message: 'Curso eliminado exitosamente' });
+                // Paso 3: Eliminar el curso de la tabla `cursos_propuestos`
+                const queryEliminarCurso = `
+                DELETE FROM cursos_propuestos WHERE id = ?
+            `;
+                connection.query(queryEliminarCurso, [cursoId], (err, result) => {
+                    if (err) {
+                        console.error('Error al eliminar el curso:', err);
+                        return res.status(500).json({ error: 'Error al eliminar el curso' });
+                    }
+
+                    res.status(200).json({ message: 'Curso eliminado exitosamente' });
+                });
             });
         });
     });
@@ -680,9 +689,9 @@ app.delete('/baja/:cursoId', (req, res) => {
 
         // Primero, eliminar de la tabla usuario_requisitos
         const deleteUsuarioRequisitosQuery = `
-        DELETE FROM usuario_requisitos 
-        WHERE usuario_id = ? AND curso_id = ?
-      `;
+            DELETE FROM usuario_requisitos 
+            WHERE usuario_id = ? AND curso_id = ?
+        `;
         connection.query(deleteUsuarioRequisitosQuery, [userId, cursoId], (err, result) => {
             if (err) {
                 console.error('Error deleting from usuario_requisitos:', err);
@@ -691,33 +700,46 @@ app.delete('/baja/:cursoId', (req, res) => {
 
             // Después, eliminar de la tabla inscripciones
             const deleteInscripcionesQuery = `
-          DELETE FROM inscripciones 
-          WHERE usuario_id = ? AND curso_id = ?
-        `;
+                DELETE FROM inscripciones 
+                WHERE usuario_id = ? AND curso_id = ?
+            `;
             connection.query(deleteInscripcionesQuery, [userId, cursoId], (err, result) => {
                 if (err) {
                     console.error('Error deleting from inscripciones:', err);
                     return res.status(500).json({ error: 'Error deleting from inscripciones' });
                 }
 
-                // Finalmente, actualizar el cupo en cursos_propuestos
-                const updateCupoQuery = `
-            UPDATE cursos_propuestos 
-            SET cupo_actual = cupo_actual - 1 
-            WHERE id = ?
-          `;
-                connection.query(updateCupoQuery, [cursoId], (err, result) => {
+                // Eliminar de la tabla codigomaestrocurso
+                const deleteCodigoMaestroCursoQuery = `
+                    DELETE FROM codigomaestrocurso 
+                    WHERE usuario_id = ? AND curso_id = ?
+                `;
+                connection.query(deleteCodigoMaestroCursoQuery, [userId, cursoId], (err, result) => {
                     if (err) {
-                        console.error('Error updating course capacity:', err);
-                        return res.status(500).json({ error: 'Error updating course capacity' });
+                        console.error('Error deleting from codigomaestrocurso:', err);
+                        return res.status(500).json({ error: 'Error deleting from codigomaestrocurso' });
                     }
 
-                    res.status(200).json({ message: 'Te has dado de baja del curso con éxito' });
+                    // Finalmente, actualizar el cupo en cursos_propuestos
+                    const updateCupoQuery = `
+                        UPDATE cursos_propuestos 
+                        SET cupo_actual = cupo_actual - 1 
+                        WHERE id = ?
+                    `;
+                    connection.query(updateCupoQuery, [cursoId], (err, result) => {
+                        if (err) {
+                            console.error('Error updating course capacity:', err);
+                            return res.status(500).json({ error: 'Error updating course capacity' });
+                        }
+
+                        res.status(200).json({ message: 'Te has dado de baja del curso con éxito' });
+                    });
                 });
             });
         });
     });
 });
+
 
 
 app.get('/mi-perfil', (req, res) => {

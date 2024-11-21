@@ -77,12 +77,18 @@ export class AdminComponent implements OnInit {
           // Si ambos son 1, entonces acepta el curso
           this.aceptarCurso(cursoId);
         } else {
-          console.log('El curso aún no puede ser aceptado.');
+          // Si el subdirector no ha aprobado, muestra una alerta
+          if (data.orden_subdirector !== 1) {
+            alert('Falta que el subdirector apruebe el curso.');
+          } else {
+            console.log('El curso aún no puede ser aceptado.');
+          }
         }
       }, error => {
         console.error('Error al verificar los requisitos del curso:', error);
       });
   }
+  
   aceptarCurso(cursoId: number) {
     // Actualiza el estado del curso a 'aceptado'
     this.http.put(`http://localhost:3000/actualizar-curso/${cursoId}`, { estado: 'aceptado' })

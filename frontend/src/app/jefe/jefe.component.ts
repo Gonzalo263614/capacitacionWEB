@@ -97,7 +97,9 @@ export class JefeComponent {
   abrirFormularioModificar(curso: any) {
     this.cursoSeleccionado = curso;
     this.mostrarFormularioModificar = true;
-
+    // Verificar los valores del enfoque y modalidad
+    console.log('Enfoque:', curso.enfoque_curso);
+    console.log('Modalidad:', curso.modalidad_curso);
     // Cargar los datos del curso seleccionado en el formulario
     this.nombreCurso = curso.nombre_curso;
     this.asignaturasRequeridas = curso.asignaturas_requeridas;
@@ -120,6 +122,7 @@ export class JefeComponent {
     this.tipoCurso = curso.tipo_curso;
     this.enfoqueCurso = curso.enfoque_curso;
     this.modalidadCurso = curso.modalidad_curso;
+    console.log('Enfoquee:', this.enfoqueCurso, 'Modalidadd:', this.modalidadCurso);
     // Instructor
     this.nombreInstructor = curso.nombre_instructor;
     this.apellidopaternoInstructor = curso.apellidopaterno_instructor;

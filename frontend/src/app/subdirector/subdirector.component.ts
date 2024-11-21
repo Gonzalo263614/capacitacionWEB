@@ -80,7 +80,12 @@ export class SubdirectorComponent implements OnInit {
           // Si ambos son 1, entonces acepta el curso
           this.aceptarCurso(cursoId);
         } else {
-          console.log('El curso aún no puede ser aceptado.');
+          // Si el subdirector no ha aprobado, muestra una alerta
+          if (data.orden_subdirector !== 1) {
+            alert('Falta que el administrador apruebe el curso.');
+          } else {
+            console.log('El curso aún no puede ser aceptado.');
+          }
         }
       }, error => {
         console.error('Error al verificar los requisitos del curso:', error);

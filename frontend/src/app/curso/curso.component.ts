@@ -207,7 +207,6 @@ export class CursoComponent implements OnInit {
             doc.setFont('helvetica', 'normal');
             doc.setFontSize(14);
             doc.text(`${this.nombreCompleto}`, 180, 300);
-            doc.text(`Curso: ${this.curso.nombre_curso}`, 195, 320);
             doc.text(`Por haber participado en el curso de ${this.curso.tipo_curso}`, 80, 340);
             doc.text(`"${this.curso.nombre_curso}"`, 200, 360);
             doc.text(`Con el número de registro ${numeroRegistro} y ${this.curso.numero_horas}hrs. de duracion`, 80, 380);
