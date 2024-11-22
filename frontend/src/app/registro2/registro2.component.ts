@@ -28,8 +28,29 @@ export class Registro2Component {
   constructor(private http: HttpClient, private router: Router) { }
 
   register() {
+    if (!this.email || !this.password || !this.confirmPassword || !this.nombre || !this.apellidopaterno || !this.apellidomaterno || !this.rol || !this.curp || !this.rfc || !this.maxestudios || !this.sexo || !this.departamento || !this.tipo_contrato) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Por favor, completa todos los campos obligatorios.',
+        confirmButtonText: 'Aceptar',
+        background: '#f8d7da',
+        color: '#721c24',
+        confirmButtonColor: '#dc3545'
+      });
+      return;
+    }
+  
     if (this.password !== this.confirmPassword) {
-      console.error('Passwords do not match');
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Las contraseñas no coinciden.',
+        confirmButtonText: 'Aceptar',
+        background: '#f8d7da',
+        color: '#721c24',
+        confirmButtonColor: '#dc3545'
+      });
       return;
     }
   
@@ -43,9 +64,9 @@ export class Registro2Component {
       curp: this.curp,
       rfc: this.rfc,
       maxestudios: this.maxestudios,
-      sexo: this.sexo, // Asegúrate de incluir el sexo
-      departamento: this.departamento, // Añadir departamento
-      tipo_contrato: this.tipo_contrato  // Añadir tipo de contrato
+      sexo: this.sexo,
+      departamento: this.departamento,
+      tipo_contrato: this.tipo_contrato
     };
   
     this.http.post(this.apiUrl, user).subscribe(
@@ -65,6 +86,29 @@ export class Registro2Component {
       },
       error => {
         console.error('Error registering user', error);
+  
+        // Verificar si el error es por correo ya registrado
+        if (error.status === 400 && error.error.error === 'El correo ya está registrado.') {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'El correo ya está registrado. Por favor, utiliza otro.',
+            confirmButtonText: 'Aceptar',
+            background: '#f8d7da',
+            color: '#721c24',
+            confirmButtonColor: '#dc3545'
+          });
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Hubo un error al registrar el usuario, el correo ya está registrado.',
+            confirmButtonText: 'Aceptar',
+            background: '#f8d7da',
+            color: '#721c24',
+            confirmButtonColor: '#dc3545'
+          });
+        }
       }
     );
   }  

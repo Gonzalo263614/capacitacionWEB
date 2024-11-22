@@ -1,50 +1,52 @@
-/* Estilos generales */
+/* Estilos globales */
 body {
-    font-family: 'Helvetica Neue', Arial, sans-serif;
-    background-color: #f4f7f9;
+    font-family: 'Roboto', sans-serif;
+    background-color: #f7f9fc;
     color: #333;
     margin: 0;
     padding: 0;
+    line-height: 1.6;
 }
 
 h1,
 h2 {
     text-align: center;
-    color: #333;
+    color: #2c3e50;
 }
 
 p {
     text-align: center;
-    color: #666;
+    color: #7f8c8d;
     font-size: 18px;
-    line-height: 1.5;
 }
 
-/* Estilos para el botón de abrir/cerrar formulario */
+/* Botón de abrir/cerrar formulario */
 .btn-toggle-form {
-    background-color: #007bff;
-    color: white;
+    background-color: #3498db;
+    color: #fff;
     border: none;
     padding: 12px 25px;
-    border-radius: 5px;
+    border-radius: 30px;
     cursor: pointer;
     display: block;
     margin: 20px auto;
-    font-size: 16px;
+    font-size: 18px;
     font-weight: bold;
-    transition: background-color 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
 }
 
 .btn-toggle-form:hover {
-    background-color: #0056b3;
+    background-color: #2980b9;
+    transform: scale(1.05);
 }
 
-/* Estilos del formulario */
+/* Formulario */
 .form-container {
     background-color: #ffffff;
-    padding: 25px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
     width: 600px;
     margin: 20px auto;
 }
@@ -52,15 +54,16 @@ p {
 .form-container h2 {
     text-align: center;
     font-size: 24px;
-    color: #333;
-    margin-bottom: 15px;
+    color: #2c3e50;
+    margin-bottom: 25px;
+    font-weight: bold;
 }
 
 .form-container label {
     display: block;
     font-weight: bold;
     margin-top: 15px;
-    color: #555;
+    color: #34495e;
 }
 
 .form-container input,
@@ -68,208 +71,266 @@ p {
 .form-container select {
     width: 100%;
     padding: 10px;
-    margin-top: 5px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 14px;
+    margin-top: 8px;
+    border: 1px solid #bdc3c7;
+    border-radius: 8px;
+    font-size: 16px;
+    background-color: #ecf0f1;
+    color: #2c3e50;
+    transition: all 0.3s ease;
+}
+
+.form-container input:focus,
+.form-container textarea:focus,
+.form-container select:focus {
+    border-color: #3498db;
+    outline: none;
+    background-color: #ffffff;
+    box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
 }
 
 .form-container .btn-submit {
-    background-color: #28a745;
+    background-color: #27ae60;
     color: white;
     border: none;
     padding: 12px;
-    border-radius: 5px;
+    border-radius: 30px;
     cursor: pointer;
     margin-top: 20px;
     width: 100%;
-    font-size: 16px;
+    font-size: 18px;
     font-weight: bold;
-    transition: background-color 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
 }
 
 .form-container .btn-submit:hover {
-    background-color: #218838;
+    background-color: #219150;
+    transform: translateY(-3px);
 }
 
-/* Estilos del título del formulario */
-.form-title {
-    text-align: center;
-    font-size: 28px;
-    font-weight: 700;
-    color: #333;
-    margin-bottom: 25px;
-    background: linear-gradient(90deg, #eff1f5, #ccc8c8);
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+/* Errores */
+.error {
+    color: #e74c3c;
+    font-size: 14px;
+    margin-top: 5px;
+    font-weight: bold;
 }
 
-/* Estilos del logo */
-.logo {
-    display: block;
-    margin: 0 auto;
-    width: 80px;
-    height: auto;
-    padding: 5px;
-    margin-bottom: 20px;
-}
-
+/* Checkboxes */
 .checkbox-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 10px;
 }
 
-.section-title {
-    font-size: 24px;
+/* Logo */
+.logo {
+    display: block;
+    margin: 0 auto;
+    width: 100px;
+    height: auto;
     margin-bottom: 20px;
 }
 
+/* Cursos */
 .curso-card {
-    background-color: #f9f9f9;
-    border: 1px solid #ddd;
-    padding: 15px;
-    margin-bottom: 20px;
-    border-radius: 8px;
+    background-color: #ffffff;
+    border: 1px solid #ecf0f1;
+    padding: 20px;
+    margin: 15px auto;
+    border-radius: 10px;
+    width: 90%;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.curso-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
 .curso-title {
-    font-size: 20px;
+    font-size: 22px;
+    color: #2c3e50;
+    font-weight: bold;
     margin-bottom: 10px;
 }
 
-.btn-modify {
-    background-color: #4caf50;
-    color: white;
-    border: none;
-    padding: 8px 12px;
-    cursor: pointer;
-    border-radius: 4px;
-}
-
-.btn-modify:hover {
-    background-color: #45a049;
-}
-
-/* Título principal de Cursos Propuestos */
-.titulo-principal {
-    font-size: 2em;
-    color: #1a73e8;
-    font-weight: bold;
-    margin-bottom: 20px;
-    border-bottom: 2px solid #1a73e8;
-    padding-bottom: 5px;
-}
-
-/* Contenedor de cada curso */
-.curso-contenedor {
-    margin-bottom: 20px;
-    padding: 15px;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    background-color: #f9f9f9;
-}
-
-/* Título de cada curso */
-.curso-nombre {
-    font-size: 1.5em;
-    color: #333;
-    font-weight: 600;
-    margin: 10px 0;
-}
-
-/* Botón para mostrar/ocultar la encuesta */
+/* Botones de encuesta */
 .boton-encuesta {
-    font-size: 1em;
-    color: #fff;
-    background-color: #1a73e8;
-    padding: 8px 12px;
+    background-color: #3498db;
+    color: #ffffff;
+    padding: 10px 15px;
     border: none;
-    border-radius: 4px;
+    border-radius: 30px;
     cursor: pointer;
-    transition: background-color 0.3s;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    display: inline-block;
+    margin-top: 10px;
 }
 
 .boton-encuesta:hover {
-    background-color: #155db8;
+    background-color: #2980b9;
 }
 
-/* Contenedor de Maestros Inscritos */
+/* Botón cerrar */
+.btn-close {
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 30px;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 15px;
+    transition: background-color 0.3s ease;
+}
+
+.btn-close:hover {
+    background-color: #c0392b;
+}
+
+/* Maestros */
 .maestros-listado {
     margin-top: 15px;
-    padding-left: 10px;
-    border-left: 3px solid #1a73e8;
+    padding: 15px;
+    background-color: #ecf0f1;
+    border-radius: 10px;
+    border-left: 5px solid #3498db;
 }
 
-/* Título de la sección Maestros Inscritos */
 .maestros-titulo {
-    font-size: 1.2em;
-    color: #444;
-    font-weight: 500;
+    font-size: 18px;
+    font-weight: bold;
+    color: #34495e;
+    margin-bottom: 10px;
 }
 
-/* Contenedor de cada maestro */
 .maestro-item {
     display: flex;
+    justify-content: space-between;
     align-items: center;
     margin-bottom: 10px;
 }
 
-/* Nombre de cada maestro */
 .maestro-nombre {
-    font-size: 1em;
-    margin-right: 10px;
-    color: #555;
+    font-size: 16px;
+    font-weight: 500;
+    color: #2c3e50;
 }
 
-/* Botón para responder encuesta de cada maestro */
-.boton-responder {
-    font-size: 0.9em;
-    color: #1a73e8;
-    background: none;
-    border: 1px solid #1a73e8;
-    padding: 6px 10px;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.boton-responder:hover {
-    color: white;
-    background-color: #1a73e8;
-}
-
-/* EncuestaJefe styling */
+/* Encuesta */
 .encuesta-jefe {
     margin-top: 15px;
-    padding: 10px;
-    background-color: #eef5fc;
-    border-radius: 8px;
-    border: 1px solid #d0e3f5;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-left: 5px solid #2ecc71;
 }
 
-.btn-close {
-    background-color: #f44336;
-    /* Color rojo */
+/* Estilos base del botón */
+.btn-submit {
+    background-color: #28a745;
+    /* Verde */
     color: white;
     /* Texto blanco */
     border: none;
-    /* Sin borde */
-    border-radius: 4px;
-    /* Bordes redondeados */
-    padding: 10px 20px;
+    /* Sin bordes */
+    padding: 12px 20px;
     /* Espaciado interno */
+    border-radius: 8px;
+    /* Bordes redondeados */
     cursor: pointer;
     /* Cursor de mano */
     font-size: 16px;
     /* Tamaño de fuente */
-    margin-top: 15px;
-    /* Espaciado superior */
-    transition: background-color 0.3s;
-    /* Transición suave al pasar el mouse */
+    font-weight: bold;
+    /* Fuente en negrita */
+    text-transform: uppercase;
+    /* Texto en mayúsculas */
+    transition: all 0.3s ease;
+    /* Transición suave */
+    width: 100%;
+    /* Tamaño completo */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    /* Sombra */
 }
 
-.btn-close:hover {
-    background-color: #d32f2f;
-    /* Color rojo más oscuro al pasar el mouse */
+/* Estilo del botón al pasar el mouse */
+.btn-submit:hover {
+    background-color: #218838;
+    /* Verde más oscuro */
+    transform: translateY(-2px);
+    /* Movimiento hacia arriba */
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+    /* Más sombra */
+}
+
+/* Botón deshabilitado */
+.btn-submit:disabled {
+    background-color: #c8d6e5;
+    /* Gris claro */
+    color: #ffffff;
+    /* Texto blanco */
+    cursor: not-allowed;
+    /* Cursor no permitido */
+    box-shadow: none;
+    /* Sin sombra */
+    opacity: 0.7;
+    /* Transparencia */
+}
+
+/* Estilo base del botón */
+.btn-save-changes {
+    background-color: #007bff;
+    /* Azul principal */
+    color: white;
+    /* Texto blanco */
+    border: none;
+    /* Sin bordes */
+    padding: 12px 20px;
+    /* Espaciado interno */
+    border-radius: 8px;
+    /* Bordes redondeados */
+    cursor: pointer;
+    /* Cursor de mano */
+    font-size: 16px;
+    /* Tamaño de fuente */
+    font-weight: bold;
+    /* Fuente en negrita */
+    text-transform: uppercase;
+    /* Texto en mayúsculas */
+    transition: all 0.3s ease;
+    /* Transición suave */
+    width: 100%;
+    /* Tamaño completo */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    /* Sombra */
+}
+
+/* Estilo del botón al pasar el mouse */
+.btn-save-changes:hover {
+    background-color: #0056b3;
+    /* Azul más oscuro */
+    transform: translateY(-2px);
+    /* Movimiento hacia arriba */
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+    /* Más sombra */
+}
+
+/* Botón deshabilitado */
+.btn-save-changes:disabled {
+    background-color: #c8d6e5;
+    /* Gris claro */
+    color: #ffffff;
+    /* Texto blanco */
+    cursor: not-allowed;
+    /* Cursor no permitido */
+    box-shadow: none;
+    /* Sin sombra */
+    opacity: 0.7;
+    /* Transparencia */
 }

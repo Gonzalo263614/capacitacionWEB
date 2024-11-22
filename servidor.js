@@ -49,31 +49,41 @@ app.get('/usuarios', (req, res) => {
 app.post('/register', (req, res) => {
     const { email, password, nombre, apellidopaterno, apellidomaterno, rol, curp, rfc, maxestudios, sexo, departamento, tipo_contrato } = req.body;
 
-    // Cifrar la contraseña
-    bcrypt.hash(password, 10, (err, hash) => {
+    // Verificar si el correo ya existe
+    const checkEmailQuery = 'SELECT * FROM usuarios WHERE email = ?';
+    connection.query(checkEmailQuery, [email], (err, results) => {
         if (err) {
-            console.error('Error hashing password:', err);
-            return res.status(500).json({ error: 'Error hashing password' });
+            console.error('Error checking email:', err);
+            return res.status(500).json({ error: 'Error checking email' });
         }
 
-        // Insertar el nuevo usuario en la base de datos
-        const query = 'INSERT INTO usuarios (email, password, nombre, apellidopaterno, apellidomaterno, rol, curp, rfc, maxestudios, sexo, departamento, tipo_contrato) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
-        connection.query(query, [email, hash, nombre, apellidopaterno, apellidomaterno, rol, curp, rfc, maxestudios, sexo, departamento, tipo_contrato], (err, results) => {
+        if (results.length > 0) {
+            // Si el correo ya existe, devolver un error
+            return res.status(400).json({ error: 'El correo ya está registrado.' });
+        }
+
+        // Cifrar la contraseña
+        bcrypt.hash(password, 10, (err, hash) => {
             if (err) {
-                console.error('Error inserting user:', err);
-                return res.status(500).json({ error: 'Error inserting user' });
+                console.error('Error hashing password:', err);
+                return res.status(500).json({ error: 'Error hashing password' });
             }
-            const userId = results.insertId; // Obtener el ID del usuario recién creado
-            res.status(201).json({ message: 'User registered successfully', userId }); // Devolver el ID
+
+            // Insertar el nuevo usuario en la base de datos
+            const insertQuery = 'INSERT INTO usuarios (email, password, nombre, apellidopaterno, apellidomaterno, rol, curp, rfc, maxestudios, sexo, departamento, tipo_contrato) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+            connection.query(insertQuery, [email, hash, nombre, apellidopaterno, apellidomaterno, rol, curp, rfc, maxestudios, sexo, departamento, tipo_contrato], (err, results) => {
+                if (err) {
+                    console.error('Error inserting user:', err);
+                    return res.status(500).json({ error: 'Error inserting user' });
+                }
+                const userId = results.insertId; // Obtener el ID del usuario recién creado
+                res.status(201).json({ message: 'User registered successfully', userId }); // Devolver el ID
+            });
         });
     });
 });
 
-
-
-
 // Ruta para el login
-// Login route
 app.post('/login', (req, res) => {
     const { email, password } = req.body;
 

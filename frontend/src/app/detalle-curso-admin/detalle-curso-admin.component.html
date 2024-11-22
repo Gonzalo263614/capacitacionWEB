@@ -6,15 +6,43 @@
     
     <div *ngIf="curso" class="course-details">
         <h2>{{ curso.nombre_curso }}</h2>
+        <p><strong>Estado:</strong> {{ curso.estado }}</p>
+        <p><strong>Asignaturas Requeridas:</strong> {{ curso.asignaturas_requeridas }}</p>
+        <p><strong>Contenidos Requeridos:</strong> {{ curso.contenidos_requeridos }}</p>
+        <p><strong>Número de Docentes:</strong> {{ curso.numero_docentes }}</p>
+        <p><strong>Tipo de Asignatura:</strong> {{ curso.tipo_asignatura }}</p>
+        <p><strong>Actividad/Evento:</strong> {{ curso.actividad_evento }}</p>
         <p><strong>Objetivo:</strong> {{ curso.objetivo }}</p>
+        <p><strong>Carreras Atendidas:</strong> {{ curso.carreras_atendidas }}</p>
+        <p><strong>Período:</strong> {{ curso.periodo }}</p>
+        <p><strong>Turno:</strong> {{ curso.turno }}</p>
         <p><strong>Fecha de Inicio:</strong> {{ curso.fecha_inicio | date }}</p>
         <p><strong>Fecha de Fin:</strong> {{ curso.fecha_fin | date }}</p>
-        <!-- Agrega otros detalles del curso aquí -->
+        <p><strong>Justificación:</strong> {{ curso.justificacion }}</p>
+        <p><strong>Número de Horas:</strong> {{ curso.numero_horas }}</p>
+        <p><strong>Horario:</strong> {{ curso.horario }}</p>
+        <p><strong>Lugar:</strong> {{ curso.lugar }}</p>
+        <p><strong>Requisitos:</strong> {{ curso.requisitos }}</p>
+        <p><strong>Tipo de Curso:</strong> {{ curso.tipo_curso }}</p>
+        <h3>Datos del Instructor</h3>
+        <p><strong>Nombre:</strong> {{ curso.nombre_instructor }} {{ curso.apellidopaterno_instructor }} {{ curso.apellidomaterno_instructor }}</p>
+        <p><strong>CURP:</strong> {{ curso.curp_instructor }}</p>
+        <p><strong>RFC:</strong> {{ curso.rfc_instructor }}</p>
+        <p><strong>Máximo Nivel de Estudios:</strong> {{ curso.maxestudios_instructor }}</p>
+        <p><strong>Email:</strong> {{ curso.email_instructor }}</p>
+        <p><strong>Sexo:</strong> {{ curso.sexo_instructor }}</p>
+        <p><strong>Tipo de Contrato:</strong> {{ curso.tipo_contrato_instructor }}</p>
+        <p><strong>Cupo Actual:</strong> {{ curso.cupo_actual }}</p>
+        <p><strong>Comentario de Revisión:</strong> {{ curso.comentario_revision }}</p>
+        <h3>Detalles Adicionales</h3>
+        <p><strong>Enfoque del Curso:</strong> {{ curso.enfoque_curso }}</p>
+        <p><strong>Modalidad del Curso:</strong> {{ curso.modalidad_curso }}</p>
     </div>
-
+    
     <div *ngIf="!curso" class="loading">
         <p>Cargando curso...</p>
     </div>
+    
     <br><button class="download-button" (click)="confirmarTerminarCurso()">Terminar Curso</button>
     <div *ngIf="archivos.length > 0" class="files-uploaded">
         <h3>Archivo Evidencias:</h3>

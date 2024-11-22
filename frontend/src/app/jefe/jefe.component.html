@@ -10,11 +10,12 @@
 </button>
 
 <div *ngIf="mostrarFormulario" class="form-container">
-  <h2>Proponer un nuevo curso</h2>
-  <form (ngSubmit)="proponerCurso()">
-    <!-- Datos del curso -->
+  <h2>Proponer un Nuevo Curso</h2>
+  <form #cursoForm="ngForm" (ngSubmit)="cursoForm.valid && proponerCurso()">
+    <!-- Datos del Curso -->
     <label>Nombre del Curso</label>
-    <input [(ngModel)]="nombreCurso" name="nombreCurso" required>
+    <input [(ngModel)]="nombreCurso" name="nombreCurso" required #nombreCursoRef="ngModel">
+    <div *ngIf="nombreCursoRef.invalid && nombreCursoRef.touched" class="error">Campo obligatorio</div>
 
     <h3>Departamentos Académicos</h3>
     <div class="checkbox-grid">
@@ -25,118 +26,149 @@
         </label>
       </div>
     </div>
+    <div *ngIf="departamentosSeleccionados.length === 0" class="error">Seleccione al menos un departamento</div>
 
     <label>Asignaturas Requeridas</label>
-    <textarea [(ngModel)]="asignaturasRequeridas" name="asignaturasRequeridas"></textarea>
+    <textarea [(ngModel)]="asignaturasRequeridas" name="asignaturasRequeridas" required
+      #asignaturasRef="ngModel"></textarea>
+    <div *ngIf="asignaturasRef.invalid && asignaturasRef.touched" class="error">Campo obligatorio</div>
 
     <label>Contenidos Requeridos</label>
-    <textarea [(ngModel)]="contenidosRequeridos" name="contenidosRequeridos"></textarea>
+    <textarea [(ngModel)]="contenidosRequeridos" name="contenidosRequeridos" required
+      #contenidosRef="ngModel"></textarea>
+    <div *ngIf="contenidosRef.invalid && contenidosRef.touched" class="error">Campo obligatorio</div>
 
     <label>Número de Docentes</label>
-    <input type="number" [(ngModel)]="numeroDocentes" name="numeroDocentes">
+    <input type="number" [(ngModel)]="numeroDocentes" name="numeroDocentes" required #numeroDocentesRef="ngModel">
+    <div *ngIf="numeroDocentesRef.invalid && numeroDocentesRef.touched" class="error">Campo obligatorio</div>
 
     <label>Tipo de Asignatura</label>
-    <select [(ngModel)]="tipoAsignatura" name="tipoAsignatura">
+    <select [(ngModel)]="tipoAsignatura" name="tipoAsignatura" required #tipoAsignaturaRef="ngModel">
       <option value="carrera generica">Carrera Genérica</option>
       <option value="modulo especialidad">Módulo de Especialidad</option>
     </select>
-
-    <label>Enfoque de Curso</label>
-    <select [(ngModel)]="enfoqueCurso" name="enfoqueCurso" required>
-      <option value="Reforzamiento">Reforzamiento</option>
-      <option value="Nivelacion">Nivelacion</option>
-      <option value="Actualizacion">Actualizacion</option>
-    </select>
-    
-    <label>Modalidad del Curso</label>
-    <select [(ngModel)]="modalidadCurso" name="modalidadCurso" required>
-      <option value="presencial">presencial</option>
-      <option value="semipresencial">semipresencial</option>
-      <option value="virtual">virtual</option>
-    </select>    
+    <div *ngIf="tipoAsignaturaRef.invalid && tipoAsignaturaRef.touched" class="error">Campo obligatorio</div>
 
     <label>Actividad/Evento</label>
-    <input [(ngModel)]="actividadEvento" name="actividadEvento">
+    <input [(ngModel)]="actividadEvento" name="actividadEvento" required #actividadEventoRef="ngModel">
+    <div *ngIf="actividadEventoRef.invalid && actividadEventoRef.touched" class="error">Campo obligatorio</div>
 
     <label>Objetivo</label>
-    <textarea [(ngModel)]="objetivo" name="objetivo"></textarea>
+    <textarea [(ngModel)]="objetivo" name="objetivo" required #objetivoRef="ngModel"></textarea>
+    <div *ngIf="objetivoRef.invalid && objetivoRef.touched" class="error">Campo obligatorio</div>
 
     <label>Carreras Atendidas</label>
-    <textarea [(ngModel)]="carrerasAtendidas" name="carrerasAtendidas"></textarea>
+    <textarea [(ngModel)]="carrerasAtendidas" name="carrerasAtendidas" required #carrerasRef="ngModel"></textarea>
+    <div *ngIf="carrerasRef.invalid && carrerasRef.touched" class="error">Campo obligatorio</div>
 
     <label>Período</label>
-    <input [(ngModel)]="periodo" name="periodo">
+    <input [(ngModel)]="periodo" name="periodo" required #periodoRef="ngModel">
+    <div *ngIf="periodoRef.invalid && periodoRef.touched" class="error">Campo obligatorio</div>
 
     <label>Turno</label>
-    <select [(ngModel)]="turno" name="turno">
+    <select [(ngModel)]="turno" name="turno" required #turnoRef="ngModel">
       <option value="M">Mañana</option>
       <option value="V">Tarde</option>
     </select>
+    <div *ngIf="turnoRef.invalid && turnoRef.touched" class="error">Campo obligatorio</div>
 
-    <label>Fecha de Inicio</label>
-    <input type="date" [(ngModel)]="fechaInicio" name="fechaInicio">
+    <label>Enfoque de Curso</label>
+    <select [(ngModel)]="enfoqueCurso" name="enfoqueCurso" required #enfoqueCursoRef="ngModel">
+      <option value="Reforzamiento">Reforzamiento</option>
+      <option value="Nivelacion">Nivelación</option>
+      <option value="Actualizacion">Actualización</option>
+    </select>
+    <div *ngIf="enfoqueCursoRef.invalid && enfoqueCursoRef.touched" class="error">Campo obligatorio</div>
 
-    <label>Fecha de Fin</label>
-    <input type="date" [(ngModel)]="fechaFin" name="fechaFin">
-
-    <!-- Nuevos campos -->
-    <label>Justificación</label>
-    <textarea [(ngModel)]="justificacion" name="justificacion"></textarea>
-
-    <label>Número de Horas</label>
-    <input type="number" [(ngModel)]="numeroHoras" name="numeroHoras">
-
-    <label>Horario</label>
-    <input [(ngModel)]="horario" name="horario">
-
-    <label>Lugar</label>
-    <input [(ngModel)]="lugar" name="lugar">
-
-    <label>Requisitos</label>
-    <textarea [(ngModel)]="requisitos" name="requisitos"></textarea>
+    <label>Modalidad del Curso</label>
+    <select [(ngModel)]="modalidadCurso" name="modalidadCurso" required #modalidadCursoRef="ngModel">
+      <option value="presencial">Presencial</option>
+      <option value="semipresencial">Semipresencial</option>
+      <option value="virtual">Virtual</option>
+    </select>
+    <div *ngIf="modalidadCursoRef.invalid && modalidadCursoRef.touched" class="error">Campo obligatorio</div>
 
     <label>Tipo de Curso</label>
-    <select [(ngModel)]="tipoCurso" name="tipoCurso">
+    <select [(ngModel)]="tipoCurso" name="tipoCurso" required #tipoCursoRef="ngModel">
       <option value="Formación Docente">Formación Docente</option>
       <option value="Actualización Profesional">Actualización Profesional</option>
     </select>
+    <div *ngIf="tipoCursoRef.invalid && tipoCursoRef.touched" class="error">Campo obligatorio</div>
 
-    <!-- Datos del instructor -->
+    <label>Fecha de Inicio</label>
+    <input type="date" [(ngModel)]="fechaInicio" name="fechaInicio" required #fechaInicioRef="ngModel">
+    <div *ngIf="fechaInicioRef.invalid && fechaInicioRef.touched" class="error">Campo obligatorio</div>
+
+    <label>Fecha de Fin</label>
+    <input type="date" [(ngModel)]="fechaFin" name="fechaFin" required #fechaFinRef="ngModel">
+    <div *ngIf="fechaFinRef.invalid && fechaFinRef.touched" class="error">Campo obligatorio</div>
+
+    <label>Justificación</label>
+    <textarea [(ngModel)]="justificacion" name="justificacion" required #justificacionRef="ngModel"></textarea>
+    <div *ngIf="justificacionRef.invalid && justificacionRef.touched" class="error">Campo obligatorio</div>
+
+    <label>Número de Horas</label>
+    <input type="number" [(ngModel)]="numeroHoras" name="numeroHoras" required #numeroHorasRef="ngModel">
+    <div *ngIf="numeroHorasRef.invalid && numeroHorasRef.touched" class="error">Campo obligatorio</div>
+
+    <label>Horario</label>
+    <input [(ngModel)]="horario" name="horario" required #horarioRef="ngModel">
+    <div *ngIf="horarioRef.invalid && horarioRef.touched" class="error">Campo obligatorio</div>
+
+    <label>Lugar</label>
+    <input [(ngModel)]="lugar" name="lugar" required #lugarRef="ngModel">
+    <div *ngIf="lugarRef.invalid && lugarRef.touched" class="error">Campo obligatorio</div>
+
+    <label>Requisitos</label>
+    <textarea [(ngModel)]="requisitos" name="requisitos" required #requisitosRef="ngModel"></textarea>
+    <div *ngIf="requisitosRef.invalid && requisitosRef.touched" class="error">Campo obligatorio</div>
+
+    <!-- Datos del Instructor -->
     <h3>Datos del Instructor</h3>
     <label>Nombre del Instructor</label>
-    <input [(ngModel)]="nombreInstructor" name="nombreInstructor">
+    <input [(ngModel)]="nombreInstructor" name="nombreInstructor" required #nombreInstructorRef="ngModel">
+    <div *ngIf="nombreInstructorRef.invalid && nombreInstructorRef.touched" class="error">Campo obligatorio</div>
 
     <label>Apellido Paterno del Instructor</label>
-    <input [(ngModel)]="apellidopaternoInstructor" name="apellidopaternoInstructor">
+    <input [(ngModel)]="apellidopaternoInstructor" name="apellidopaternoInstructor" required
+      #apellidopaternoRef="ngModel">
+    <div *ngIf="apellidopaternoRef.invalid && apellidopaternoRef.touched" class="error">Campo obligatorio</div>
 
     <label>Apellido Materno del Instructor</label>
-    <input [(ngModel)]="apellidomaternoInstructor" name="apellidomaternoInstructor">
+    <input [(ngModel)]="apellidomaternoInstructor" name="apellidomaternoInstructor" required
+      #apellidomaternoRef="ngModel">
+    <div *ngIf="apellidomaternoRef.invalid && apellidomaternoRef.touched" class="error">Campo obligatorio</div>
 
     <label>CURP del Instructor</label>
-    <input [(ngModel)]="curpInstructor" name="curpInstructor">
+    <input [(ngModel)]="curpInstructor" name="curpInstructor" required #curpRef="ngModel">
+    <div *ngIf="curpRef.invalid && curpRef.touched" class="error">Campo obligatorio</div>
 
     <label>RFC del Instructor</label>
-    <input [(ngModel)]="rfcInstructor" name="rfcInstructor">
+    <input [(ngModel)]="rfcInstructor" name="rfcInstructor" required #rfcRef="ngModel">
+    <div *ngIf="rfcRef.invalid && rfcRef.touched" class="error">Campo obligatorio</div>
+
+    <label>Email del Instructor</label>
+    <input [(ngModel)]="emailInstructor" name="emailInstructor" required email #emailRef="ngModel">
+    <div *ngIf="emailRef.invalid && emailRef.touched" class="error">Campo obligatorio y debe ser un correo válido</div>
 
     <label>Máximo Nivel de Estudios del Instructor</label>
-    <select [(ngModel)]="maxestudiosInstructor" name="maxestudiosInstructor">
+    <select [(ngModel)]="maxestudiosInstructor" name="maxestudiosInstructor" required #maxestudiosRef="ngModel">
       <option value="Licenciatura">Licenciatura</option>
       <option value="Maestría">Maestría</option>
       <option value="Doctorado">Doctorado</option>
       <option value="Técnico Superior">Técnico Superior</option>
     </select>
-
-    <label>Email del Instructor</label>
-    <input [(ngModel)]="emailInstructor" name="emailInstructor">
+    <div *ngIf="maxestudiosRef.invalid && maxestudiosRef.touched" class="error">Campo obligatorio</div>
 
     <label>Sexo del Instructor</label>
-    <select [(ngModel)]="sexoInstructor" name="sexoInstructor">
+    <select [(ngModel)]="sexoInstructor" name="sexoInstructor" required #sexoRef="ngModel">
       <option value="M">Masculino</option>
       <option value="F">Femenino</option>
     </select>
+    <div *ngIf="sexoRef.invalid && sexoRef.touched" class="error">Campo obligatorio</div>
 
     <label>Tipo de Contrato del Instructor</label>
-    <select [(ngModel)]="tipoContratoInstructor" name="tipoContratoInstructor">
+    <select [(ngModel)]="tipoContratoInstructor" name="tipoContratoInstructor" required #tipoContratoRef="ngModel">
       <option value="tiempo completo">Tiempo Completo</option>
       <option value="30 hrs">30 Horas</option>
       <option value="20 hrs">20 Horas</option>
@@ -144,27 +176,26 @@
       <option value="honorarios">Honorarios</option>
       <option value="no aplica">No Aplica</option>
     </select>
+    <div *ngIf="tipoContratoRef.invalid && tipoContratoRef.touched" class="error">Campo obligatorio</div>
 
-    <h2 class="section-title">Subir Archivo Criterios para seleccion del Instructor</h2>
-    <form class="file-upload-form">
-      <label for="file">Seleccionar archivo:</label>
-      <input type="file" (change)="onFileSelected($event)">
-      <!-- <button type="button" (click)="onSubmit()" class="upload-button">Subir archivo</button> -->
-    </form>
-
+    <label>Seleccionar Archivo</label>
+    <input type="file" (change)="onFileSelected($event)" required>
+    <div *ngIf="!selectedFile && archivoTouched" class="error">Campo obligatorio</div>
     <!-- Contraseña generada automáticamente -->
     <label>Contraseña del Instructor (Generada Automáticamente)</label>
     <input [(ngModel)]="passwordInstructor" name="passwordInstructor" readonly>
+    <button type="submit" [disabled]="!cursoForm.valid || !selectedFile" class="btn-submit">
+      Proponer Curso
+    </button>
 
-    <button type="submit" class="btn-submit">Proponer Curso</button>
   </form>
 </div>
-
 
 <h2 class="section-title">Cursos Pendientes de Revisión</h2>
 <div *ngFor="let curso of cursosPendientes" class="curso-card">
   <h3 class="curso-title">{{ curso.nombre_curso }}</h3>
-  <p><strong> Colocar departamentos Y subir nuevamente criterios, y favor de REVISAR</strong>: {{ curso.comentario_revision }}
+  <p><strong> Colocar departamentos Y subir nuevamente criterios, y favor de REVISAR</strong>: {{
+    curso.comentario_revision }}
   </p>
   <button class="boton-encuesta" (click)="abrirFormularioModificar(curso)">Modificar</button>
 </div>
@@ -172,135 +203,165 @@
 <!-- Formulario para modificar el curso -->
 <div *ngIf="mostrarFormularioModificar" class="form-container">
   <h2 class="form-title">Modificar Curso</h2>
-  <form (ngSubmit)="modificarCursoConfirmado()">
-    <!-- Campos del curso (reutiliza los mismos del formulario de proponer curso) -->
+  <form #modificarCursoForm="ngForm" (ngSubmit)="modificarCursoForm.valid && modificarCursoConfirmado()">
+    <!-- Campos del curso -->
     <label>Nombre del Curso</label>
-    <input [(ngModel)]="nombreCurso" name="nombreCurso" required>
+    <input [(ngModel)]="nombreCurso" name="nombreCurso" required #nombreCursoRef="ngModel">
+    <div *ngIf="nombreCursoRef.invalid && nombreCursoRef.touched" class="error">Campo obligatorio</div>
 
-    <!-- Resto de los campos idénticos al formulario de proponer curso -->
-    <!-- ... -->
     <h3>Departamentos Académicos</h3>
     <div class="checkbox-grid">
       <div *ngFor="let departamento of departamentosAcademicos">
         <label>
-          <input type="checkbox" (change)="onCheckboxChange(departamento, $event)">
+          <input type="checkbox" (change)="onCheckboxChange(departamento, $event)"
+            [checked]="departamentosSeleccionados.includes(departamento)">
           {{ departamento }}
         </label>
       </div>
     </div>
+    <div *ngIf="departamentosSeleccionados.length === 0" class="error">Seleccione al menos un departamento</div>
 
     <label>Asignaturas Requeridas</label>
-    <textarea [(ngModel)]="asignaturasRequeridas" name="asignaturasRequeridas"></textarea>
+    <textarea [(ngModel)]="asignaturasRequeridas" name="asignaturasRequeridas" required
+      #asignaturasRef="ngModel"></textarea>
+    <div *ngIf="asignaturasRef.invalid && asignaturasRef.touched" class="error">Campo obligatorio</div>
 
     <label>Contenidos Requeridos</label>
-    <textarea [(ngModel)]="contenidosRequeridos" name="contenidosRequeridos"></textarea>
+    <textarea [(ngModel)]="contenidosRequeridos" name="contenidosRequeridos" required
+      #contenidosRef="ngModel"></textarea>
+    <div *ngIf="contenidosRef.invalid && contenidosRef.touched" class="error">Campo obligatorio</div>
 
     <label>Número de Docentes</label>
-    <input type="number" [(ngModel)]="numeroDocentes" name="numeroDocentes">
+    <input type="number" [(ngModel)]="numeroDocentes" name="numeroDocentes" required #numeroDocentesRef="ngModel">
+    <div *ngIf="numeroDocentesRef.invalid && numeroDocentesRef.touched" class="error">Campo obligatorio</div>
 
     <label>Tipo de Asignatura</label>
-    <select [(ngModel)]="tipoAsignatura" name="tipoAsignatura">
+    <select [(ngModel)]="tipoAsignatura" name="tipoAsignatura" required #tipoAsignaturaRef="ngModel">
       <option value="carrera generica">Carrera Genérica</option>
       <option value="modulo especialidad">Módulo de Especialidad</option>
     </select>
-
-    <label>Enfoque de Curso</label>
-    <select [(ngModel)]="enfoqueCurso" name="enfoqueCurso" required>
-      <option value="Reforzamiento">Reforzamiento</option>
-      <option value="Nivelacion">Nivelacion</option>
-      <option value="Actualizacion">Actualizacion</option>
-    </select>
-    
-    <label>Modalidad del Curso</label>
-    <select [(ngModel)]="modalidadCurso" name="modalidadCurso" required>
-      <option value="presencial">presencial</option>
-      <option value="semipresencial">semipresencial</option>
-      <option value="virtual">virtual</option>
-    </select>
+    <div *ngIf="tipoAsignaturaRef.invalid && tipoAsignaturaRef.touched" class="error">Campo obligatorio</div>
 
     <label>Actividad/Evento</label>
-    <input [(ngModel)]="actividadEvento" name="actividadEvento">
+    <input [(ngModel)]="actividadEvento" name="actividadEvento" required #actividadEventoRef="ngModel">
+    <div *ngIf="actividadEventoRef.invalid && actividadEventoRef.touched" class="error">Campo obligatorio</div>
 
     <label>Objetivo</label>
-    <textarea [(ngModel)]="objetivo" name="objetivo"></textarea>
+    <textarea [(ngModel)]="objetivo" name="objetivo" required #objetivoRef="ngModel"></textarea>
+    <div *ngIf="objetivoRef.invalid && objetivoRef.touched" class="error">Campo obligatorio</div>
 
     <label>Carreras Atendidas</label>
-    <textarea [(ngModel)]="carrerasAtendidas" name="carrerasAtendidas"></textarea>
+    <textarea [(ngModel)]="carrerasAtendidas" name="carrerasAtendidas" required #carrerasRef="ngModel"></textarea>
+    <div *ngIf="carrerasRef.invalid && carrerasRef.touched" class="error">Campo obligatorio</div>
 
     <label>Período</label>
-    <input [(ngModel)]="periodo" name="periodo">
+    <input [(ngModel)]="periodo" name="periodo" required #periodoRef="ngModel">
+    <div *ngIf="periodoRef.invalid && periodoRef.touched" class="error">Campo obligatorio</div>
 
     <label>Turno</label>
-    <select [(ngModel)]="turno" name="turno">
+    <select [(ngModel)]="turno" name="turno" required #turnoRef="ngModel">
       <option value="M">Mañana</option>
       <option value="V">Tarde</option>
     </select>
+    <div *ngIf="turnoRef.invalid && turnoRef.touched" class="error">Campo obligatorio</div>
 
-    <label>Fecha de Inicio</label>
-    <input type="date" [(ngModel)]="fechaInicio" name="fechaInicio">
+    <label>Enfoque de Curso</label>
+    <select [(ngModel)]="enfoqueCurso" name="enfoqueCurso" required #enfoqueCursoRef="ngModel">
+      <option value="Reforzamiento">Reforzamiento</option>
+      <option value="Nivelacion">Nivelación</option>
+      <option value="Actualizacion">Actualización</option>
+    </select>
+    <div *ngIf="enfoqueCursoRef.invalid && enfoqueCursoRef.touched" class="error">Campo obligatorio</div>
 
-    <label>Fecha de Fin</label>
-    <input type="date" [(ngModel)]="fechaFin" name="fechaFin">
-
-    <!-- Nuevos campos -->
-    <label>Justificación</label>
-    <textarea [(ngModel)]="justificacion" name="justificacion"></textarea>
-
-    <label>Número de Horas</label>
-    <input type="number" [(ngModel)]="numeroHoras" name="numeroHoras">
-
-    <label>Horario</label>
-    <input [(ngModel)]="horario" name="horario">
-
-    <label>Lugar</label>
-    <input [(ngModel)]="lugar" name="lugar">
-
-    <label>Requisitos</label>
-    <textarea [(ngModel)]="requisitos" name="requisitos"></textarea>
+    <label>Modalidad del Curso</label>
+    <select [(ngModel)]="modalidadCurso" name="modalidadCurso" required #modalidadCursoRef="ngModel">
+      <option value="presencial">Presencial</option>
+      <option value="semipresencial">Semipresencial</option>
+      <option value="virtual">Virtual</option>
+    </select>
+    <div *ngIf="modalidadCursoRef.invalid && modalidadCursoRef.touched" class="error">Campo obligatorio</div>
 
     <label>Tipo de Curso</label>
-    <select [(ngModel)]="tipoCurso" name="tipoCurso">
+    <select [(ngModel)]="tipoCurso" name="tipoCurso" required #tipoCursoRef="ngModel">
       <option value="Formación Docente">Formación Docente</option>
       <option value="Actualización Profesional">Actualización Profesional</option>
     </select>
+    <div *ngIf="tipoCursoRef.invalid && tipoCursoRef.touched" class="error">Campo obligatorio</div>
 
-    <!-- Datos del instructor -->
-    <!-- Datos del instructor -->
+    <label>Fecha de Inicio</label>
+    <input type="date" [(ngModel)]="fechaInicio" name="fechaInicio" required #fechaInicioRef="ngModel">
+    <div *ngIf="fechaInicioRef.invalid && fechaInicioRef.touched" class="error">Campo obligatorio</div>
+
+    <label>Fecha de Fin</label>
+    <input type="date" [(ngModel)]="fechaFin" name="fechaFin" required #fechaFinRef="ngModel">
+    <div *ngIf="fechaFinRef.invalid && fechaFinRef.touched" class="error">Campo obligatorio</div>
+
+    <label>Justificación</label>
+    <textarea [(ngModel)]="justificacion" name="justificacion" required #justificacionRef="ngModel"></textarea>
+    <div *ngIf="justificacionRef.invalid && justificacionRef.touched" class="error">Campo obligatorio</div>
+
+    <label>Número de Horas</label>
+    <input type="number" [(ngModel)]="numeroHoras" name="numeroHoras" required #numeroHorasRef="ngModel">
+    <div *ngIf="numeroHorasRef.invalid && numeroHorasRef.touched" class="error">Campo obligatorio</div>
+
+    <label>Horario</label>
+    <input [(ngModel)]="horario" name="horario" required #horarioRef="ngModel">
+    <div *ngIf="horarioRef.invalid && horarioRef.touched" class="error">Campo obligatorio</div>
+
+    <label>Lugar</label>
+    <input [(ngModel)]="lugar" name="lugar" required #lugarRef="ngModel">
+    <div *ngIf="lugarRef.invalid && lugarRef.touched" class="error">Campo obligatorio</div>
+
+    <label>Requisitos</label>
+    <textarea [(ngModel)]="requisitos" name="requisitos" required #requisitosRef="ngModel"></textarea>
+    <div *ngIf="requisitosRef.invalid && requisitosRef.touched" class="error">Campo obligatorio</div>
+
+    <!-- Datos del Instructor -->
     <h3>Datos del Instructor</h3>
     <label>Nombre del Instructor</label>
-    <input [(ngModel)]="nombreInstructor" name="nombreInstructor">
+    <input [(ngModel)]="nombreInstructor" name="nombreInstructor" required #nombreInstructorRef="ngModel">
+    <div *ngIf="nombreInstructorRef.invalid && nombreInstructorRef.touched" class="error">Campo obligatorio</div>
 
     <label>Apellido Paterno del Instructor</label>
-    <input [(ngModel)]="apellidopaternoInstructor" name="apellidopaternoInstructor">
+    <input [(ngModel)]="apellidopaternoInstructor" name="apellidopaternoInstructor" required
+      #apellidopaternoRef="ngModel">
+    <div *ngIf="apellidopaternoRef.invalid && apellidopaternoRef.touched" class="error">Campo obligatorio</div>
 
     <label>Apellido Materno del Instructor</label>
-    <input [(ngModel)]="apellidomaternoInstructor" name="apellidomaternoInstructor">
+    <input [(ngModel)]="apellidomaternoInstructor" name="apellidomaternoInstructor" required
+      #apellidomaternoRef="ngModel">
+    <div *ngIf="apellidomaternoRef.invalid && apellidomaternoRef.touched" class="error">Campo obligatorio</div>
 
     <label>CURP del Instructor</label>
-    <input [(ngModel)]="curpInstructor" name="curpInstructor">
+    <input [(ngModel)]="curpInstructor" name="curpInstructor" required #curpRef="ngModel">
+    <div *ngIf="curpRef.invalid && curpRef.touched" class="error">Campo obligatorio</div>
 
     <label>RFC del Instructor</label>
-    <input [(ngModel)]="rfcInstructor" name="rfcInstructor">
+    <input [(ngModel)]="rfcInstructor" name="rfcInstructor" required #rfcRef="ngModel">
+    <div *ngIf="rfcRef.invalid && rfcRef.touched" class="error">Campo obligatorio</div>
+
+    <label>Email del Instructor</label>
+    <input [(ngModel)]="emailInstructor" name="emailInstructor" required email #emailRef="ngModel">
+    <div *ngIf="emailRef.invalid && emailRef.touched" class="error">Campo obligatorio y debe ser un correo válido</div>
 
     <label>Máximo Nivel de Estudios del Instructor</label>
-    <select [(ngModel)]="maxestudiosInstructor" name="maxestudiosInstructor">
+    <select [(ngModel)]="maxestudiosInstructor" name="maxestudiosInstructor" required #maxestudiosRef="ngModel">
       <option value="Licenciatura">Licenciatura</option>
       <option value="Maestría">Maestría</option>
       <option value="Doctorado">Doctorado</option>
       <option value="Técnico Superior">Técnico Superior</option>
     </select>
-
-    <label>Email del Instructor</label>
-    <input [(ngModel)]="emailInstructor" name="emailInstructor">
+    <div *ngIf="maxestudiosRef.invalid && maxestudiosRef.touched" class="error">Campo obligatorio</div>
 
     <label>Sexo del Instructor</label>
-    <select [(ngModel)]="sexoInstructor" name="sexoInstructor">
+    <select [(ngModel)]="sexoInstructor" name="sexoInstructor" required #sexoRef="ngModel">
       <option value="M">Masculino</option>
       <option value="F">Femenino</option>
     </select>
+    <div *ngIf="sexoRef.invalid && sexoRef.touched" class="error">Campo obligatorio</div>
 
     <label>Tipo de Contrato del Instructor</label>
-    <select [(ngModel)]="tipoContratoInstructor" name="tipoContratoInstructor">
+    <select [(ngModel)]="tipoContratoInstructor" name="tipoContratoInstructor" required #tipoContratoRef="ngModel">
       <option value="tiempo completo">Tiempo Completo</option>
       <option value="30 hrs">30 Horas</option>
       <option value="20 hrs">20 Horas</option>
@@ -308,17 +369,20 @@
       <option value="honorarios">Honorarios</option>
       <option value="no aplica">No Aplica</option>
     </select>
-    <h2 class="section-title">Subir Archivo Criterios para seleccion del Instructor</h2>
-    <form class="file-upload-form">
-      <label for="file">Seleccionar archivo:</label>
-      <input type="file" (change)="onFileSelected($event)">
-      <!-- <button type="button" (click)="onSubmit()" class="upload-button">Subir archivo</button> -->
-    </form>
-    <!-- Botón para cerrar el formulario -->
+    <div *ngIf="tipoContratoRef.invalid && tipoContratoRef.touched" class="error">Campo obligatorio</div>
+
+    <label>Seleccionar Archivo</label>
+    <input type="file" (change)="onFileSelected($event)" required>
+    <div *ngIf="!selectedFile && archivoTouched" class="error">Campo obligatorio</div>
+
+    <button type="submit" [disabled]="!modificarCursoForm.valid || !selectedFile" class="btn-save-changes">
+      Guardar Cambios
+    </button>
+
     <button type="button" class="btn-close" (click)="cerrarFormulario()">Cerrar</button>
-    <button type="submit" class="btn-submit">Guardar Cambios</button>
   </form>
 </div>
+
 
 <h2 class="titulo-principal">Cursos Propuestos</h2>
 <div *ngFor="let curso of cursosPropuestos" class="curso-contenedor">

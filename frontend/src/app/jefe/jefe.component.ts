@@ -75,6 +75,7 @@ export class JefeComponent {
   ];
   departamentosSeleccionados: string[] = [];
   idJefe = 1;  // Por ejemplo, esto podría provenir del sistema de autenticación
+archivoTouched: any;
 
   constructor(private http: HttpClient, private route: ActivatedRoute) {
     this.obtenerCursosPendientes(); // Llamar a la función al iniciar el componente

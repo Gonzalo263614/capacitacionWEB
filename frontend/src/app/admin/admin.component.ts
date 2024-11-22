@@ -117,12 +117,17 @@ export class AdminComponent implements OnInit {
     this.http.put(`http://localhost:3000/actualizar-curso/${cursoId}`, { estado: 'aceptado' })
       .subscribe(response => {
         console.log('Curso aceptado:', response);
+        
+        // Mostrar alerta de curso aceptado
+        alert('El curso ha sido aceptado con éxito.');
+        
         this.registrarInstructor(cursoId); // Registra al instructor después de aceptar el curso
         this.obtenerCursos(); // Recarga los cursos
       }, error => {
         console.error('Error al aceptar el curso:', error);
       });
   }
+  
   registrarInstructor(cursoId: number) {
     this.http.get(`http://localhost:3000/cursos/${cursoId}`)
       .subscribe((curso: any) => {

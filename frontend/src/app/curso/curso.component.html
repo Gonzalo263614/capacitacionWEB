@@ -8,17 +8,14 @@
 
   <!-- Botones -->
   <div class="button-group">
-    <!-- Botón para mostrar/ocultar detalles del curso -->
     <button class="btn" (click)="toggleDetalles()">
       {{ showDetalles ? 'Ocultar detalles' : 'Ver detalles' }}
     </button>
 
-    <!-- Botón para mostrar/ocultar asistencias -->
     <button class="btn" (click)="toggleAsistencias()">
       {{ showAsistencias ? 'Ocultar asistencias' : 'Ver asistencias' }}
     </button>
 
-    <!-- Botón para descargar constancia -->
     <button class="btn btn-download" (click)="descargarConstancia()">
       Descargar constancia
     </button>
@@ -29,10 +26,10 @@
     <h2>Detalles del curso:</h2>
     <p><strong>Estado:</strong> {{ curso.estado }}</p>
     <p><strong>Periodo:</strong> {{ curso.periodo }}</p>
-    <p><strong>Fecha de inicio:</strong> {{ curso.fecha_inicio }}</p>
-    <p><strong>Fecha de fin:</strong> {{ curso.fecha_fin }}</p>
-    <p><strong>Instructor:</strong> {{ curso.nombre_instructor }} {{ curso.apellidopaterno_instructor }} {{
-      curso.apellidomaterno_instructor }}</p>
+    <p><strong>Fecha de inicio:</strong> {{ curso.fecha_inicio | date }}</p>
+    <p><strong>Fecha de fin:</strong> {{ curso.fecha_fin | date }}</p>
+    <p><strong>Instructor:</strong> {{ curso.nombre_instructor }} {{ curso.apellidopaterno_instructor }}
+      {{ curso.apellidomaterno_instructor }}</p>
     <p><strong>Tu calificación:</strong> {{ calificacion !== null ? calificacion : 'No disponible' }}</p>
   </div>
 
@@ -55,9 +52,13 @@
     </table>
   </div>
 </div>
+
 <!-- Botón para mostrar la encuesta -->
-<button class="btn" (click)="showEncuesta = !showEncuesta">
-  {{ showEncuesta ? 'Ocultar encuesta' : 'Mostrar encuesta' }}
-</button>
+<div class="survey-section">
+  <button class="btn" (click)="showEncuesta = !showEncuesta">
+    {{ showEncuesta ? 'Ocultar encuesta' : 'Mostrar encuesta' }}
+  </button>
+</div>
+
 <!-- Encuesta -->
 <app-encuesta *ngIf="showEncuesta" [cursoNombre]="curso.nombre_curso"></app-encuesta>

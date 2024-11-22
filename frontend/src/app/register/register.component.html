@@ -1,80 +1,113 @@
 <h2 class="form-title">Formación y Actualización Profesional Docente</h2>
 <img src="TecNM.png" alt="Logo de la Institución" class="logo"> <!-- Ajusta la ruta según tu estructura -->
-<form (ngSubmit)="register()" class="register-form">
+<form (ngSubmit)="register()" class="register-form" #registerForm="ngForm">
   <h2 class="form-title2">Registro de Usuario</h2>
   
   <div class="form-group">
     <label for="email">Email:</label>
-    <input type="email" id="email" [(ngModel)]="email" name="email" required>
+    <input type="email" id="email" [(ngModel)]="email" name="email" required #emailField="ngModel">
+    <div *ngIf="emailField.invalid && emailField.touched" class="error">
+      El correo electrónico es obligatorio.
+    </div>
   </div>
 
   <div class="form-group">
     <label for="password">Password:</label>
-    <input type="password" id="password" [(ngModel)]="password" name="password" required>
+    <input type="password" id="password" [(ngModel)]="password" name="password" required #passwordField="ngModel">
+    <div *ngIf="passwordField.invalid && passwordField.touched" class="error">
+      La contraseña es obligatoria.
+    </div>
   </div>
 
   <div class="form-group">
     <label for="confirmPassword">Confirm Password:</label>
-    <input type="password" id="confirmPassword" [(ngModel)]="confirmPassword" name="confirmPassword" required>
+    <input type="password" id="confirmPassword" [(ngModel)]="confirmPassword" name="confirmPassword" required #confirmPasswordField="ngModel">
+    <div *ngIf="confirmPasswordField.invalid && confirmPasswordField.touched" class="error">
+      Es obligatorio confirmar la contraseña.
+    </div>
   </div>
 
   <div class="form-group">
     <label for="nombre">Nombre:</label>
-    <input type="text" id="nombre" [(ngModel)]="nombre" name="nombre" required>
+    <input type="text" id="nombre" [(ngModel)]="nombre" name="nombre" required #nombreField="ngModel">
+    <div *ngIf="nombreField.invalid && nombreField.touched" class="error">
+      El nombre es obligatorio.
+    </div>
   </div>
 
   <div class="form-group">
     <label for="apellidopaterno">Apellido Paterno:</label>
-    <input type="text" id="apellidopaterno" [(ngModel)]="apellidopaterno" name="apellidopaterno">
+    <input type="text" id="apellidopaterno" [(ngModel)]="apellidopaterno" name="apellidopaterno" required #apellidopaternoField="ngModel">
+    <div *ngIf="apellidopaternoField.invalid && apellidopaternoField.touched" class="error">
+      El apellido paterno es obligatorio.
+    </div>
   </div>
 
   <div class="form-group">
     <label for="apellidomaterno">Apellido Materno:</label>
-    <input type="text" id="apellidomaterno" [(ngModel)]="apellidomaterno" name="apellidomaterno">
+    <input type="text" id="apellidomaterno" [(ngModel)]="apellidomaterno" name="apellidomaterno" required #apellidomaternoField="ngModel">
+    <div *ngIf="apellidomaternoField.invalid && apellidomaternoField.touched" class="error">
+      El apellido materno es obligatorio.
+    </div>
   </div>
 
   <div class="form-group">
     <label for="rol">Rol:</label>
-    <select id="rol" [(ngModel)]="rol" name="rol" required>
-      <!-- <option value="administrador">Administrador</option> -->
-      <!-- <option value="jefe">Jefe</option> -->
+    <select id="rol" [(ngModel)]="rol" name="rol" required #rolField="ngModel">
+      <option value="" disabled selected>Seleccione un rol</option>
       <option value="maestro">Maestro</option>
-      <!-- <option value="Subdirector">Subdirector</option> -->
-      <!-- <option value="instructor">Instructor</option> -->
     </select>
+    <div *ngIf="rolField.invalid && rolField.touched" class="error">
+      Seleccione un rol.
+    </div>
   </div>
 
   <div class="form-group">
     <label for="curp">CURP:</label>
-    <input type="text" id="curp" [(ngModel)]="curp" name="curp">
+    <input type="text" id="curp" [(ngModel)]="curp" name="curp" required #curpField="ngModel">
+    <div *ngIf="curpField.invalid && curpField.touched" class="error">
+      La CURP es obligatoria.
+    </div>
   </div>
 
   <div class="form-group">
     <label for="rfc">RFC:</label>
-    <input type="text" id="rfc" [(ngModel)]="rfc" name="rfc">
+    <input type="text" id="rfc" [(ngModel)]="rfc" name="rfc" required #rfcField="ngModel">
+    <div *ngIf="rfcField.invalid && rfcField.touched" class="error">
+      El RFC es obligatorio.
+    </div>
   </div>
 
   <div class="form-group">
     <label for="maxestudios">Máximo Grado de Estudios:</label>
-    <select id="maxestudios" [(ngModel)]="maxestudios" name="maxestudios" required>
+    <select id="maxestudios" [(ngModel)]="maxestudios" name="maxestudios" required #maxestudiosField="ngModel">
+      <option value="" disabled selected>Seleccione el máximo grado de estudios</option>
       <option value="Licenciatura">Licenciatura</option>
       <option value="Maestría">Maestría</option>
       <option value="Doctorado">Doctorado</option>
       <option value="Técnico Superior">Técnico Superior</option>
     </select>
-  </div>  
+    <div *ngIf="maxestudiosField.invalid && maxestudiosField.touched" class="error">
+      Seleccione el máximo grado de estudios.
+    </div>
+  </div>
 
   <div class="form-group">
     <label for="sexo">Sexo:</label>
-    <select id="sexo" [(ngModel)]="sexo" name="sexo" required>
+    <select id="sexo" [(ngModel)]="sexo" name="sexo" required #sexoField="ngModel">
+      <option value="" disabled selected>Seleccione el sexo</option>
       <option value="M">Masculino</option>
       <option value="F">Femenino</option>
     </select>
+    <div *ngIf="sexoField.invalid && sexoField.touched" class="error">
+      Seleccione el sexo.
+    </div>
   </div>
 
   <div class="form-group">
     <label for="departamento">Departamento Académico:</label>
-    <select id="departamento" [(ngModel)]="departamento" name="departamento" required>
+    <select id="departamento" [(ngModel)]="departamento" name="departamento" required #departamentoField="ngModel">
+      <option value="" disabled selected>Seleccione un departamento</option>
       <option value="Ciencias Básicas">Ciencias Básicas</option>
       <option value="Ciencias Económico - Administrativas">Ciencias Económico - Administrativas</option>
       <option value="Desarrollo Académico">Desarrollo Académico</option>
@@ -84,11 +117,15 @@
       <option value="Sistemas y Computación">Sistemas y Computación</option>
       <option value="Química y Bioquímica">Química y Bioquímica</option>
     </select>
+    <div *ngIf="departamentoField.invalid && departamentoField.touched" class="error">
+      Seleccione un departamento.
+    </div>
   </div>
 
   <div class="form-group">
     <label for="tipo_contrato">Tipo de Contrato:</label>
-    <select id="tipo_contrato" [(ngModel)]="tipo_contrato" name="tipo_contrato" required>
+    <select id="tipo_contrato" [(ngModel)]="tipo_contrato" name="tipo_contrato" required #tipoContratoField="ngModel">
+      <option value="" disabled selected>Seleccione un tipo de contrato</option>
       <option value="tiempo completo">Tiempo Completo</option>
       <option value="30 hrs">30 hrs</option>
       <option value="20 hrs">20 hrs</option>
@@ -96,7 +133,10 @@
       <option value="honorarios">Honorarios</option>
       <option value="no aplica">No Aplica</option>
     </select>
+    <div *ngIf="tipoContratoField.invalid && tipoContratoField.touched" class="error">
+      Seleccione un tipo de contrato.
+    </div>
   </div>
-  
-  <button type="submit" class="btn">Registrar</button>
+
+  <button type="submit" class="btn" [disabled]="!registerForm.valid">Registrar</button>
 </form>
