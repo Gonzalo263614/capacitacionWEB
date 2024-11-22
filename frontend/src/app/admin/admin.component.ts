@@ -64,9 +64,32 @@ export class AdminComponent implements OnInit {
       });
     }
   }
-  
+
   actualizarRequisitosCurso(cursoId: number, ordenAdmin: number) {
     return this.http.put(`http://localhost:3000/actualizar-requisitos-curso/${cursoId}`, { orden_admin: ordenAdmin });
+  }
+  descargarCriterios(curso: any) {
+    const params = {
+      nombreCurso: curso.nombre_curso,
+      nombreInstructor: curso.nombre_instructor,
+      apellidoPaterno: curso.apellidopaterno_instructor,
+      apellidoMaterno: curso.apellidomaterno_instructor
+    };
+
+    this.http.get('http://localhost:3000/criterios-evaluacion', {
+      params,
+      responseType: 'blob' // Necesario para manejar archivos binarios
+    }).subscribe((response: Blob) => {
+      // Crear un enlace para descargar el archivo
+      const url = window.URL.createObjectURL(response);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `criterios_evaluacion_${curso.nombre_curso}.pdf`; // Ajustar el nombre del archivo si es necesario
+      link.click();
+      window.URL.revokeObjectURL(url); // Liberar memoria
+    }, error => {
+      console.error('Error al descargar los criterios de evaluación:', error);
+    });
   }
 
   verificarRequisitos(cursoId: number) {
@@ -88,7 +111,7 @@ export class AdminComponent implements OnInit {
         console.error('Error al verificar los requisitos del curso:', error);
       });
   }
-  
+
   aceptarCurso(cursoId: number) {
     // Actualiza el estado del curso a 'aceptado'
     this.http.put(`http://localhost:3000/actualizar-curso/${cursoId}`, { estado: 'aceptado' })
@@ -149,12 +172,12 @@ export class AdminComponent implements OnInit {
 
   solicitarRevision(id: number, comentario: string) {
     const data = { estado: 'pendiente_revision', comentario };
-  
+
     // Primero, actualizamos la tabla requisitos_curso
     this.http.put(`http://localhost:3000/actualizar-requisitos-curso/${id}`, { orden_admin: 0 })
       .subscribe(() => {
         console.log(`Requisitos del curso ${id} actualizados a 0`);
-  
+
         // Luego, actualizamos el estado del curso a 'pendiente_revision'
         this.http.put(`http://localhost:3000/actualizar-curso/${id}`, data)
           .subscribe(response => {
@@ -167,7 +190,7 @@ export class AdminComponent implements OnInit {
         console.error('Error al actualizar requisitos del curso:', error);
       });
   }
-  
+
 
 
   // Función para alternar la visibilidad de los cursos

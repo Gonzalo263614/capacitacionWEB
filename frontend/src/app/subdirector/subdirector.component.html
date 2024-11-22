@@ -48,6 +48,9 @@
         <p><strong>Email del Instructor:</strong> {{ curso.email_instructor }}</p>
         <p><strong>Sexo del Instructor:</strong> {{ curso.sexo_instructor }}</p>
         <p><strong>Tipo de Contrato del Instructor:</strong> {{ curso.tipo_contrato_instructor }}</p>
+        <button *ngIf="curso.estado === 'pendiente'" 
+        (click)="descargarCriterios(curso)"
+        class="download-button">Descargar Criterios de Evaluación</button>
         <button *ngIf="curso.estado === 'pendiente'" (click)="actualizarEstado(curso.id, 'aceptado')"
           class="accept-button">Aceptar</button>
         <button *ngIf="curso.estado === 'pendiente'" (click)="actualizarEstado(curso.id, 'rechazado')"

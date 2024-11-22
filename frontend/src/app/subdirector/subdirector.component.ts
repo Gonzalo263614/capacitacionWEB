@@ -71,7 +71,29 @@ export class SubdirectorComponent implements OnInit {
   actualizarOrdenSubdirector(cursoId: number, ordenSubdirector: number) {
     return this.http.put(`http://localhost:3000/actualizar-orden-subdirector/${cursoId}`, { orden_subdirector: ordenSubdirector });
   }
+  descargarCriterios(curso: any) {
+    const params = {
+      nombreCurso: curso.nombre_curso,
+      nombreInstructor: curso.nombre_instructor,
+      apellidoPaterno: curso.apellidopaterno_instructor,
+      apellidoMaterno: curso.apellidomaterno_instructor
+    };
 
+    this.http.get('http://localhost:3000/criterios-evaluacion', {
+      params,
+      responseType: 'blob' // Necesario para manejar archivos binarios
+    }).subscribe((response: Blob) => {
+      // Crear un enlace para descargar el archivo
+      const url = window.URL.createObjectURL(response);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `criterios_evaluacion_${curso.nombre_curso}.pdf`; // Ajustar el nombre del archivo si es necesario
+      link.click();
+      window.URL.revokeObjectURL(url); // Liberar memoria
+    }, error => {
+      console.error('Error al descargar los criterios de evaluación:', error);
+    });
+  }
   verificarRequisitos(cursoId: number) {
     // Verifica si ambos campos 'orden_admin' y 'orden_subdirector' son 1
     this.http.get(`http://localhost:3000/verificar-requisitos-curso/${cursoId}`)

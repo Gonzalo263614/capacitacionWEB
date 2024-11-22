@@ -16,7 +16,7 @@ const connection = mysql.createConnection({
     host: 'localhost',
     user: 'root',
     password: 'Contraseña2190.', // Usa tu contraseña
-    database: 'capacitacionDB2'
+    database: 'capacitacionDB3'
 });
 
 // CONEXION BASE DE DATOS
@@ -1644,17 +1644,23 @@ app.post('/uploads2', upload.single('archivo'), (req, res) => {
         return res.status(400).json({ error: 'Faltan datos obligatorios.' });
     }
 
-    // Leer el archivo y prepararlo para la inserción
+    // Leer el archivo y prepararlo para la inserción o actualización
     const archivoData = fs.readFileSync(archivo.path);
 
-    // Consulta SQL para insertar en la tabla archivos_curso
-    const sqlInsertArchivo = `
-        INSERT INTO archivos_curso_criterios
-        (jefe_id, nombre_instructor, apellido_paterno_instructor, apellido_materno_instructor, 
-         curp_instructor, nombre_curso, fecha_inicio, fecha_fin, nombre_archivo, archivo, fecha_subida) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
+    // Consulta SQL para verificar si ya existe un archivo con los mismos datos
+    const sqlCheck = `
+        SELECT id 
+        FROM archivos_curso_criterios 
+        WHERE jefe_id = ? 
+          AND nombre_instructor = ? 
+          AND apellido_paterno_instructor = ? 
+          AND apellido_materno_instructor = ? 
+          AND curp_instructor = ? 
+          AND nombre_curso = ? 
+          AND fecha_inicio = ? 
+          AND fecha_fin = ?
     `;
-    const values = [
+    const checkValues = [
         jefe_id,
         nombre_instructor,
         apellido_paterno_instructor || null,
@@ -1662,25 +1668,75 @@ app.post('/uploads2', upload.single('archivo'), (req, res) => {
         curp_instructor || null,
         nombre_curso,
         fecha_inicio,
-        fecha_fin,
-        archivo.originalname,
-        archivoData
+        fecha_fin
     ];
 
-    // Ejecutar la consulta
-    connection.query(sqlInsertArchivo, values, (err) => {
+    connection.query(sqlCheck, checkValues, (err, results) => {
         if (err) {
-            console.error('Error al guardar el archivo en la base de datos:', err.message);
-            return res.status(500).json({ error: 'Error al guardar el archivo en la base de datos.' });
+            console.error('Error al comprobar si el archivo existe:', err.message);
+            return res.status(500).json({ error: 'Error al comprobar si el archivo ya existe.' });
         }
 
-        // Eliminar el archivo temporal para liberar espacio
-        fs.unlinkSync(archivo.path);
+        if (results.length > 0) {
+            // Si ya existe, actualizar el archivo
+            const sqlUpdate = `
+                UPDATE archivos_curso_criterios 
+                SET nombre_archivo = ?, archivo = ?, fecha_subida = NOW() 
+                WHERE id = ?
+            `;
+            const updateValues = [
+                archivo.originalname,
+                archivoData,
+                results[0].id
+            ];
 
-        // Respuesta exitosa como JSON
-        res.status(200).json({ message: 'Archivo y datos subidos exitosamente.' });
+            connection.query(sqlUpdate, updateValues, (updateErr) => {
+                if (updateErr) {
+                    console.error('Error al actualizar el archivo en la base de datos:', updateErr.message);
+                    return res.status(500).json({ error: 'Error al actualizar el archivo en la base de datos.' });
+                }
+
+                // Eliminar el archivo temporal
+                fs.unlinkSync(archivo.path);
+
+                res.status(200).json({ message: 'Archivo actualizado exitosamente.' });
+            });
+        } else {
+            // Si no existe, insertar el archivo como nuevo
+            const sqlInsert = `
+                INSERT INTO archivos_curso_criterios
+                (jefe_id, nombre_instructor, apellido_paterno_instructor, apellido_materno_instructor, 
+                 curp_instructor, nombre_curso, fecha_inicio, fecha_fin, nombre_archivo, archivo, fecha_subida) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
+            `;
+            const insertValues = [
+                jefe_id,
+                nombre_instructor,
+                apellido_paterno_instructor || null,
+                apellido_materno_instructor || null,
+                curp_instructor || null,
+                nombre_curso,
+                fecha_inicio,
+                fecha_fin,
+                archivo.originalname,
+                archivoData
+            ];
+
+            connection.query(sqlInsert, insertValues, (insertErr) => {
+                if (insertErr) {
+                    console.error('Error al guardar el archivo en la base de datos:', insertErr.message);
+                    return res.status(500).json({ error: 'Error al guardar el archivo en la base de datos.' });
+                }
+
+                // Eliminar el archivo temporal
+                fs.unlinkSync(archivo.path);
+
+                res.status(200).json({ message: 'Archivo y datos subidos exitosamente.' });
+            });
+        }
     });
 });
+
 
 
 app.get('/asistencias/count/:usuarioId/:cursoId', (req, res) => {
@@ -2677,6 +2733,38 @@ app.put('/cursos/:id/terminar', (req, res) => {
     });
 });
 
+app.get('/criterios-evaluacion', (req, res) => {
+    const { nombreCurso, nombreInstructor, apellidoPaterno, apellidoMaterno } = req.query;
+
+    const query = `
+        SELECT nombre_archivo, archivo
+        FROM archivos_curso_criterios
+        WHERE nombre_curso = ? 
+          AND nombre_instructor = ? 
+          AND apellido_paterno_instructor = ? 
+          AND apellido_materno_instructor = ?`;
+
+    connection.query(query, [nombreCurso, nombreInstructor, apellidoPaterno, apellidoMaterno], (err, results) => {
+        if (err) {
+            console.error('Error en la consulta SQL:', err);
+            res.status(500).send('Error al obtener los criterios de evaluación.');
+            return;
+        }
+
+        if (results.length > 0) {
+            console.log('Archivo encontrado:', results[0].nombre_archivo);
+            const archivo = results[0].archivo;
+            const nombreArchivo = results[0].nombre_archivo;
+
+            res.setHeader('Content-Disposition', `attachment; filename="${nombreArchivo}"`);
+            res.setHeader('Content-Type', 'application/pdf'); // Ajustar según el tipo de archivo
+            res.send(archivo);
+        } else {
+            console.warn('No se encontró el archivo para los criterios dados.');
+            res.status(404).send('Archivo no encontrado.');
+        }
+    });
+});
 
 // Iniciar el servidor en el puerto 3000
 const PORT = 3000;
