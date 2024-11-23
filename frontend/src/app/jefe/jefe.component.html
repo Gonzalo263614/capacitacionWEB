@@ -194,7 +194,7 @@
 <h2 class="section-title">Cursos Pendientes de Revisión</h2>
 <div *ngFor="let curso of cursosPendientes" class="curso-card">
   <h3 class="curso-title">{{ curso.nombre_curso }}</h3>
-  <p><strong> Colocar departamentos Y subir nuevamente criterios, y favor de REVISAR</strong>: {{
+  <p><strong> Subir nuevamente criterios, y favor de REVISAR</strong>: {{
     curso.comentario_revision }}
   </p>
   <button class="boton-encuesta" (click)="abrirFormularioModificar(curso)">Modificar</button>

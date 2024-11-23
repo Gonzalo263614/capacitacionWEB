@@ -103,7 +103,7 @@ export class SubdirectorComponent implements OnInit {
           this.aceptarCurso(cursoId);
         } else {
           // Si el subdirector no ha aprobado, muestra una alerta
-          if (data.orden_subdirector !== 1) {
+          if (data.orden_admin !== 1) {
             alert('Falta que el administrador apruebe el curso.');
           } else {
             console.log('El curso aún no puede ser aceptado.');

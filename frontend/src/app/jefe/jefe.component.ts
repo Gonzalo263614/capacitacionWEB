@@ -75,7 +75,7 @@ export class JefeComponent {
   ];
   departamentosSeleccionados: string[] = [];
   idJefe = 1;  // Por ejemplo, esto podría provenir del sistema de autenticación
-archivoTouched: any;
+  archivoTouched: any;
 
   constructor(private http: HttpClient, private route: ActivatedRoute) {
     this.obtenerCursosPendientes(); // Llamar a la función al iniciar el componente
@@ -94,10 +94,29 @@ archivoTouched: any;
     }
     // Aquí puedes continuar con otras inicializaciones si es necesario
   }
+  obtenerDepartamentosDelCurso(cursoId: number) {
+    this.http.get<string[]>(`http://localhost:3000/curso/${cursoId}/departamentos`).subscribe({
+      next: (departamentos) => {
+        this.departamentosSeleccionados = departamentos;
+        console.log('Departamentos cargados:', departamentos);
+      },
+      error: (err) => {
+        console.error('Error al cargar departamentos:', err);
+      },
+    });
+  }
 
   abrirFormularioModificar(curso: any) {
     this.cursoSeleccionado = curso;
     this.mostrarFormularioModificar = true;
+    // Obtener los departamentos relacionados desde el backend
+    if (curso.id) {
+      this.obtenerDepartamentosDelCurso(curso.id);
+    } else {
+      console.error('El curso no tiene un ID válido.');
+      this.departamentosSeleccionados = [];
+    }
+    console.log('Departamentos seleccionados al abrir formulario:', this.departamentosSeleccionados);
     // Verificar los valores del enfoque y modalidad
     console.log('Enfoque:', curso.enfoque_curso);
     console.log('Modalidad:', curso.modalidad_curso);

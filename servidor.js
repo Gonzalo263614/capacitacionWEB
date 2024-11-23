@@ -2516,26 +2516,6 @@ app.get('/descargar-inscripcion/:id', (req, res) => {
     });
 });
 
-// En tu servidor Express
-app.get('/curso/:cursoId/departamentos', (req, res) => {
-    const cursoId = req.params.cursoId;
-
-    const query = `
-      SELECT d.nombre 
-      FROM departamentos d
-      JOIN departamento_curso dc ON d.id = dc.departamento_id
-      WHERE dc.curso_id = ?
-    `;
-
-    db.query(query, [cursoId], (error, results) => {
-        if (error) {
-            console.error('Error al obtener departamentos:', error);
-            res.status(500).send('Error al obtener departamentos');
-        } else {
-            res.json(results);
-        }
-    });
-});
 app.put('/usuarios/:id/cambiar-contrasena', (req, res) => {
     const { id } = req.params;  // ID del usuario a cambiar la contraseña
     const { nuevaContrasena } = req.body;  // Nueva contraseña enviada desde el frontend
@@ -2773,6 +2753,30 @@ app.get('/criterios-evaluacion', (req, res) => {
             console.warn('No se encontró el archivo para los criterios dados.');
             res.status(404).send('Archivo no encontrado.');
         }
+    });
+});
+
+// Ruta para obtener los departamentos asociados a un curso
+app.get('/curso/:id/departamentos', (req, res) => {
+    const cursoId = req.params.id;
+
+    // Consulta SQL para obtener los departamentos relacionados con un curso
+    const query = `
+        SELECT d.nombre
+        FROM departamentos d
+        JOIN departamento_curso dc ON d.id = dc.departamento_id
+        WHERE dc.curso_id = ?;
+    `;
+
+    connection.query(query, [cursoId], (err, results) => {
+        if (err) {
+            console.error('Error al obtener los departamentos:', err);
+            res.status(500).json({ error: 'Error al obtener los departamentos' });
+            return;
+        }
+
+        // Retornar los nombres de los departamentos
+        res.json(results.map(row => row.nombre));
     });
 });
 
