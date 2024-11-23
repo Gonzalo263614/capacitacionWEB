@@ -16,7 +16,7 @@ const connection = mysql.createConnection({
     host: 'localhost',
     user: 'root',
     password: 'Contraseña2190.', // Usa tu contraseña
-    database: 'capacitacionDB3'
+    database: 'capacitacionDB'
 });
 
 // CONEXION BASE DE DATOS
